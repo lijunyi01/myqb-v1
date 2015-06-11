@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration scan="true" scanPeriod="600 seconds">
+    <contextName>loginapi</contextName>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{32} - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <Encoding>UTF-8</Encoding>
+        <file>/Users/ljy/applog/loginapi/loginapi.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>/Users/ljy/applog/loginapi/loginapi-%d{yyyy-MM-dd}.log</FileNamePattern>
+            <MaxHistory>10</MaxHistory>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+
+    <!--<jmxConfigurator />-->
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+    <!--<logger name="service" level="ALL" additivity="false">-->
+    <!-- 默认 additivity="true"，会将日志传递给根节点<root>，level符合的话就会在控制台和日志文件同时输出-->
+    <!--name 要写完整的包名或类名，否则匹配不上！-->
+    <logger name="myqb.cn" level="ALL" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+</configuration>

@@ -27,13 +27,13 @@ class ApplicationConfig {
     @Bean
 	public static PropertyPlaceholderConfigurer propertyPlaceholderConfigurer() {
 		PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
-        ppc.setLocation(new FileSystemResource("/appconf/s37-rest-jpa/persistence.properties"));        //JPA的标准配置文件
+        ppc.setLocation(new FileSystemResource("/appconf/loginapi/persistence.properties"));        //JPA的标准配置文件
 		return ppc;
 	}
 
     @Bean
     public static JoranConfigurator readLogbackPropertyFile(){
-        File logbackFile = new File("/appconf/s37-rest-jpa/logback.xml");
+        File logbackFile = new File("/appconf/loginapi/logback.xml");
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
         JoranConfigurator configurator = new JoranConfigurator();
         configurator.setContext(lc);
