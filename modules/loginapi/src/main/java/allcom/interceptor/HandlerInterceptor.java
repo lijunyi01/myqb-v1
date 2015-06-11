@@ -24,10 +24,12 @@ public class HandlerInterceptor extends HandlerInterceptorAdapter {
         String clientip = request.getRemoteAddr();
         System.out.print("client ip is:"+ clientip);
         if(clientip.equals("127.0.0.1")){
-            ret = true;
+            ret = false;
             response.sendRedirect("/errorpage");
         }
-
+        else{
+            ret = true;
+        }
         return ret;
     }
 

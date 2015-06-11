@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 /**
  * Created by ljy on 15/5/12.
  * class 上的@RequestMapping("/aaa")注释和方法上的@RequestMapping("/greeting")要叠加
@@ -18,16 +16,16 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 
 @RestController
-public class TestController {
+public class LoginController {
 
     @Autowired
     private AccountService accountService;
 
-    private static Logger log = LoggerFactory.getLogger(TestController
+    private static Logger log = LoggerFactory.getLogger(LoginController
             .class);
 
-    //  客户端访问URL    http://localhost:8080/login?username=ljy&password=sdf
-    @RequestMapping(value = "/testlogin")
+    //  客户端访问URL    http://localhost:8080/service/login?username=ljy&password=sdf
+    @RequestMapping(value = "/service/login")
     public RetMessage loginAuth(@RequestParam(value="username") String username,@RequestParam(value="password") String password) {
         String errorCode="-1";
         String errorMessage="失败";
@@ -42,20 +40,15 @@ public class TestController {
         return new RetMessage(errorCode,errorMessage,retContent);
     }
 
-    // 测试用，客户端访问URL    http://localhost:8080/createuser?username=ljy&password=sdf
-    @RequestMapping(value = "/createuser")
-    public RetMessage createUser(@RequestParam(value="username") String username,@RequestParam(value="password") String password) {
-        String errorCode="-1";
-        String errorMessage="失败";
-        String retContent="";
+    @RequestMapping(value = "/errorpage")
+    public String getError(){
+        return "error page!!!";
+    }
 
-        log.info("createUser,username is:"+username +" and password is:"+password);
-        //AccountService accountService = new AccountService();
-        if(accountService.createAccount(username,password)){
-            errorCode="0";
-            errorMessage="成功";
-        }
-        return new RetMessage(errorCode,errorMessage,retContent);
+
+    @RequestMapping(value = "/")
+    public String getHome(){
+        return "home page!!!";
     }
 
 }
