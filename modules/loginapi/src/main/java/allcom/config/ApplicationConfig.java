@@ -1,7 +1,6 @@
-package myqb.cn.config;
+package allcom.config;
 
-import static org.springframework.context.annotation.ComponentScan.Filter;
-
+import allcom.App;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
@@ -12,9 +11,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.stereotype.Controller;
-
-import myqb.cn.App;
 
 import java.io.File;
 
@@ -23,7 +19,7 @@ import java.io.File;
 并通过在方法上标注@Bean注解的方式注入bean。
 */
 @Configuration
-@ComponentScan(basePackageClasses = App.class, excludeFilters = @Filter({Controller.class, Configuration.class}))
+@ComponentScan(basePackageClasses = App.class)
 class ApplicationConfig {
 
     //在标注了@Configuration的java类中，通过在类方法标注@Bean定义一个Bean。方法必须提供Bean的实例化逻辑。
@@ -31,14 +27,13 @@ class ApplicationConfig {
     @Bean
 	public static PropertyPlaceholderConfigurer propertyPlaceholderConfigurer() {
 		PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
-		//ppc.setLocation(new ClassPathResource("/persistence.properties"));
-        ppc.setLocation(new FileSystemResource("/appconf/loginapi/persistence.properties"));   //应用配置文件，含JPA的配置文件
+        ppc.setLocation(new FileSystemResource("/appconf/s37-rest-jpa/persistence.properties"));        //JPA的标准配置文件
 		return ppc;
 	}
 
     @Bean
     public static JoranConfigurator readLogbackPropertyFile(){
-        File logbackFile = new File("/appconf/loginapi/logback.xml");
+        File logbackFile = new File("/appconf/s37-rest-jpa/logback.xml");
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
         JoranConfigurator configurator = new JoranConfigurator();
         configurator.setContext(lc);
@@ -53,23 +48,10 @@ class ApplicationConfig {
         return configurator;
 
     }
-//    //从程序外部读取logbak的配置文件
-//    private static void readLogbackPropertyFile1(){
-//        File logbackFile = new File("/appconf/processmonitor/logback.xml");
-//        if (logbackFile.exists()) {
-//            LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-//            JoranConfigurator configurator = new JoranConfigurator();
-//            configurator.setContext(lc);
-//            lc.reset();
-//            try {
-//                configurator.doConfigure(logbackFile);
-//            }
-//            catch (JoranException e) {
-//                e.printStackTrace(System.err);
-//                System.exit(-1);
-//            }
-//        }
-//
-//    }1
+
+//    @Bean
+//    public PasswordEncoder passwordEncoder() {
+//        return new StandardPasswordEncoder();
+//    }
 	
 }

@@ -1,4 +1,4 @@
-package myqb.cn.controller;
+package allcom.controller;
 
 /**
  * Created by ljy on 15/5/12.

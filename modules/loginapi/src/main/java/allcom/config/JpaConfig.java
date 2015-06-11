@@ -1,9 +1,6 @@
-package myqb.cn.config;
+package allcom.config;
 
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
+import allcom.App;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,11 +14,12 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.TransactionManagementConfigurer;
 
-import myqb.cn.App;
+import javax.sql.DataSource;
+import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackageClasses = App.class,entityManagerFactoryRef = "entityManagerFactory")
+@EnableJpaRepositories(basePackageClasses = App.class,transactionManagerRef = "transactionManager",entityManagerFactoryRef = "entityManagerFactory")
 class JpaConfig implements TransactionManagementConfigurer {
 
     @Value("${dataSource.driverClassName}")
@@ -63,6 +61,7 @@ class JpaConfig implements TransactionManagementConfigurer {
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
         config.addDataSourceProperty("useServerPrepStmts", "true");
+        //config.setAutoCommit(true);
 
         return new HikariDataSource(config);
     }
@@ -82,7 +81,7 @@ class JpaConfig implements TransactionManagementConfigurer {
         return entityManagerFactoryBean;
     }
 
-    @Bean
+    @Bean(name = "transactionManager")
     public PlatformTransactionManager annotationDrivenTransactionManager() {
         return new JpaTransactionManager();
     }
