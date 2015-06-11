@@ -16,7 +16,7 @@
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <FileNamePattern>/Users/ljy/applog/loginapi/loginapi-%d{yyyy-MM-dd}.log</FileNamePattern>
-            <MaxHistory>10</MaxHistory>
+            <MaxHistory>15</MaxHistory>
         </rollingPolicy>
 
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
