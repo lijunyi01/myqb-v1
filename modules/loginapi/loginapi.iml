@@ -18,11 +18,10 @@
     <facet type="Spring" name="Spring">
       <configuration>
         <fileset id="fileset" name="Spring Application Context" removed="false">
-          <file>file://$MODULE_DIR$/src/main/java/myqb/cn/config/ApplicationConfig.java</file>
-          <file>file://$MODULE_DIR$/src/main/java/myqb/cn/config/InterceptorsConfig.java</file>
-          <file>file://$MODULE_DIR$/src/main/java/myqb/cn/config/JpaConfig.java</file>
-          <file>file://$MODULE_DIR$/src/main/java/myqb/cn/config/WebMvcConfig.java</file>
           <file>file://$MODULE_DIR$/src/main/resources/interceptors.xml</file>
+          <file>file://$MODULE_DIR$/src/main/java/allcom/config/ApplicationConfig.java</file>
+          <file>file://$MODULE_DIR$/src/main/java/allcom/config/InterceptorsConfig.java</file>
+          <file>file://$MODULE_DIR$/src/main/java/allcom/config/JpaConfig.java</file>
         </fileset>
       </configuration>
     </facet>
