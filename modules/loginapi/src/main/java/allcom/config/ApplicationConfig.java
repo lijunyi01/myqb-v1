@@ -5,12 +5,15 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
 
 import java.io.File;
 
@@ -21,6 +24,9 @@ import java.io.File;
 @Configuration
 @ComponentScan(basePackageClasses = App.class)
 class ApplicationConfig {
+
+    @Value("${passwordencoder.key}")
+    private String encodekey;
 
     //在标注了@Configuration的java类中，通过在类方法标注@Bean定义一个Bean。方法必须提供Bean的实例化逻辑。
     //通过@Bean的name属性可以定义Bean的名称，未指定时默认名称为方法名。
@@ -49,9 +55,9 @@ class ApplicationConfig {
 
     }
 
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return new StandardPasswordEncoder();
-//    }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new StandardPasswordEncoder(encodekey);
+    }
 	
 }

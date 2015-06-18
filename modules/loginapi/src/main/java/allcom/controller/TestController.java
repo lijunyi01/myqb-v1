@@ -42,16 +42,21 @@ public class TestController {
         return new RetMessage(errorCode,errorMessage,retContent);
     }
 
-    // 测试用，客户端访问URL    http://localhost:8080/createuser?username=ljy&password=sdf
+    // 测试用，客户端访问URL    http://localhost:8080/createuser?username=ljy&password=sdf&site=192.168.0.88
     @RequestMapping(value = "/createuser")
-    public RetMessage createUser(@RequestParam(value="username") String username,@RequestParam(value="password") String password) {
+    public RetMessage createUser(
+            @RequestParam(value="username") String username,
+            @RequestParam(value="password") String password,
+            @RequestParam(value="role",required = false,defaultValue = "ROLE_USER") String role,
+            @RequestParam(value="site") String site
+    ) {
         String errorCode="-1";
         String errorMessage="失败";
         String retContent="";
 
         log.info("createUser,username is:"+username +" and password is:"+password);
         //AccountService accountService = new AccountService();
-        if(accountService.createAccount(username,password)){
+        if(accountService.createAccount(username,password,role,site)){
             errorCode="0";
             errorMessage="成功";
         }

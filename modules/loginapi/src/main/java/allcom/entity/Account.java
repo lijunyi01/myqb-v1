@@ -13,11 +13,6 @@ public class Account implements java.io.Serializable {
 
     //public static final String FIND_BY_EMAIL = "Account.findByEmail";
 
-//    @Id
-//    @GeneratedValue
-//    private int id;
-
-//    @Column(unique = true)
     @Id
     private String userName;
 
@@ -25,32 +20,23 @@ public class Account implements java.io.Serializable {
     private String password;
 
     private String role = "ROLE_USER";
+    private String site = "";
 
     protected Account() {
 
     }
 
-    public Account(String userName, String password, String role) {
+    public Account(String userName, String password, String role,String site) {
         this.userName = userName;
         this.password = password;
         this.role = role;
+        this.site = site;
     }
 
     public String getId(){
         return this.userName;
     }
 
-//    public int getId() {
-//        return this.id;
-//    }
-
-//    public String getUserName() {
-//        return this.userName;
-//    }
-//
-//    public void setUserName(String username) {
-//        this.userName = userName;
-//    }
 
 
     public String getPassword() {
@@ -68,4 +54,8 @@ public class Account implements java.io.Serializable {
     public void setRole(String role) {
         this.role = role;
     }
+
+    public String getSite() {return this.site;}
+
+    public void setSite(String site) { this.site = site;}
 }

@@ -24,20 +24,14 @@ public class LoginController {
     private static Logger log = LoggerFactory.getLogger(LoginController
             .class);
 
-    //  客户端访问URL    http://localhost:8080/service/login?username=ljy&password=sdf
-    @RequestMapping(value = "/service/login")
+    //  客户端访问URL    http://localhost:8080/login?username=ljy&password=sdf
+    @RequestMapping(value = "/login")
     public RetMessage loginAuth(@RequestParam(value="username") String username,@RequestParam(value="password") String password) {
-        String errorCode="-1";
-        String errorMessage="失败";
-        String retContent="";
 
+        RetMessage ret = null;
         log.info("userlogin,username is:"+username +" and password is:"+password);
-
-        if(accountService.auth(username,password)) {
-            errorCode = "0";
-            errorMessage = "成功";
-        }
-        return new RetMessage(errorCode,errorMessage,retContent);
+        ret = accountService.auth2(username,password);
+        return ret;
     }
 
     @RequestMapping(value = "/errorpage")
