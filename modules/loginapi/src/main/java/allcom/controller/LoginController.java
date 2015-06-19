@@ -4,6 +4,7 @@ import allcom.service.AccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.NamedThreadLocal;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,16 +22,22 @@ public class LoginController {
     @Autowired
     private AccountService accountService;
 
-    private static Logger log = LoggerFactory.getLogger(LoginController
-            .class);
+    private static Logger log = LoggerFactory.getLogger(LoginController.class);
 
     //  客户端访问URL    http://localhost:8080/login?username=ljy&password=sdf
     @RequestMapping(value = "/login")
-    public RetMessage loginAuth(@RequestParam(value="username") String username,@RequestParam(value="password") String password) {
+    public RetMessage loginAuth(
+            @RequestParam(value="username") String username,
+            @RequestParam(value="password") String password,
+            @RequestParam(value = "devicetype",required = false,defaultValue = "web") String devicetype,
+            @RequestParam(value = "deviceinfo",required = false,defaultValue = "")String deviceinfo,
+            @RequestParam(value = "ip",required = false,defaultValue = "")String ip
+    ) {
 
         RetMessage ret = null;
-        log.info("userlogin,username is:"+username +" and password is:"+password);
+        log.info("userlogin,username is:"+username +" and password is:"+password + " and ip is:"+ip);
         ret = accountService.auth2(username,password);
+        accountService.recordLogin(username,ip,ret.getErrorCode());
         return ret;
     }
 
@@ -44,5 +51,6 @@ public class LoginController {
     public String getHome(){
         return "home page!!!";
     }
+
 
 }

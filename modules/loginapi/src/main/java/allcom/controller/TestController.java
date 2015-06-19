@@ -23,8 +23,7 @@ public class TestController {
     @Autowired
     private AccountService accountService;
 
-    private static Logger log = LoggerFactory.getLogger(TestController
-            .class);
+    private static Logger log = LoggerFactory.getLogger(TestController.class);
 
     //  客户端访问URL    http://localhost:8080/login?username=ljy&password=sdf
     @RequestMapping(value = "/testlogin")

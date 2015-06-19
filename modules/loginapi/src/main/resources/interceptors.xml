@@ -15,5 +15,10 @@ http://www.springframework.org/schema/context                http://www.springfr
             <!-- 定义在mvc:interceptor下面的表示是对特定的请求才进行拦截的 -->
             <bean class="allcom.interceptor.HandlerInterceptor"/>
         </mvc:interceptor>
+        <!--<mvc:interceptor>-->
+            <!--<mvc:mapping path="/login"/>-->
+            <!--&lt;!&ndash; 定义在mvc:interceptor下面的表示是对特定的请求才进行拦截的 &ndash;&gt;-->
+            <!--<bean class="allcom.interceptor.LoginInterceptor"/>-->
+        <!--</mvc:interceptor>-->
     </mvc:interceptors>
 </beans>

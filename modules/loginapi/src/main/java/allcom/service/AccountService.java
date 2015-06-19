@@ -1,15 +1,19 @@
 package allcom.service;
 
-import allcom.App;
 import allcom.controller.RetMessage;
-import allcom.dao.AccountRepository;
+import allcom.dao.*;
 import allcom.entity.Account;
+import allcom.entity.AccountSession;
+import allcom.entity.LoginHistory;
+import allcom.toolkit.GlobalTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
 
 /**
  * Created by ljy on 15/6/10.
@@ -19,8 +23,15 @@ import org.springframework.stereotype.Service;
 public class AccountService {
     private static Logger log = LoggerFactory.getLogger(AccountService.class);
 
+    @Value("${session.timeout}")
+    private long sessionTimeout;
+
     @Autowired
     private  AccountRepository accountRepository;
+    @Autowired
+    private AccountSessionRepository accountSessionRepository;
+    @Autowired
+    private LoginHistoryRepository loginHistoryRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -59,7 +70,7 @@ public class AccountService {
                 ret.setErrorCode("0");
                 ret.setErrorMessage("auth success");
                 //生成sessionid
-                String sessionid = "sessionid";
+                String sessionid = getSessionId(userName);
                 retContent = sessionid + "<{DATA}>" +account.getSite();
                 ret.setRetContent(retContent);
             } else {
@@ -69,6 +80,42 @@ public class AccountService {
             }
         }
         return ret;
+    }
+
+    private String getSessionId(String userName){
+        String ret="";
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        //log.info("username:"+userName+" and timestamp now:" + currentTime);
+        AccountSession accountSession = accountSessionRepository.findOne(userName);
+        if(accountSession !=null){
+            //log.info("username:"+userName+" and timestamp:" + accountSession.getTimestamp());
+            long timediff = GlobalTools.getTimeDifference(currentTime,accountSession.getTimestamp());
+            if(timediff<sessionTimeout){
+                ret = accountSession.getSessionId();
+            }else{
+                ret = GlobalTools.getRandomString(16);
+            }
+            accountSession.setSessionId(ret);
+            accountSession.setTimestamp(currentTime);
+            //更新表里的sessionid和最后使用时间
+            //accountSessionRepository.delete(userName);
+            accountSessionRepository.save(accountSession);
+
+        }else{
+            ret = GlobalTools.getRandomString(16);
+            accountSessionRepository.save(new AccountSession(userName,ret,currentTime));
+        }
+
+
+        return ret;
+    }
+
+    public void recordLogin(String userName,String ip,String errorCode){
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        LoginHistory loginHistory = new LoginHistory(userName,currentTime);
+        loginHistory.setIp(ip);
+        loginHistory.setErrorCode(errorCode);
+        loginHistoryRepository.save(loginHistory);
     }
 
 
