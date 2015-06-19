@@ -37,7 +37,7 @@ public class LoginController {
         RetMessage ret = null;
         log.info("userlogin,username is:"+username +" and password is:"+password + " and ip is:"+ip);
         ret = accountService.auth2(username,password);
-        accountService.recordLogin(username,ip,ret.getErrorCode());
+        accountService.recordLogin(username,ip,ret.getErrorCode(),devicetype,deviceinfo);
         return ret;
     }
 

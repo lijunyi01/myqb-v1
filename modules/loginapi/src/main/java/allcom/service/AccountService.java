@@ -110,11 +110,13 @@ public class AccountService {
         return ret;
     }
 
-    public void recordLogin(String userName,String ip,String errorCode){
+    public void recordLogin(String userName,String ip,String errorCode,String deviceType,String deviceInfo){
         Timestamp currentTime = new Timestamp(System.currentTimeMillis());
         LoginHistory loginHistory = new LoginHistory(userName,currentTime);
         loginHistory.setIp(ip);
         loginHistory.setErrorCode(errorCode);
+        loginHistory.setDeviceType(deviceType);
+        loginHistory.setDeviceInfo(deviceInfo);
         loginHistoryRepository.save(loginHistory);
     }
 

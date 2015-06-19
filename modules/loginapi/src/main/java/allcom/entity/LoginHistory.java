@@ -19,14 +19,12 @@ public class LoginHistory implements java.io.Serializable {
     @Id
     @GeneratedValue
     private long id;
-
     private String userName;
-
     private String ip;
-
     private Timestamp loginTime;
-
     private String errorCode;
+    private String deviceType;
+    private String deviceInfo;
 
     protected LoginHistory() {
     }
@@ -58,5 +56,11 @@ public class LoginHistory implements java.io.Serializable {
 
     public String getErrorCode() { return this.errorCode; }
     public void setErrorCode(String errorCode) { this.errorCode = errorCode;}
+
+    public String getDeviceType(){ return this.deviceType; }
+    public void setDeviceType(String deviceType){ this.deviceType = deviceType; }
+
+    public String getDeviceInfo(){ return this.deviceInfo; }
+    public void setDeviceInfo(String deviceInfo){ this.deviceInfo = deviceInfo; }
 
 }
