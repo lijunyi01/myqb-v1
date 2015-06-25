@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 
 @SuppressWarnings("serial")
 @Entity
-@Table(name = "accountsession")
+@Table(name = "myqbauth_accountsession")
 //@NamedQuery(name = Account.FIND_BY_EMAIL, query = "select a from Account a where a.email = :email")
 public class AccountSession implements java.io.Serializable {
 

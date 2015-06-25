@@ -119,6 +119,4 @@ public class AccountService {
         loginHistory.setDeviceInfo(deviceInfo);
         loginHistoryRepository.save(loginHistory);
     }
-
-
 }

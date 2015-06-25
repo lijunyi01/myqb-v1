@@ -39,18 +39,19 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.33</version>
         </dependency>
+        <!--连oracle用,已导入本地库-->
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc</artifactId>
+            <version>14</version>
+        </dependency>
         <!--HikariCP 是一个高性能的 JDBC 连接池组件-->
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>2.3.8</version>
         </dependency>
-        <!--jpa entity index相关-->
-        <!--<dependency>-->
-            <!--<groupId>javax.jdo</groupId>-->
-            <!--<artifactId>jdo2-api</artifactId>-->
-            <!--<version>2.3-eb</version>-->
-        <!--</dependency>-->
+
 
         <dependency>
             <groupId>org.apache.tomcat</groupId>
@@ -64,6 +65,13 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
             <version>3.2.5.RELEASE</version>
+        </dependency>
+
+        <!--图片验证码-->
+        <dependency>
+            <groupId>com.github.bingoohuang</groupId>
+            <artifactId>patchca</artifactId>
+            <version>0.0.1</version>
         </dependency>
 
     </dependencies>

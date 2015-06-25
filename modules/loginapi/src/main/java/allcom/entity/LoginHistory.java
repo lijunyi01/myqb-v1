@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @SuppressWarnings("serial")
 @Entity
 //@Table(name = "login_history",indexes = {@Index(name = "i_1",columnList = "userName"),@Index(name = "i_2",columnList = "loginTime")})
-@Table(name = "login_history",indexes = {@Index(name = "i_3",columnList = "userName,loginTime",unique = false)})
+@Table(name = "myqbauth_login_history",indexes = {@Index(name = "i_3",columnList = "userName,loginTime",unique = false)})
 //@NamedQuery(name = Account.FIND_BY_EMAIL, query = "select a from Account a where a.email = :email")
 public class LoginHistory implements java.io.Serializable {
 
