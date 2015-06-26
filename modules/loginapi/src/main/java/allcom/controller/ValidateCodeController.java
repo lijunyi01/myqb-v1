@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -53,6 +55,7 @@ public class ValidateCodeController {
         cs.setWordFactory(wf);
     }
 
+//    图片验证码获取接口（输出图片流）
     @RequestMapping(value = "/validatecode")
     public void validateCode(HttpServletRequest request, HttpServletResponse response) {
 
@@ -100,5 +103,37 @@ public class ValidateCodeController {
         response.setDateHeader("Date", time);
         response.setDateHeader("Expires", time);
     }
+
+//    图片验证码验证接口
+    @RequestMapping(value = "/vcodeverify")
+    @ResponseBody
+    public RetMessage vcodeVerify(
+            @RequestParam(value = "vcode",required = true,defaultValue = "")String vcode,
+            HttpServletRequest request
+    ) {
+
+        RetMessage ret = new RetMessage();
+        String vcodetmp = vcode.toLowerCase();
+
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            session = request.getSession();
+        }
+        String vcodeInSession = (String)session.getAttribute("captchaToken");
+        String sessionId = session.getId();
+
+        if (vcodetmp.equals(vcodeInSession.toLowerCase())){
+            ret.setErrorCode("0");
+            ret.setErrorMessage("vcode verify success");
+            log.info("vcodeVerify success,sessionId is:"+ sessionId +" and vcode in session is:"+vcodeInSession + " and vcode in request is:"+vcode);
+        }else{
+            ret.setErrorCode("-2");
+            ret.setErrorMessage("vcode verify failed");
+            log.info("vcodeVerify failed,sessionId is:"+ sessionId +" and vcode in session is:"+vcodeInSession + " and vcode in request is:"+vcode);
+        }
+
+        return ret;
+    }
+
 
 }
