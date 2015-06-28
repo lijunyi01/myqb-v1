@@ -97,7 +97,7 @@ public class AccountService {
             if(timediff<sessionTimeout){
                 ret = accountSession.getSessionId();
             }else{
-                ret = GlobalTools.getRandomString(16);
+                ret = GlobalTools.getRandomString(16,false);
             }
             accountSession.setSessionId(ret);
             accountSession.setTimestamp(currentTime);
@@ -106,7 +106,7 @@ public class AccountService {
             accountSessionRepository.save(accountSession);
 
         }else{
-            ret = GlobalTools.getRandomString(16);
+            ret = GlobalTools.getRandomString(16,false);
             accountSessionRepository.save(new AccountSession(userName,ret,currentTime));
         }
 

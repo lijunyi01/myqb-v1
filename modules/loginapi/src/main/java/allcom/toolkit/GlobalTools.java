@@ -1,6 +1,5 @@
 package allcom.toolkit;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
 import java.sql.Timestamp;
@@ -8,8 +7,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Random;
-
-import static java.lang.Thread.sleep;
 
 /**
  * Created by ljy on 15/6/18.
@@ -21,8 +18,13 @@ public class GlobalTools {
 
 
 //    生成随机字符串
-    public static String getRandomString(int length) { //length表示生成字符串的长度
-        String base = "abcdefghijklmnopqrstuvwxyz0123456789";
+    public static String getRandomString(int length,boolean numberflag) { //length表示生成字符串的长度;numberflag表示是否纯数字
+        String base = "";
+        if(numberflag){
+            base = "0123456789";
+        }else {
+            base = "abcdefghijklmnopqrstuvwxyz0123456789";
+        }
         Random random = new Random();
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < length; i++) {
@@ -103,7 +105,7 @@ public class GlobalTools {
 
     public static void main(String[] args){
 //        1.测试随机串
-//        String rs = GlobalTools.getRandomString(16);
+//        String rs = GlobalTools.getRandomString(6,true);
 //        System.out.print("测试随机串:"+rs);
 
 //        2.测试时间差
@@ -127,8 +129,9 @@ public class GlobalTools {
 //        String ip = "192.168.0.112";
 //        System.out.print(getIpSegment(ip));
 
-        String s = getMessageByLocale("cn","-2");
-        System.out.print(s);
+//        测试通过错误码获取错误信息
+//        String s = getMessageByLocale("cn","-2");
+//        System.out.print(s);
 
 
 

@@ -131,6 +131,8 @@ public class ValidateCodeController {
         if (vcodetmp.equals(vcodeInSession.toLowerCase())){
             ret.setErrorCode("0");
             ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"0"));
+            //设置图片验证码校验成功标志
+            session.setAttribute("vcodeverifyflag", "success");
             log.info("vcodeVerify success,sessionId is:"+ sessionId +" and vcode in session is:"+vcodeInSession + " and vcode in request is:"+vcode);
         }else{
             ret.setErrorCode("-2");
