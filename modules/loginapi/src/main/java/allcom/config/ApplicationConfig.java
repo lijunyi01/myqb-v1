@@ -10,6 +10,7 @@ import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -58,6 +59,13 @@ class ApplicationConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new StandardPasswordEncoder(encodekey);
+    }
+
+    @Bean
+    public ResourceBundleMessageSource resourceBundleMessageSource(){
+        ResourceBundleMessageSource resourceBundleMessageSource = new ResourceBundleMessageSource();
+        resourceBundleMessageSource.setBasename("resource");
+        return resourceBundleMessageSource;
     }
 	
 }

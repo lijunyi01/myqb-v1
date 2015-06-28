@@ -37,7 +37,7 @@
     <!--<logger name="service" level="ALL" additivity="false">-->
     <!-- 默认 additivity="true"，会将日志传递给根节点<root>，level符合的话就会在控制台和日志文件同时输出-->
     <!--name 要写完整的包名或类名，否则匹配不上！-->
-    <logger name="myqb.cn" level="ALL" additivity="false">
+    <logger name="allcom" level="ALL" additivity="false">
         <appender-ref ref="FILE" />
     </logger>
 </configuration>

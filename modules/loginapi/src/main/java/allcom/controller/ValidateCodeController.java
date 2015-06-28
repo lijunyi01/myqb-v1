@@ -7,6 +7,8 @@ import com.github.bingoohuang.patchca.utils.encoder.EncoderHelper;
 import com.github.bingoohuang.patchca.word.RandomWordFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.awt.*;
 import java.io.*;
+import java.util.Locale;
 import java.util.Random;
 
 /**
@@ -30,6 +33,8 @@ public class ValidateCodeController {
     private static Logger log = LoggerFactory.getLogger(ValidateCodeController.class);
     private static ConfigurableCaptchaService cs = new ConfigurableCaptchaService();
     private static Random random = new Random();
+    @Autowired
+    private ResourceBundleMessageSource mySource;
 
     static {
 //        cs.setColorFactory(new SingleColorFactory(new Color(25, 60, 170)));
@@ -109,8 +114,16 @@ public class ValidateCodeController {
     @ResponseBody
     public RetMessage vcodeVerify(
             @RequestParam(value = "vcode",required = true,defaultValue = "")String vcode,
+            @RequestParam(value = "area",required = false,defaultValue = "cn")String area,
             HttpServletRequest request
     ) {
+        Object[] params = {""};
+        Locale locale = null;
+        if(area.equals("en")){
+            locale = Locale.US;
+        }else{
+            locale = Locale.CHINA;
+        }
 
         RetMessage ret = new RetMessage();
         String vcodetmp = vcode.toLowerCase();
@@ -120,6 +133,9 @@ public class ValidateCodeController {
             session = request.getSession();
         }
         String vcodeInSession = (String)session.getAttribute("captchaToken");
+        if(vcodeInSession == null){
+            vcodeInSession = "";
+        }
         String sessionId = session.getId();
 
         if (vcodetmp.equals(vcodeInSession.toLowerCase())){
@@ -128,7 +144,7 @@ public class ValidateCodeController {
             log.info("vcodeVerify success,sessionId is:"+ sessionId +" and vcode in session is:"+vcodeInSession + " and vcode in request is:"+vcode);
         }else{
             ret.setErrorCode("-2");
-            ret.setErrorMessage("vcode verify failed");
+            ret.setErrorMessage(mySource.getMessage("-2",params,locale));
             log.info("vcodeVerify failed,sessionId is:"+ sessionId +" and vcode in session is:"+vcodeInSession + " and vcode in request is:"+vcode);
         }
 

@@ -66,6 +66,19 @@ public class GlobalTools {
         return (t1-t2)/1000;
     }
 
+//    获取ip前三段;对于ipv6，就是去除最后一段，分隔符是：
+    public static String getIpSegment(String ip){
+        String ret="";
+        if(ip.indexOf(".")>0) {
+            ret = ip.substring(0, ip.lastIndexOf("."));
+        }else if(ip.indexOf(":")>0){
+            ret = ip.substring(0,ip.lastIndexOf(":"));
+        }else{
+            ret = ip;
+        }
+        return  ret;
+    }
+
     public static void main(String[] args){
 //        1.测试随机串
 //        String rs = GlobalTools.getRandomString(16);
@@ -87,6 +100,10 @@ public class GlobalTools {
 //        System.out.print("timestamp diff:");
 //
 //        System.out.println(getTimeDifference(currentTime2, currentTime));
+
+//        测试获取ip前三段
+        String ip = "192.168.0.112";
+        System.out.print(getIpSegment(ip));
 
 
 

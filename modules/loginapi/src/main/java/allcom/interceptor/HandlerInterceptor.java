@@ -1,5 +1,10 @@
 package allcom.interceptor;
 
+import allcom.dao.IpBlackListRepository;
+import allcom.toolkit.GlobalTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -11,6 +16,11 @@ import javax.servlet.http.HttpServletResponse;
  * ok
  */
 public class HandlerInterceptor extends HandlerInterceptorAdapter {
+
+    private static Logger log = LoggerFactory.getLogger(HandlerInterceptor.class);
+
+    @Autowired
+    private IpBlackListRepository ipBlackListRepository;
     /**
      * preHandle方法是进行处理器拦截用的，顾名思义，该方法将在Controller处理之前进行调用，SpringMVC中的Interceptor拦截器是链式的，可以同时存在
      * 多个Interceptor，然后SpringMVC会根据声明的前后顺序一个接一个的执行，而且所有的Interceptor中的preHandle方法都会在
@@ -19,15 +29,16 @@ public class HandlerInterceptor extends HandlerInterceptorAdapter {
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+//        判断ip是否在黑名单
         boolean ret = false;
-        System.out.println("===========HandlerInterceptor preHandle");
-        String clientip = request.getRemoteAddr();
-        System.out.print("client ip is:"+ clientip);
-        if(clientip.equals("127.0.0.1")){
+        String clientip = request.getRemoteAddr();    //ipv6:   00:00:99:000:99
+        String clientip2 = GlobalTools.getIpSegment(clientip);
+        log.info("clientip:" + clientip);
+        if (ipBlackListRepository.exists(clientip) || ipBlackListRepository.exists(clientip2)) {
             ret = false;
-            response.sendRedirect("/errorpage");
-        }
-        else{
+//            response.sendRedirect("/errorpage");
+            log.info("ip intercepted:" + clientip);
+        } else {
             ret = true;
         }
         return ret;
@@ -42,7 +53,7 @@ public class HandlerInterceptor extends HandlerInterceptorAdapter {
      */
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        System.out.println("===========HandlerInterceptor postHandle");
+//        System.out.println("===========HandlerInterceptor postHandle");
     }
 
     /**
@@ -51,6 +62,6 @@ public class HandlerInterceptor extends HandlerInterceptorAdapter {
      */
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        System.out.println("===========HandlerInterceptor afterCompletion");
+//        System.out.println("===========HandlerInterceptor afterCompletion");
     }
 }
