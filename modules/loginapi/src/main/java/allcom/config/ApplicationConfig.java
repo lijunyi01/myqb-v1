@@ -61,11 +61,11 @@ class ApplicationConfig {
         return new StandardPasswordEncoder(encodekey);
     }
 
-    @Bean
-    public ResourceBundleMessageSource resourceBundleMessageSource(){
-        ResourceBundleMessageSource resourceBundleMessageSource = new ResourceBundleMessageSource();
-        resourceBundleMessageSource.setBasename("resource");
-        return resourceBundleMessageSource;
-    }
+//    @Bean
+//    public ResourceBundleMessageSource resourceBundleMessageSource(){
+//        ResourceBundleMessageSource resourceBundleMessageSource = new ResourceBundleMessageSource();
+//        resourceBundleMessageSource.setBasename("resource");
+//        return resourceBundleMessageSource;
+//    }
 	
 }

@@ -1,5 +1,6 @@
 package allcom.controller;
 
+import allcom.toolkit.GlobalTools;
 import com.github.bingoohuang.patchca.color.ColorFactory;
 import com.github.bingoohuang.patchca.custom.ConfigurableCaptchaService;
 import com.github.bingoohuang.patchca.filter.predefined.*;
@@ -7,8 +8,6 @@ import com.github.bingoohuang.patchca.utils.encoder.EncoderHelper;
 import com.github.bingoohuang.patchca.word.RandomWordFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,8 +32,6 @@ public class ValidateCodeController {
     private static Logger log = LoggerFactory.getLogger(ValidateCodeController.class);
     private static ConfigurableCaptchaService cs = new ConfigurableCaptchaService();
     private static Random random = new Random();
-    @Autowired
-    private ResourceBundleMessageSource mySource;
 
     static {
 //        cs.setColorFactory(new SingleColorFactory(new Color(25, 60, 170)));
@@ -117,13 +114,6 @@ public class ValidateCodeController {
             @RequestParam(value = "area",required = false,defaultValue = "cn")String area,
             HttpServletRequest request
     ) {
-        Object[] params = {""};
-        Locale locale = null;
-        if(area.equals("en")){
-            locale = Locale.US;
-        }else{
-            locale = Locale.CHINA;
-        }
 
         RetMessage ret = new RetMessage();
         String vcodetmp = vcode.toLowerCase();
@@ -140,12 +130,12 @@ public class ValidateCodeController {
 
         if (vcodetmp.equals(vcodeInSession.toLowerCase())){
             ret.setErrorCode("0");
-            ret.setErrorMessage("vcode verify success");
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"0"));
             log.info("vcodeVerify success,sessionId is:"+ sessionId +" and vcode in session is:"+vcodeInSession + " and vcode in request is:"+vcode);
         }else{
             ret.setErrorCode("-2");
-            ret.setErrorMessage(mySource.getMessage("-2",params,locale));
-            log.info("vcodeVerify failed,sessionId is:"+ sessionId +" and vcode in session is:"+vcodeInSession + " and vcode in request is:"+vcode);
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "-2"));
+            log.info("vcodeVerify failed,sessionId is:" + sessionId + " and vcode in session is:" + vcodeInSession + " and vcode in request is:" + vcode);
         }
 
         return ret;

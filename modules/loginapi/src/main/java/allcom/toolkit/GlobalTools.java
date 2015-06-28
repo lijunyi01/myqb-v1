@@ -1,5 +1,8 @@
 package allcom.toolkit;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.ResourceBundleMessageSource;
+
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,6 +16,9 @@ import static java.lang.Thread.sleep;
  * ok
  */
 public class GlobalTools {
+
+    private static ResourceBundleMessageSource resourceBundleMessageSource = new ResourceBundleMessageSource();
+
 
 //    生成随机字符串
     public static String getRandomString(int length) { //length表示生成字符串的长度
@@ -79,6 +85,22 @@ public class GlobalTools {
         return  ret;
     }
 
+//    获取国际化信息内容
+    public static String getMessageByLocale(String area,String key){
+        resourceBundleMessageSource.setBasename("resource");
+
+        String ret = "";
+        Object[] params = {""};
+        Locale locale = null;
+        if(area.equals("en")){
+            locale = Locale.US;
+        }else{
+            locale = Locale.CHINA;
+        }
+        ret = resourceBundleMessageSource.getMessage(key,params,locale);
+        return  ret;
+    }
+
     public static void main(String[] args){
 //        1.测试随机串
 //        String rs = GlobalTools.getRandomString(16);
@@ -102,8 +124,11 @@ public class GlobalTools {
 //        System.out.println(getTimeDifference(currentTime2, currentTime));
 
 //        测试获取ip前三段
-        String ip = "192.168.0.112";
-        System.out.print(getIpSegment(ip));
+//        String ip = "192.168.0.112";
+//        System.out.print(getIpSegment(ip));
+
+        String s = getMessageByLocale("cn","-2");
+        System.out.print(s);
 
 
 

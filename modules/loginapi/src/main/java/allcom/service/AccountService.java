@@ -60,7 +60,7 @@ public class AccountService {
         return ret;
     }
 
-    public RetMessage auth2(String userName,String password){
+    public RetMessage auth2(String userName,String password,String area){
         RetMessage ret = new RetMessage();
         String retContent="";
         Account account = accountRepository.findOne(userName);
@@ -68,16 +68,20 @@ public class AccountService {
             if (passwordEncoder.matches(password, account.getPassword())) {
                 log.info(userName + " auth success!");
                 ret.setErrorCode("0");
-                ret.setErrorMessage("auth success");
+                ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"0"));
                 //生成sessionid
                 String sessionid = getSessionId(userName);
                 retContent = sessionid + "<{DATA}>" +account.getSite();
                 ret.setRetContent(retContent);
             } else {
                 log.info(userName + " auth failed!");
-                ret.setErrorCode("-2");
-                ret.setErrorMessage("auth failed");
+                ret.setErrorCode("-3");
+                ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-3"));
             }
+        }else{
+            log.info(userName + " auth failed,no such user!");
+            ret.setErrorCode("-3");
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-3"));
         }
         return ret;
     }

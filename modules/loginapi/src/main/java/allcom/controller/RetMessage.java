@@ -10,7 +10,7 @@ public class RetMessage {
     public RetMessage() {
         this.errorCode = "-1";
         this.retContent = "";
-        this.errorMessage = "failed";
+        this.errorMessage = "";
     }
 
     public RetMessage(String errorCode,String errorMessage,String retContent) {

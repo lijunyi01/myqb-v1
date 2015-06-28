@@ -31,12 +31,13 @@ public class LoginController {
             @RequestParam(value="password") String password,
             @RequestParam(value = "devicetype",required = false,defaultValue = "web") String devicetype,
             @RequestParam(value = "deviceinfo",required = false,defaultValue = "")String deviceinfo,
-            @RequestParam(value = "ip",required = false,defaultValue = "")String ip
+            @RequestParam(value = "ip",required = false,defaultValue = "")String ip,
+            @RequestParam(value = "area",required = false,defaultValue = "cn")String area
     ) {
 
         RetMessage ret = null;
         log.info("userlogin,username is:"+username +" and password is:"+password + " and ip is:"+ip);
-        ret = accountService.auth2(username,password);
+        ret = accountService.auth2(username,password,area);
         accountService.recordLogin(username,ip,ret.getErrorCode(),devicetype,deviceinfo);
         return ret;
     }
