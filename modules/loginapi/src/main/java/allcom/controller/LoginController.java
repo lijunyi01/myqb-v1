@@ -27,8 +27,8 @@ public class LoginController {
     //  客户端访问URL    http://localhost:8080/login?username=ljy&password=sdf
     @RequestMapping(value = "/login")
     public RetMessage loginAuth(
-            @RequestParam(value="username") String username,
-            @RequestParam(value="password") String password,
+            @RequestParam(value="username",required = true) String username,
+            @RequestParam(value="password",required = true) String password,
             @RequestParam(value = "devicetype",required = false,defaultValue = "web") String devicetype,
             @RequestParam(value = "deviceinfo",required = false,defaultValue = "")String deviceinfo,
             @RequestParam(value = "ip",required = false,defaultValue = "")String ip,

@@ -54,4 +54,21 @@ public class SigninController {
         return ret;
     }
 
+    @RequestMapping(value = "/signin/createuser")
+    public RetMessage createUser(
+            @RequestParam(value = "phoneNumber",required = true,defaultValue = "")String phoneNumber,
+            @RequestParam(value = "smsVerifyCode",required = true,defaultValue = "")String smsVerifyCode,
+            @RequestParam(value = "initPassword",required = true,defaultValue = "")String initPassword,
+            @RequestParam(value = "area",required = false,defaultValue = "cn")String area
+    ) {
+        log.info("createuser params:phoneNumber"+phoneNumber+";smsVerifyCode"+smsVerifyCode);
+        RetMessage ret = null;
+        String site = "";
+        //按一定的逻辑决定用户的业务站点参数site
+
+
+
+        return ret;
+    }
+
 }

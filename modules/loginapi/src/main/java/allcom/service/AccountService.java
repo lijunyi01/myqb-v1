@@ -10,10 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * Created by ljy on 15/6/10.
@@ -36,47 +39,55 @@ public class AccountService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public boolean createAccount(String userName,String password,String role,String site){
+    public boolean createAccount(String phoneNumber,String password,String role,String site){
         boolean ret =false;
         String encodepassword = passwordEncoder.encode(password);
-        Account account = new Account(userName,encodepassword,role,site);
+        Account account = new Account(phoneNumber,encodepassword,role,site);
         if(accountRepository.save(account)!=null){
             ret = true;
         }
         return ret;
     }
 
-    public boolean auth(String userName,String password){
-        boolean ret =false;
-        Account account = accountRepository.findOne(userName);
-        if(account!=null) {
-            if (passwordEncoder.matches(password, account.getPassword())) {
-                log.info(userName + " auth success!");
-                ret = true;
-            } else {
-                log.info(userName + " auth failed!");
-            }
-        }
-        return ret;
-    }
+//    public boolean auth(String userName,String password){
+//        boolean ret =false;
+//        Account account = accountRepository.findOne(userName);
+//        if(account!=null) {
+//            if (passwordEncoder.matches(password, account.getPassword())) {
+//                log.info(userName + " auth success!");
+//                ret = true;
+//            } else {
+//                log.info(userName + " auth failed!");
+//            }
+//        }
+//        return ret;
+//    }
 
     public RetMessage auth2(String userName,String password,String area){
         RetMessage ret = new RetMessage();
         String retContent="";
-        Account account = accountRepository.findOne(userName);
-        if(account!=null) {
-            if (passwordEncoder.matches(password, account.getPassword())) {
-                log.info(userName + " auth success!");
-                ret.setErrorCode("0");
-                ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"0"));
-                //生成sessionid
-                String sessionid = getSessionId(userName);
-                retContent = sessionid + "<{DATA}>" +account.getSite();
-                ret.setRetContent(retContent);
-            } else {
+        //Account account = accountRepository.findOne(userName);
+        List<Account> account_l = accountRepository.findByUserName(userName);
+        if(!account_l.isEmpty()) {
+            if(account_l.size()==1) {
+                Account account = account_l.get(0);
+                if (passwordEncoder.matches(password, account.getPassword())) {
+                    log.info(userName + " auth success!");
+                    ret.setErrorCode("0");
+                    ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
+                    //生成sessionid
+                    String sessionid = getSessionId(userName);
+                    retContent = account.getId() + "<{DATA}>" + sessionid + "<{DATA}>" + account.getSite();
+                    ret.setRetContent(retContent);
+                } else {
+                    log.info(userName + " auth failed!");
+                    ret.setErrorCode("-3");
+                    ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "-3"));
+                }
+            }else{
                 log.info(userName + " auth failed!");
                 ret.setErrorCode("-3");
-                ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-3"));
+                ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "-3"));
             }
         }else{
             log.info(userName + " auth failed,no such user!");

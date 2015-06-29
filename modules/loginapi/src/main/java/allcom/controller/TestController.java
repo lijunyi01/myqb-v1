@@ -25,26 +25,11 @@ public class TestController {
 
     private static Logger log = LoggerFactory.getLogger(TestController.class);
 
-    //  客户端访问URL    http://localhost:8080/login?username=ljy&password=sdf
-    @RequestMapping(value = "/testlogin")
-    public RetMessage loginAuth(@RequestParam(value="username") String username,@RequestParam(value="password") String password) {
-        String errorCode="-1";
-        String errorMessage="失败";
-        String retContent="";
 
-        log.info("userlogin,username is:"+username +" and password is:"+password);
-
-        if(accountService.auth(username,password)) {
-            errorCode = "0";
-            errorMessage = "成功";
-        }
-        return new RetMessage(errorCode,errorMessage,retContent);
-    }
-
-    // 测试用，客户端访问URL    http://localhost:8080/createuser?username=ljy&password=sdf&site=192.168.0.88
+    // 测试用，客户端访问URL    http://localhost:8080/createuser?phoneNumber=13818002196&password=sdf&site=192.168.0.88
     @RequestMapping(value = "/createuser")
     public RetMessage createUser(
-            @RequestParam(value="username") String username,
+            @RequestParam(value="phoneNumber") String phoneNumber,
             @RequestParam(value="password") String password,
             @RequestParam(value="role",required = false,defaultValue = "ROLE_USER") String role,
             @RequestParam(value="site") String site
@@ -53,9 +38,9 @@ public class TestController {
         String errorMessage="失败";
         String retContent="";
 
-        log.info("createUser,username is:"+username +" and password is:"+password);
+        //log.info("createUser,username is:"+username +" and password is:"+password);
         //AccountService accountService = new AccountService();
-        if(accountService.createAccount(username,password,role,site)){
+        if(accountService.createAccount(phoneNumber,password,role,site)){
             errorCode="0";
             errorMessage="成功";
         }
