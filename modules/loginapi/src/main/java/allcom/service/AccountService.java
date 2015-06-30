@@ -134,4 +134,11 @@ public class AccountService {
         loginHistory.setDeviceInfo(deviceInfo);
         loginHistoryRepository.save(loginHistory);
     }
+
+    public RetMessage returnFail(String area,String errorCode){
+        RetMessage retMessage = new RetMessage();
+        retMessage.setErrorCode(errorCode);
+        retMessage.setErrorMessage(GlobalTools.getMessageByLocale(area,errorCode));
+        return retMessage;
+    }
 }

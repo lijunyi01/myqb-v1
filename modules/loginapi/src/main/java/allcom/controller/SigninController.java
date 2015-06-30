@@ -1,5 +1,6 @@
 package allcom.controller;
 
+import allcom.service.AccountService;
 import allcom.service.SessionService;
 import allcom.service.SmsService;
 import org.slf4j.Logger;
@@ -27,6 +28,8 @@ public class SigninController {
 
     @Autowired
     private SmsService smsService;
+    @Autowired
+    private AccountService accountService;
 
     @RequestMapping(value = "/signin/sendsms")
     public RetMessage signIn(
@@ -48,12 +51,13 @@ public class SigninController {
         if(vcodeverifyflag.equals("success")){
             ret = smsService.sendSms(phoneNumber,area);
         }else{
-            ret = smsService.returnFail(area);
+            ret = smsService.returnFail(area,"-5");
         }
 
         return ret;
     }
 
+    //http://192.168.8.104:8080/signin/createuser?phoneNumber=18001831657&smsVerifyCode=111111&initPassword=111111
     @RequestMapping(value = "/signin/createuser")
     public RetMessage createUser(
             @RequestParam(value = "phoneNumber",required = true,defaultValue = "")String phoneNumber,
@@ -61,13 +65,25 @@ public class SigninController {
             @RequestParam(value = "initPassword",required = true,defaultValue = "")String initPassword,
             @RequestParam(value = "area",required = false,defaultValue = "cn")String area
     ) {
-        log.info("createuser params:phoneNumber"+phoneNumber+";smsVerifyCode"+smsVerifyCode);
+        log.info("createuser params:phoneNumber:"+phoneNumber+";smsVerifyCode:"+smsVerifyCode);
+
         RetMessage ret = null;
-        String site = "";
-        //按一定的逻辑决定用户的业务站点参数site
 
-
-
+        //验证短信验证码
+        if(!smsService.verifySmsVerifyCode(phoneNumber, smsVerifyCode)){
+            log.info("verify SmsVerifyCode failed!");
+            ret = smsService.returnFail(area,"-7");
+        }else {
+            String site = "";
+            //按一定的逻辑决定用户的业务站点参数site
+            if(accountService.createAccount(phoneNumber,initPassword,"ROLE_USER",site)){
+                log.info("create user success! phonenumber is:" + phoneNumber);
+                ret = accountService.returnFail(area,"0");
+            }else{
+                log.info("create user failed! phonenumber is:" + phoneNumber);
+                ret = accountService.returnFail(area,"-8");
+            }
+        }
         return ret;
     }
 

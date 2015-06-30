@@ -51,6 +51,7 @@ public class GlobalTools {
      * @param formatTime1
      * @param formatTime2
      * @return
+     * 大的时间在前，得到的时间差的单位是秒
      */
     public static long getTimeDifference(Timestamp formatTime1, Timestamp formatTime2) {
         SimpleDateFormat timeformat = new SimpleDateFormat("yyyy-MM-dd,HH:mm:ss");

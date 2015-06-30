@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * Created by ljy on 15/6/10.
@@ -49,11 +50,26 @@ public class SmsService {
         return retMessage;
     }
 
-    public RetMessage returnFail(String area){
+    public RetMessage returnFail(String area,String errorCode){
         RetMessage retMessage = new RetMessage();
-        retMessage.setErrorMessage("-5");
-        retMessage.setErrorMessage(GlobalTools.getMessageByLocale(area,"-5"));
+        retMessage.setErrorCode(errorCode);
+        retMessage.setErrorMessage(GlobalTools.getMessageByLocale(area,errorCode));
         return retMessage;
+    }
+
+    public boolean verifySmsVerifyCode(String phoneNumber,String key){
+        boolean ret = false;
+
+        List<SmsVerifyCode> smsVerifyCodeList = smsVerifyCodeRepository.findByPhoneNumberAndSmsContent(phoneNumber,key);
+        for(SmsVerifyCode smsVerifyCode: smsVerifyCodeList){
+            Timestamp sendTime = smsVerifyCode.getSendTime();
+            Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+            if(GlobalTools.getTimeDifference(currentTime,sendTime) < 61 ){
+                ret = true;
+                break;
+            }
+        }
+        return ret;
     }
 
 }
