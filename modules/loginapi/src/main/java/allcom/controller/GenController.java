@@ -29,9 +29,9 @@ public class GenController {
     @RequestMapping(value = "/gi")
     public RetMessage loginAuth(
             @RequestParam(value="functionId") int functionId,
-            @RequestParam(value = "username",required = true,defaultValue = "")String username,
-            @RequestParam(value = "generalInput",required = true,defaultValue = "") String generalInput,
-            @RequestParam(value = "sessionId",required = true,defaultValue = "")String sessionId,
+            @RequestParam(value = "username",required = true)String username,
+            @RequestParam(value = "generalInput",required = true) String generalInput,
+            @RequestParam(value = "sessionId",required = true)String sessionId,
             @RequestParam(value = "area",required = false,defaultValue = "cn")String area
     ) {
         log.info("In general interface,functionid is:"+functionId +"; general input params is:"+generalInput);

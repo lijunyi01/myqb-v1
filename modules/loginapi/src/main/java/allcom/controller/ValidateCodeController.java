@@ -110,7 +110,7 @@ public class ValidateCodeController {
     @RequestMapping(value = "/vcodeverify")
     @ResponseBody
     public RetMessage vcodeVerify(
-            @RequestParam(value = "vcode",required = true,defaultValue = "")String vcode,
+            @RequestParam(value = "vcode",required = true)String vcode,
             @RequestParam(value = "area",required = false,defaultValue = "cn")String area,
             HttpServletRequest request
     ) {
@@ -128,7 +128,7 @@ public class ValidateCodeController {
         }
         String sessionId = session.getId();
 
-        if (vcodetmp.equals(vcodeInSession.toLowerCase())){
+        if (!vcode.equals("") && vcodetmp.equals(vcodeInSession.toLowerCase())){
             ret.setErrorCode("0");
             ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"0"));
             //设置图片验证码校验成功标志

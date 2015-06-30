@@ -33,7 +33,7 @@ public class SigninController {
 
     @RequestMapping(value = "/signin/sendsms")
     public RetMessage signIn(
-            @RequestParam(value = "phoneNumber",required = true,defaultValue = "")String phoneNumber,
+            @RequestParam(value = "phoneNumber",required = true)String phoneNumber,
             @RequestParam(value = "area",required = false,defaultValue = "cn")String area,
             HttpServletRequest request
     ) {
@@ -60,9 +60,9 @@ public class SigninController {
     //http://192.168.8.104:8080/signin/createuser?phoneNumber=18001831657&smsVerifyCode=111111&initPassword=111111
     @RequestMapping(value = "/signin/createuser")
     public RetMessage createUser(
-            @RequestParam(value = "phoneNumber",required = true,defaultValue = "")String phoneNumber,
-            @RequestParam(value = "smsVerifyCode",required = true,defaultValue = "")String smsVerifyCode,
-            @RequestParam(value = "initPassword",required = true,defaultValue = "")String initPassword,
+            @RequestParam(value = "phoneNumber",required = true)String phoneNumber,
+            @RequestParam(value = "smsVerifyCode",required = true)String smsVerifyCode,
+            @RequestParam(value = "initPassword",required = true)String initPassword,
             @RequestParam(value = "area",required = false,defaultValue = "cn")String area
     ) {
         log.info("createuser params:phoneNumber:"+phoneNumber+";smsVerifyCode:"+smsVerifyCode);
