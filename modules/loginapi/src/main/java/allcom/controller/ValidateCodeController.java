@@ -92,7 +92,7 @@ public class ValidateCodeController {
         }
 
         session.setAttribute("captchaToken", token);
-        log.info("当前的SessionID=" + session.getId() + "，验证码=" + token);
+        log.info("current SessionID=" + session.getId() + ",vcode=" + token);
 
     }
 

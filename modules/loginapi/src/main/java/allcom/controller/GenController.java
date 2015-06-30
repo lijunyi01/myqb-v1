@@ -28,8 +28,8 @@ public class GenController {
     // 通用接口
     @RequestMapping(value = "/gi")
     public RetMessage loginAuth(
-            @RequestParam(value="functionId") int functionId,
-            @RequestParam(value = "username",required = true)String username,
+            @RequestParam(value="functionId",required = true) int functionId,
+            @RequestParam(value = "umid",required = true)int umid,
             @RequestParam(value = "generalInput",required = true) String generalInput,
             @RequestParam(value = "sessionId",required = true)String sessionId,
             @RequestParam(value = "area",required = false,defaultValue = "cn")String area
@@ -38,8 +38,8 @@ public class GenController {
         RetMessage ret = null;
 
         //sessionId验证
-        if(sessionService.verifySessionId(username,sessionId)){
-            //开户
+        if(sessionService.verifySessionId(umid,sessionId)){
+            //
             if(functionId==1){
 
             }else if(functionId==2){
@@ -48,7 +48,7 @@ public class GenController {
 
         }else{
             ret = sessionService.returnFail(area);
-            log.info("username:"+username+" failed to check sessionid:"+sessionId);
+            log.info("umid:"+umid+" failed to check sessionid:"+sessionId);
         }
 
         return ret;

@@ -1,6 +1,7 @@
 package allcom.controller;
 
 import allcom.service.AccountService;
+import allcom.toolkit.GlobalTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,13 @@ public class LoginController {
         RetMessage ret = null;
         log.info("userlogin,username is:"+username +" and password is:"+password + " and ip is:"+ip);
         ret = accountService.auth2(username,password,area);
-        accountService.recordLogin(username,ip,ret.getErrorCode(),devicetype,deviceinfo);
+        int umid=0;
+        String errorCode = ret.getErrorCode();
+        if(errorCode.equals("0")||errorCode.equals("-9")){
+            String s[] = ret.getRetContent().split("<[CDATA]>");
+            umid= GlobalTools.convertStringToInt(s[0]);
+        }
+        accountService.recordLogin(umid,username,ip,errorCode,devicetype,deviceinfo);
         return ret;
     }
 

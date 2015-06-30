@@ -10,15 +10,13 @@ import java.sql.Timestamp;
 @SuppressWarnings("serial")
 @Entity
 //@Table(name = "login_history",indexes = {@Index(name = "i_1",columnList = "userName"),@Index(name = "i_2",columnList = "loginTime")})
-@Table(name = "myqbauth_login_history",indexes = {@Index(name = "i_3",columnList = "userName,loginTime",unique = false)})
-//@NamedQuery(name = Account.FIND_BY_EMAIL, query = "select a from Account a where a.email = :email")
+@Table(name = "myqbauth_login_history",indexes = {@Index(name = "i_1",columnList = "userName,loginTime",unique = false)})
 public class LoginHistory implements java.io.Serializable {
-
-    //public static final String FIND_BY_EMAIL = "Account.findByEmail";
 
     @Id
     @GeneratedValue
     private long id;
+    private int umid;
     private String userName;
     private String ip;
     private Timestamp loginTime;
@@ -29,18 +27,19 @@ public class LoginHistory implements java.io.Serializable {
     protected LoginHistory() {
     }
 
-    public LoginHistory(String userName, Timestamp loginTime) {
-        this.userName = userName;
+    public LoginHistory(int umid, String userName,Timestamp loginTime) {
+        this.umid = umid;
         this.loginTime = loginTime;
+        this.userName = userName;
     }
 
     public long getId(){
         return this.id;
     }
 
-    public String getUserName(){ return this.userName; }
+    public int getUmid(){ return this.umid; }
 
-    public void setUserName(String userName) { this.userName = userName; }
+    public void setUmid(int umid) { this.umid = umid; }
 
 
     public Timestamp getLoginTime() {
@@ -62,5 +61,8 @@ public class LoginHistory implements java.io.Serializable {
 
     public String getDeviceInfo(){ return this.deviceInfo; }
     public void setDeviceInfo(String deviceInfo){ this.deviceInfo = deviceInfo; }
+
+    public String getUserName(){ return  this.userName;}
+    public void setUserName(String userName) {this.userName = userName;}
 
 }

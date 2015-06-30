@@ -31,7 +31,7 @@ public class SmsService {
         //key 为纯数字6位随机串
         String key = GlobalTools.getRandomString(6,true);
         //调用短信发送接口发送短信，传入参数为phoneNumber和key
-        boolean sendresult = false;
+        boolean sendresult = true;
 //        sendresult = ...
 
         Timestamp sendTime = new Timestamp(System.currentTimeMillis());

@@ -104,6 +104,21 @@ public class GlobalTools {
         return  ret;
     }
 
+//    字符串转数字
+    public static int convertStringToInt(String sValue) {
+
+        int iValue = -10000;
+
+        try {
+            iValue = Integer.parseInt(sValue);
+        }
+        catch (NumberFormatException ex) {
+            System.out.println("The String does not contain a parsable integer");
+        }
+        return iValue;
+
+    }
+
     public static void main(String[] args){
 //        1.测试随机串
 //        String rs = GlobalTools.getRandomString(6,true);

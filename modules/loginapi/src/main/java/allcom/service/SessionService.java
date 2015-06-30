@@ -31,10 +31,10 @@ public class SessionService {
     @Autowired
     private AccountSessionRepository accountSessionRepository;
 
-    public boolean verifySessionId(String userName,String sessionId){
+    public boolean verifySessionId(int umid,String sessionId){
         boolean ret =false;
         Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-        AccountSession accountSession = accountSessionRepository.findOne(userName);
+        AccountSession accountSession = accountSessionRepository.findOne(umid);
         if(accountSession !=null){
             long timediff = GlobalTools.getTimeDifference(currentTime,accountSession.getTimestamp());
 

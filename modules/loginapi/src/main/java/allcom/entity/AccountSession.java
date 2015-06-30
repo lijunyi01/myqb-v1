@@ -17,7 +17,7 @@ public class AccountSession implements java.io.Serializable {
     //public static final String FIND_BY_EMAIL = "Account.findByEmail";
 
     @Id
-    private String userName;
+    private int umid;
 
     @JsonIgnore
     private String sessionId;
@@ -28,14 +28,14 @@ public class AccountSession implements java.io.Serializable {
 
     }
 
-    public AccountSession(String userName, String sessionId, Timestamp timestamp) {
-        this.userName = userName;
+    public AccountSession(int umid, String sessionId, Timestamp timestamp) {
+        this.umid = umid;
         this.sessionId = sessionId;
         this.timestamp = timestamp;
     }
 
-    public String getId(){
-        return this.userName;
+    public int getId(){
+        return this.umid;
     }
 
 

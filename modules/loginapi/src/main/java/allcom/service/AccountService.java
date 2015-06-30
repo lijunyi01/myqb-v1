@@ -66,23 +66,24 @@ public class AccountService {
     public RetMessage auth2(String userName,String password,String area){
         RetMessage ret = new RetMessage();
         String retContent="";
-        //Account account = accountRepository.findOne(userName);
-        List<Account> account_l = accountRepository.findByUserName(userName);
-        if(!account_l.isEmpty()) {
-            if(account_l.size()==1) {
-                Account account = account_l.get(0);
+        List<Account> accountList = accountRepository.findByUserName(userName);
+        if(!accountList.isEmpty()) {
+            if(accountList.size()==1) {
+                Account account = accountList.get(0);
+                int umid = account.getId();
                 if (passwordEncoder.matches(password, account.getPassword())) {
-                    log.info(userName + " auth success!");
+                    log.info(userName + " auth success! umid is:"+ umid);
                     ret.setErrorCode("0");
                     ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
                     //生成sessionid
-                    String sessionid = getSessionId(userName);
-                    retContent = account.getId() + "<{DATA}>" + sessionid + "<{DATA}>" + account.getSite();
+                    String sessionid = getSessionId(umid);
+                    retContent = umid + "<{DATA}>" + sessionid + "<{DATA}>" + account.getSite();
                     ret.setRetContent(retContent);
                 } else {
                     log.info(userName + " auth failed!");
-                    ret.setErrorCode("-3");
-                    ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "-3"));
+                    ret.setErrorCode("-9");
+                    ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "-9"));
+                    ret.setRetContent(umid+ "<{DATA}>");
                 }
             }else{
                 log.info(userName + " auth failed!");
@@ -97,11 +98,11 @@ public class AccountService {
         return ret;
     }
 
-    private String getSessionId(String userName){
+    private String getSessionId(int umid){
         String ret="";
         Timestamp currentTime = new Timestamp(System.currentTimeMillis());
         //log.info("username:"+userName+" and timestamp now:" + currentTime);
-        AccountSession accountSession = accountSessionRepository.findOne(userName);
+        AccountSession accountSession = accountSessionRepository.findOne(umid);
         if(accountSession !=null){
             //log.info("username:"+userName+" and timestamp:" + accountSession.getTimestamp());
             long timediff = GlobalTools.getTimeDifference(currentTime,accountSession.getTimestamp());
@@ -118,16 +119,16 @@ public class AccountService {
 
         }else{
             ret = GlobalTools.getRandomString(16,false);
-            accountSessionRepository.save(new AccountSession(userName,ret,currentTime));
+            accountSessionRepository.save(new AccountSession(umid,ret,currentTime));
         }
 
 
         return ret;
     }
 
-    public void recordLogin(String userName,String ip,String errorCode,String deviceType,String deviceInfo){
+    public void recordLogin(int umid,String userName,String ip,String errorCode,String deviceType,String deviceInfo){
         Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-        LoginHistory loginHistory = new LoginHistory(userName,currentTime);
+        LoginHistory loginHistory = new LoginHistory(umid,userName,currentTime);
         loginHistory.setIp(ip);
         loginHistory.setErrorCode(errorCode);
         loginHistory.setDeviceType(deviceType);

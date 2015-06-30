@@ -7,11 +7,8 @@ import javax.persistence.*;
 
 @SuppressWarnings("serial")
 @Entity
-@Table(name = "myqbauth_account")
-//@NamedQuery(name = Account.FIND_BY_USERNAME, query = "select a from Account a where a.email = :userName or a.phoneNumber = :userName or a.nickName = :userName")
+@Table(name = "myqbauth_account",indexes = {@Index(name = "i_1",columnList = "phoneNumber",unique = true),@Index(name = "i_2",columnList = "email",unique = true),@Index(name = "i_3",columnList = "nickName",unique = true)})
 public class Account implements java.io.Serializable {
-
-    //public static final String FIND_BY_USERNAME = "Account.findByUserName";
 
     @Id
     @GeneratedValue

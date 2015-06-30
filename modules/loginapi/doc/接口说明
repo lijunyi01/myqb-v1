@@ -1,0 +1,17 @@
+
+获取图片验证码：
+http://222.46.16.172:83/loginapi/validatecode
+验证图片验证码：
+http://222.46.16.172:83/loginapi/vcodeverify?vcode=1111[&area=en]
+
+发送短信验证码：
+http://222.46.16.172:83/loginapi/signin/sendsms?phoneNumber=13818000000[&area=en]
+
+开户：
+http://222.46.16.172:83/loginapi/signin/createuser?phoneNumber=13818000000&smsVerifyCode=231333&initPassword=111111[&area=en]
+
+登录验证：
+http://222.46.16.172:83/loginapi/login?username=ljy&password=sdf[&devicetype=web&deviceinfo=&area=en]
+
+通用接口：
+http://222.46.16.172:83/loginapi/gi?functionId=1&umid=1&generalInput=abc<[CDATA]>abc&sessionId=sdfas232[&area=en]
