@@ -29,6 +29,9 @@ public class AccountService {
     @Value("${session.timeout}")
     private long sessionTimeout;
 
+    @Value("${systemparam.defaultsite}")
+    private String defaultsite;
+
     @Autowired
     private  AccountRepository accountRepository;
     @Autowired
@@ -49,21 +52,14 @@ public class AccountService {
         return ret;
     }
 
-//    public boolean auth(String userName,String password){
-//        boolean ret =false;
-//        Account account = accountRepository.findOne(userName);
-//        if(account!=null) {
-//            if (passwordEncoder.matches(password, account.getPassword())) {
-//                log.info(userName + " auth success!");
-//                ret = true;
-//            } else {
-//                log.info(userName + " auth failed!");
-//            }
-//        }
-//        return ret;
-//    }
+    public String getSite(String ip){
+        String ret =defaultsite;
+        //TODO
+        //设计逻辑获得当前开户用户应当所在的site
+        return ret;
+    }
 
-    public RetMessage auth2(String userName,String password,String area){
+    public RetMessage auth(String userName,String password,String area){
         RetMessage ret = new RetMessage();
         String retContent="";
         List<Account> accountList = accountRepository.findByUserName(userName);
@@ -141,5 +137,55 @@ public class AccountService {
         retMessage.setErrorCode(errorCode);
         retMessage.setErrorMessage(GlobalTools.getMessageByLocale(area,errorCode));
         return retMessage;
+    }
+
+    public int getUserNumber(String userName){
+        int ret = 0;
+        List<Account> accountList = accountRepository.findByUserName(userName);
+        ret = accountList.size();
+        return ret;
+    }
+
+    public int getUserNumberByPhoneNumber(String phoneNumber){
+        int ret = 0;
+        Account account = accountRepository.findByPhoneNumber(phoneNumber);
+        if(account !=null){
+            ret =1;
+        }
+        return ret;
+    }
+
+    public String getPhoneNumber(String userName){
+        String ret = "";
+        List<Account> accountList = accountRepository.findByUserName(userName);
+        if(accountList.size()==1){
+            Account account = accountList.get(0);
+            ret = account.getPhoneNumber();
+        }
+        return ret;
+    }
+
+    public boolean resetPassword(String phoneNumber,String newPassword){
+        boolean ret = false;
+        Account account = accountRepository.findByPhoneNumber(phoneNumber);
+        if(account !=null){
+            if(resetPassword(account.getId(),newPassword)){
+                ret = true;
+            }
+        }
+        return ret;
+    }
+
+    public boolean resetPassword(int umid,String newPassword){
+        boolean ret = false;
+        Account account = accountRepository.findOne(umid);
+        if(account!=null){
+            String encodepassword = passwordEncoder.encode(newPassword);
+            account.setPassword(encodepassword);
+            if(accountRepository.save(account)!=null){
+                ret = true;
+            }
+        }
+        return ret;
     }
 }

@@ -92,6 +92,8 @@ public class ValidateCodeController {
         }
 
         session.setAttribute("captchaToken", token);
+        //清除图片验证码验证成功的标志，确保重新验证
+        session.setAttribute("vcodeverifyflag", "failed");
         log.info("current SessionID=" + session.getId() + ",vcode=" + token);
 
     }

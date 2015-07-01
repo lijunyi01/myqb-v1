@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 
 @SuppressWarnings("serial")
 @Entity
-@Table(name = "myqbauth_smsverifycode")
+@Table(name = "myqbauth_smsverifycode",indexes = {@Index(name = "i_1",columnList = "sendTime",unique = false)})
 public class SmsVerifyCode implements java.io.Serializable {
 
     //public static final String FIND_BY_EMAIL = "Account.findByEmail";

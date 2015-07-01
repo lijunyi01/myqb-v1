@@ -38,7 +38,7 @@ public class LoginController {
 
         RetMessage ret = null;
         log.info("userlogin,username is:"+username +" and password is:"+password + " and ip is:"+ip);
-        ret = accountService.auth2(username,password,area);
+        ret = accountService.auth(username,password,area);
         int umid=0;
         String errorCode = ret.getErrorCode();
         if(errorCode.equals("0")||errorCode.equals("-9")){

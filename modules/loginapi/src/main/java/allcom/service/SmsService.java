@@ -23,6 +23,9 @@ import java.util.List;
 public class SmsService {
     private static Logger log = LoggerFactory.getLogger(SmsService.class);
 
+    @Value("${systemparam.verifycodetimeout}")
+    private long verifyCodeTimeout;
+
     @Autowired
     SmsVerifyCodeRepository smsVerifyCodeRepository;
 
@@ -47,6 +50,9 @@ public class SmsService {
         }
         smsVerifyCodeRepository.save(smsVerifyCode);
 
+        //删除1天前的短信验证码记录
+        smsVerifyCodeRepository.deleteOldRecord(GlobalTools.getTimeBefore(3600*24));
+
         return retMessage;
     }
 
@@ -64,7 +70,7 @@ public class SmsService {
         for(SmsVerifyCode smsVerifyCode: smsVerifyCodeList){
             Timestamp sendTime = smsVerifyCode.getSendTime();
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-            if(GlobalTools.getTimeDifference(currentTime,sendTime) < 61 ){
+            if(GlobalTools.getTimeDifference(currentTime,sendTime) < verifyCodeTimeout ){
                 ret = true;
                 break;
             }

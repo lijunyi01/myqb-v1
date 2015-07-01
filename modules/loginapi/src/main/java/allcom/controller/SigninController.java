@@ -1,5 +1,6 @@
 package allcom.controller;
 
+import allcom.entity.Account;
 import allcom.service.AccountService;
 import allcom.service.SessionService;
 import allcom.service.SmsService;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 /**
  * Created by ljy on 15/5/12.
@@ -63,25 +65,64 @@ public class SigninController {
             @RequestParam(value = "phoneNumber",required = true)String phoneNumber,
             @RequestParam(value = "smsVerifyCode",required = true)String smsVerifyCode,
             @RequestParam(value = "initPassword",required = true)String initPassword,
-            @RequestParam(value = "area",required = false,defaultValue = "cn")String area
+            @RequestParam(value = "area",required = false,defaultValue = "cn")String area,
+            HttpServletRequest request
     ) {
         log.info("createuser params:phoneNumber:"+phoneNumber+";smsVerifyCode:"+smsVerifyCode);
 
         RetMessage ret = null;
+        String clientip = request.getRemoteAddr();
 
         //验证短信验证码
         if(!smsService.verifySmsVerifyCode(phoneNumber, smsVerifyCode)){
             log.info("verify SmsVerifyCode failed!");
             ret = smsService.returnFail(area,"-7");
-        }else {
+        } else if(accountService.getUserNumberByPhoneNumber(phoneNumber)>0){   //该手机号码已经注册过
+            log.info("phonenumber exists already! phonenumber is:" + phoneNumber);
+            ret = accountService.returnFail(area,"-10");
+        } else {
             String site = "";
             //按一定的逻辑决定用户的业务站点参数site
+            site = accountService.getSite(clientip);
             if(accountService.createAccount(phoneNumber,initPassword,"ROLE_USER",site)){
                 log.info("create user success! phonenumber is:" + phoneNumber);
                 ret = accountService.returnFail(area,"0");
             }else{
                 log.info("create user failed! phonenumber is:" + phoneNumber);
                 ret = accountService.returnFail(area,"-8");
+            }
+        }
+        return ret;
+    }
+
+    @RequestMapping(value = "/signin/resetpass")
+    public RetMessage resetPassword(
+            @RequestParam(value = "userName",required = true)String userName,
+            @RequestParam(value = "verifyCode",required = true)String verifyCode,
+            @RequestParam(value = "newPassword",required = true)String newPassword,
+            @RequestParam(value = "area",required = false,defaultValue = "cn")String area
+    ) {
+        log.info("resetpassword params:userName:"+userName+";verifyCode:"+verifyCode);
+        RetMessage ret = null;
+
+        int usernumber = accountService.getUserNumber(userName);
+        if (usernumber == 0){
+            log.info("user not exists! username:" + userName);
+            ret = smsService.returnFail(area,"-11");
+        } else if(usernumber >1){
+            log.info("usernumber > 1 ! username:" + userName);
+            ret = smsService.returnFail(area,"-12");
+        }else {
+            String phoneNumber = accountService.getPhoneNumber(userName);
+            if(!smsService.verifySmsVerifyCode(phoneNumber, verifyCode)) {   //验证短信/邮件验证码
+                log.info("verify VerifyCode failed! phonenumber is:" + phoneNumber + " and verifycode is:"+verifyCode);
+                ret = smsService.returnFail(area, "-7");
+            }else{
+                if(accountService.resetPassword(phoneNumber,newPassword)){
+                    log.info("resetpassword success! phonenumber is:" + phoneNumber);
+                }else {
+                    log.info("resetpassword failed! phonenumber is:" + phoneNumber);
+                }
             }
         }
         return ret;

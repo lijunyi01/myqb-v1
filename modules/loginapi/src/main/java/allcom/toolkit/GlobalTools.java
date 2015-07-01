@@ -75,6 +75,17 @@ public class GlobalTools {
         return (t1-t2)/1000;
     }
 
+    // 获得当前时间之前多少秒的时间;由long到timeStamp
+    public static Timestamp getTimeBefore(long seconds){
+        Timestamp ret= null;
+        long ct = 0L;
+        long bt = 0L;
+        ct = System.currentTimeMillis();
+        bt = ct - seconds*1000;   //毫秒
+        ret = new Timestamp(bt);
+        return ret;
+    }
+
 //    获取ip前三段;对于ipv6，就是去除最后一段，分隔符是：
     public static String getIpSegment(String ip){
         String ret="";

@@ -7,6 +7,7 @@ import javax.persistence.*;
 
 @SuppressWarnings("serial")
 @Entity
+//email and nickName 可能为null，但唯一索引可以容纳多个null
 @Table(name = "myqbauth_account",indexes = {@Index(name = "i_1",columnList = "phoneNumber",unique = true),@Index(name = "i_2",columnList = "email",unique = true),@Index(name = "i_3",columnList = "nickName",unique = true)})
 public class Account implements java.io.Serializable {
 
@@ -17,11 +18,12 @@ public class Account implements java.io.Serializable {
     @JsonIgnore    // Jackson默认是针对get方法来生成JSON字符串的; 用于排除作jason转化
     private String password;
 
-    private String role = "ROLE_USER";
+    private String role = "";
     private String site = "";
     private String phoneNumber = "";
-    private String email = "";
-    private String nickName = "";
+    private String email;
+    private int emailVerifyFlag = 0;
+    private String nickName;
 
     protected Account() {
 
@@ -69,4 +71,8 @@ public class Account implements java.io.Serializable {
     public String getNickName(){return this.nickName;}
 
     public void setNickName(String nickName){this.nickName = nickName;}
+
+    public int getEmailVerifyFlag(){return this.emailVerifyFlag;}
+
+    public void setEmailVerifyFlag(int emailVerifyFlag){this.emailVerifyFlag = emailVerifyFlag;}
 }
