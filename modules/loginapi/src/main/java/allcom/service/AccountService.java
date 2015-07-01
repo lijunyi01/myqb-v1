@@ -139,14 +139,14 @@ public class AccountService {
         return retMessage;
     }
 
-    public int getUserNumber(String userName){
+    public int getNumberOfUsers(String userName){
         int ret = 0;
         List<Account> accountList = accountRepository.findByUserName(userName);
         ret = accountList.size();
         return ret;
     }
 
-    public int getUserNumberByPhoneNumber(String phoneNumber){
+    public int getNumberOfUsersByPhoneNumber(String phoneNumber){
         int ret = 0;
         Account account = accountRepository.findByPhoneNumber(phoneNumber);
         if(account !=null){

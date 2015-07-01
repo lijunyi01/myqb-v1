@@ -77,7 +77,7 @@ public class SigninController {
         if(!smsService.verifySmsVerifyCode(phoneNumber, smsVerifyCode)){
             log.info("verify SmsVerifyCode failed!");
             ret = smsService.returnFail(area,"-7");
-        } else if(accountService.getUserNumberByPhoneNumber(phoneNumber)>0){   //该手机号码已经注册过
+        } else if(accountService.getNumberOfUsersByPhoneNumber(phoneNumber)>0){   //该手机号码已经注册过
             log.info("phonenumber exists already! phonenumber is:" + phoneNumber);
             ret = accountService.returnFail(area,"-10");
         } else {
@@ -98,24 +98,24 @@ public class SigninController {
     @RequestMapping(value = "/signin/resetpass")
     public RetMessage resetPassword(
             @RequestParam(value = "userName",required = true)String userName,
-            @RequestParam(value = "verifyCode",required = true)String verifyCode,
+            @RequestParam(value = "smsverifyCode",required = true)String smsverifyCode,
             @RequestParam(value = "newPassword",required = true)String newPassword,
             @RequestParam(value = "area",required = false,defaultValue = "cn")String area
     ) {
-        log.info("resetpassword params:userName:"+userName+";verifyCode:"+verifyCode);
+        log.info("resetpassword params:userName:"+userName+";verifyCode:"+smsverifyCode);
         RetMessage ret = null;
 
-        int usernumber = accountService.getUserNumber(userName);
-        if (usernumber == 0){
+        int numberOfUsers = accountService.getNumberOfUsers(userName);
+        if (numberOfUsers == 0){
             log.info("user not exists! username:" + userName);
             ret = smsService.returnFail(area,"-11");
-        } else if(usernumber >1){
+        } else if(numberOfUsers >1){
             log.info("usernumber > 1 ! username:" + userName);
             ret = smsService.returnFail(area,"-12");
         }else {
             String phoneNumber = accountService.getPhoneNumber(userName);
-            if(!smsService.verifySmsVerifyCode(phoneNumber, verifyCode)) {   //验证短信/邮件验证码
-                log.info("verify VerifyCode failed! phonenumber is:" + phoneNumber + " and verifycode is:"+verifyCode);
+            if(!smsService.verifySmsVerifyCode(phoneNumber, smsverifyCode)) {
+                log.info("verify VerifyCode failed! phonenumber is:" + phoneNumber + " and verifycode is:"+smsverifyCode);
                 ret = smsService.returnFail(area, "-7");
             }else{
                 if(accountService.resetPassword(phoneNumber,newPassword)){

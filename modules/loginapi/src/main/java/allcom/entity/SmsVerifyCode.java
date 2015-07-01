@@ -3,7 +3,6 @@ package allcom.entity;
 import javax.persistence.*;
 import java.sql.Timestamp;
 
-
 @SuppressWarnings("serial")
 @Entity
 @Table(name = "myqbauth_smsverifycode",indexes = {@Index(name = "i_1",columnList = "sendTime",unique = false)})
