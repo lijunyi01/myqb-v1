@@ -139,10 +139,12 @@ public class AccountService {
         return retMessage;
     }
 
-    public int getNumberOfUsers(String userName){
+    public int getNumberOfUsersByEmail(String email){
         int ret = 0;
-        List<Account> accountList = accountRepository.findByUserName(userName);
-        ret = accountList.size();
+        Account account = accountRepository.findByEmail(email);
+        if(account !=null){
+            ret =1;
+        }
         return ret;
     }
 
@@ -185,6 +187,26 @@ public class AccountService {
             if(accountRepository.save(account)!=null){
                 ret = true;
             }
+        }
+        return ret;
+    }
+
+    public RetMessage isEmailVerified(String email,String area){
+        RetMessage ret = new RetMessage();
+        Account account = accountRepository.findByEmail(email);
+        if(account!=null){
+            if(account.getEmailVerifyFlag() == 1){
+                ret.setErrorCode("0");
+                ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
+            }else{
+                ret.setErrorCode("-13");
+                ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-13"));
+                log.info("email not verified:" + email);
+            }
+        }else{
+            ret.setErrorCode("-11");
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-11"));
+            log.info("email not exists:" + email);
         }
         return ret;
     }

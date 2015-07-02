@@ -2,6 +2,7 @@ package allcom.controller;
 
 import allcom.entity.Account;
 import allcom.service.AccountService;
+import allcom.service.EmailService;
 import allcom.service.SessionService;
 import allcom.service.SmsService;
 import org.slf4j.Logger;
@@ -32,7 +33,10 @@ public class SigninController {
     private SmsService smsService;
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private EmailService emailService;
 
+    //发送短信验证码的接口
     @RequestMapping(value = "/signin/sendsms")
     public RetMessage signIn(
             @RequestParam(value = "phoneNumber",required = true)String phoneNumber,
@@ -95,25 +99,24 @@ public class SigninController {
         return ret;
     }
 
-    @RequestMapping(value = "/signin/resetpass")
+    //忘记密码时，通过短信验证码重置密码的接口
+    @RequestMapping(value = "/signin/resetpassbyphone")
     public RetMessage resetPassword(
-            @RequestParam(value = "userName",required = true)String userName,
+            @RequestParam(value = "phoneNumber",required = true)String phoneNumber,
             @RequestParam(value = "smsverifyCode",required = true)String smsverifyCode,
             @RequestParam(value = "newPassword",required = true)String newPassword,
             @RequestParam(value = "area",required = false,defaultValue = "cn")String area
     ) {
-        log.info("resetpassword params:userName:"+userName+";verifyCode:"+smsverifyCode);
+        log.info("resetpassword params:phoneNumber:"+phoneNumber+";verifyCode:"+smsverifyCode);
         RetMessage ret = null;
 
-        int numberOfUsers = accountService.getNumberOfUsers(userName);
-        if (numberOfUsers == 0){
-            log.info("user not exists! username:" + userName);
+
+
+        //getNumberOfUsersByPhoneNumber()方法返回 非0即1
+        if (accountService.getNumberOfUsersByPhoneNumber(phoneNumber) == 0){
+            log.info("user not exists! phoneNumber:" + phoneNumber);
             ret = smsService.returnFail(area,"-11");
-        } else if(numberOfUsers >1){
-            log.info("usernumber > 1 ! username:" + userName);
-            ret = smsService.returnFail(area,"-12");
         }else {
-            String phoneNumber = accountService.getPhoneNumber(userName);
             if(!smsService.verifySmsVerifyCode(phoneNumber, smsverifyCode)) {
                 log.info("verify VerifyCode failed! phonenumber is:" + phoneNumber + " and verifycode is:"+smsverifyCode);
                 ret = smsService.returnFail(area, "-7");
@@ -127,5 +130,60 @@ public class SigninController {
         }
         return ret;
     }
+
+    //获取邮件地址是否经过验证的接口
+    @RequestMapping(value = "/signin/isemailverified")
+    public RetMessage isEmailVerified(
+            @RequestParam(value = "email",required = true)String email,
+            @RequestParam(value = "area",required = false,defaultValue = "cn")String area,
+            HttpServletRequest request
+    ) {
+        log.info("ask if email is verified, email:"+email);
+        RetMessage ret = null;
+
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            session = request.getSession();
+        }
+        String vcodeverifyflag=(String)session.getAttribute("vcodeverifyflag");
+        if(vcodeverifyflag == null){
+            vcodeverifyflag = "";
+        }
+        if(vcodeverifyflag.equals("success")){
+            ret = accountService.isEmailVerified(email, area);
+        }else{
+            ret = accountService.returnFail(area, "-5");
+        }
+
+        return ret;
+    }
+
+    //发送邮件（内含重置密码的联接）的接口
+    @RequestMapping(value = "/signin/sendemail")
+    public RetMessage sendEmail(
+            @RequestParam(value = "email",required = true)String email,
+            @RequestParam(value = "area",required = false,defaultValue = "cn")String area,
+            HttpServletRequest request
+    ) {
+        log.info("send verify email, email:"+email);
+        RetMessage ret = null;
+
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            session = request.getSession();
+        }
+        String vcodeverifyflag=(String)session.getAttribute("vcodeverifyflag");
+        if(vcodeverifyflag == null){
+            vcodeverifyflag = "";
+        }
+        if(vcodeverifyflag.equals("success")){
+            ret = emailService.sendEmail(email, area);
+        }else{
+            ret = emailService.returnFail(area, "-5");
+        }
+
+        return ret;
+    }
+
 
 }
