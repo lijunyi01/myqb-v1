@@ -59,13 +59,13 @@ public class GenController {
                     //用于业务平台发起的sessionId验证；由于之前已经完成sessionId校验，此处再校验下ip即可
                     ret = sessionService.returnFail(area,"0");
                 } else if (functionId == 2) {
-                    //修改密码
+                    //登录完成后的修改密码
                     if(inputMap.size()!=1){
                         ret = accountService.returnFail(area, "-14");
                         log.info("general input param error:" + generalInput);
                     }else{
                         String newPassword = inputMap.get("newPassword");
-                        if(newPassword == null || newPassword.equals("")){
+                        if(newPassword == null || newPassword.equals("")) {
                             ret = accountService.returnFail(area, "-14");
                             log.info("general input param error:" + generalInput);
                         }else{

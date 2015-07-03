@@ -131,6 +131,37 @@ public class SigninController {
         return ret;
     }
 
+    //获取手机号码是否是已有用户的接口（用于通过手机重置密码）
+    @RequestMapping(value = "/signin/isphonenumberexist")
+    public RetMessage isPhoneNumberExist(
+            @RequestParam(value = "phoneNumber",required = true)String phoneNumber,
+            @RequestParam(value = "area",required = false,defaultValue = "cn")String area,
+            HttpServletRequest request
+    ) {
+        log.info("ask if phoneNumber exists, phoneNumber:"+phoneNumber);
+        RetMessage ret = null;
+
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            session = request.getSession();
+        }
+        String vcodeverifyflag=(String)session.getAttribute("vcodeverifyflag");
+        if(vcodeverifyflag == null){
+            vcodeverifyflag = "";
+        }
+        if(vcodeverifyflag.equals("success")){
+            if(accountService.getNumberOfUsersByPhoneNumber(phoneNumber)>0){
+                ret= accountService.returnFail(area,"0");
+            }else{
+                ret= accountService.returnFail(area,"-11");
+            }
+        }else{
+            ret = accountService.returnFail(area, "-5");
+        }
+
+        return ret;
+    }
+
     //获取邮件地址是否经过验证的接口
     @RequestMapping(value = "/signin/isemailverified")
     public RetMessage isEmailVerified(
