@@ -25,8 +25,11 @@ import java.sql.Timestamp;
 public class SessionService {
     private static Logger log = LoggerFactory.getLogger(SessionService.class);
 
-    @Value("${session.timeout}")
-    private long sessionTimeout;
+    @Value("${sessionid.timeout}")
+    private long sessionIdTimeout;
+
+    @Value("${systemparam.debug}")
+    private int systemdebugflag;
 
     @Autowired
     private AccountSessionRepository accountSessionRepository;
@@ -38,7 +41,7 @@ public class SessionService {
         if(accountSession !=null){
             long timediff = GlobalTools.getTimeDifference(currentTime,accountSession.getTimestamp());
 
-            if(timediff<sessionTimeout){
+            if(timediff<sessionIdTimeout){
                 if(sessionId.equals(accountSession.getSessionId())){
                     ret = true;
 //                    更新sessionid最近使用时间
@@ -47,14 +50,33 @@ public class SessionService {
                 }
             }
         }
+
+        if(systemdebugflag ==1){
+            ret = true;
+        }
         return ret;
     }
 
-    public RetMessage returnFail(String area){
+    public boolean verifyIp(int functionId,String clientIp){
+        boolean ret = true;
+        if(functionId == 1 || functionId == 6){
+            //TODO：校验ip是否来自于设定的业务平台，实际要做得更灵活，而不是写死
+            if(!true){
+                ret = false;
+            }
+        }
+        if(systemdebugflag ==1){
+            ret = true;
+        }
+        return ret;
+    }
+
+    public RetMessage returnFail(String area,String errorCode){
         RetMessage retMessage = new RetMessage();
-        retMessage.setErrorMessage("-4");
-        retMessage.setErrorMessage(GlobalTools.getMessageByLocale(area,"-4"));
+        retMessage.setErrorMessage(errorCode);
+        retMessage.setErrorMessage(GlobalTools.getMessageByLocale(area,errorCode));
         return retMessage;
     }
+
 
 }

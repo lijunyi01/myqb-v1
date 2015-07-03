@@ -42,9 +42,9 @@ public class EmailService {
             retMessage.setErrorCode("0");
             retMessage.setErrorMessage(GlobalTools.getMessageByLocale(area,"0"));
         }else{
-            retMessage.setErrorCode("-6");
-            retMessage.setErrorMessage(GlobalTools.getMessageByLocale(area,"-6"));
-            emailVerifyCode.setSendResult("-6");
+            retMessage.setErrorCode("-1");
+            retMessage.setErrorMessage(GlobalTools.getMessageByLocale(area,"-1"));
+            emailVerifyCode.setSendResult("-1");
         }
         emailVerifyCodeRepository.save(emailVerifyCode);
 

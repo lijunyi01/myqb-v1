@@ -23,4 +23,11 @@ http://222.46.16.172:83/loginapi/signin/sendemail?email=ljy@allcomchina.com[&are
 http://222.46.16.172:83/loginapi/login?username=ljy&password=sdf[&devicetype=web&deviceinfo=&area=en]
 
 通用接口：
-http://222.46.16.172:83/loginapi/gi?functionId=1&umid=1&generalInput=abc<[CDATA]>abc&sessionId=sdfas232[&area=en]
+http://222.46.16.172:83/loginapi/gi?functionId=1&umid=1&generalInput=user=abc<[CDATA]>pass=abc&sessionId=sdfas232[&area=en]
+functionId:
+1. 验证sessionId
+2. 改密码
+3. 改手机号
+4. 改邮箱地址
+5. 改昵称
+6. 查询phoneNUmber,email,nickName等基本信息

@@ -26,8 +26,8 @@ import java.util.List;
 public class AccountService {
     private static Logger log = LoggerFactory.getLogger(AccountService.class);
 
-    @Value("${session.timeout}")
-    private long sessionTimeout;
+    @Value("${sessionid.timeout}")
+    private long sessionIdTimeout;
 
     @Value("${systemparam.defaultsite}")
     private String defaultsite;
@@ -102,7 +102,7 @@ public class AccountService {
         if(accountSession !=null){
             //log.info("username:"+userName+" and timestamp:" + accountSession.getTimestamp());
             long timediff = GlobalTools.getTimeDifference(currentTime,accountSession.getTimestamp());
-            if(timediff<sessionTimeout){
+            if(timediff<sessionIdTimeout){
                 ret = accountSession.getSessionId();
             }else{
                 ret = GlobalTools.getRandomString(16,false);
@@ -139,14 +139,6 @@ public class AccountService {
         return retMessage;
     }
 
-    public int getNumberOfUsersByEmail(String email){
-        int ret = 0;
-        Account account = accountRepository.findByEmail(email);
-        if(account !=null){
-            ret =1;
-        }
-        return ret;
-    }
 
     public int getNumberOfUsersByPhoneNumber(String phoneNumber){
         int ret = 0;
@@ -157,12 +149,20 @@ public class AccountService {
         return ret;
     }
 
-    public String getPhoneNumber(String userName){
-        String ret = "";
-        List<Account> accountList = accountRepository.findByUserName(userName);
-        if(accountList.size()==1){
-            Account account = accountList.get(0);
-            ret = account.getPhoneNumber();
+    public int getNumberOfUsersByNickName(String nickName){
+        int ret = 0;
+        Account account = accountRepository.findByNickName(nickName);
+        if(account !=null){
+            ret =1;
+        }
+        return ret;
+    }
+
+    public int getNumberOfUsersByEmail(String email){
+        int ret = 0;
+        Account account = accountRepository.findByEmail(email);
+        if(account !=null){
+            ret =1;
         }
         return ret;
     }
@@ -182,9 +182,66 @@ public class AccountService {
         boolean ret = false;
         Account account = accountRepository.findOne(umid);
         if(account!=null){
-            String encodepassword = passwordEncoder.encode(newPassword);
-            account.setPassword(encodepassword);
-            if(accountRepository.save(account)!=null){
+            if(!passwordEncoder.matches(newPassword,account.getPassword())) {
+                String encodepassword = passwordEncoder.encode(newPassword);
+                account.setPassword(encodepassword);
+                if (accountRepository.save(account) != null) {
+                    ret = true;
+                }
+            }else{
+                //如果密码未变，则什么都不做，直接返回成功
+                ret = true;
+            }
+        }
+        return ret;
+    }
+
+    public boolean setNickName(int umid,String nickName){
+        boolean ret = false;
+        Account account = accountRepository.findOne(umid);
+        if(account!=null){
+            if(!nickName.equals(account.getNickName())) {
+                account.setNickName(nickName);
+                if (accountRepository.save(account) != null) {
+                    ret = true;
+                }
+            }else{
+                //如果nickname未变，则什么都不做，直接返回成功
+                ret = true;
+            }
+        }
+        return ret;
+    }
+
+    public boolean setPhoneNumber(int umid,String phoneNumber){
+        boolean ret = false;
+        Account account = accountRepository.findOne(umid);
+        if(account!=null){
+            if(!phoneNumber.equals(account.getPhoneNumber())) {
+                account.setPhoneNumber(phoneNumber);
+                if (accountRepository.save(account) != null) {
+                    ret = true;
+                }
+            }else{
+                //如果phoneNumber未变，则什么都不做，直接返回成功
+                ret = true;
+            }
+        }
+        return ret;
+    }
+
+    public boolean setEmail(int umid,String email){
+        boolean ret = false;
+        Account account = accountRepository.findOne(umid);
+        if(account!=null){
+            if(!email.equals(account.getEmail())) {
+                account.setEmail(email);
+                account.setEmailVerifyFlag(0);
+                if (accountRepository.save(account) != null) {
+                    ret = true;
+                }
+            }else{
+                //如果邮件地址未变，则什么都不做，直接返回成功
                 ret = true;
             }
         }
@@ -207,6 +264,21 @@ public class AccountService {
             ret.setErrorCode("-11");
             ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-11"));
             log.info("email not exists:" + email);
+        }
+        return ret;
+    }
+
+    public RetMessage getUserInfo(int umid,String area){
+        RetMessage ret = new RetMessage();
+        Account account = accountRepository.findOne(umid);
+        if(account !=null){
+            ret.setErrorCode("0");
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
+            ret.setRetContent("phoneNumber="+account.getPhoneNumber()+"<[CDATA]>email="+account.getEmail()+"<[CDATA]>emailverifyflag="+account.getEmailVerifyFlag()+"<[CDATA]>nickName="+account.getNickName());
+        }else{
+            ret.setErrorCode("-11");
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-11"));
+            log.info("get no userinfo in getUserInfo,umid:" + umid);
         }
         return ret;
     }

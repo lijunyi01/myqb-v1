@@ -5,7 +5,9 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -130,6 +132,21 @@ public class GlobalTools {
 
     }
 
+    public static Map<String,String> parseInput(String input){
+        Map<String,String> ret = new HashMap<String,String>();
+        String[] a = input.split("\\<\\[CDATA\\]\\>");
+        for(String str:a){
+            String[] str_ = str.split("=");
+            if(str_.length==1){
+                //形如：username=
+                ret.put(str_[0],"");
+            }else {
+                ret.put(str_[0], str_[1]);
+            }
+        }
+        return ret;
+    }
+
     public static void main(String[] args){
 //        1.测试随机串
 //        String rs = GlobalTools.getRandomString(6,true);
@@ -160,7 +177,12 @@ public class GlobalTools {
 //        String s = getMessageByLocale("cn","-2");
 //        System.out.print(s);
 
-
+//        测试解析通用输入参数
+//        String input="username=<[CDATA]>pass=111";
+//        Map<String,String> map = parseInput(input);
+//        String pass = map.get("pass1");
+//        System.out.print(pass);
+//        System.out.print(map);
 
     }
 }
