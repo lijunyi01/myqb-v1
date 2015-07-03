@@ -122,8 +122,10 @@ public class SigninController {
                 ret = smsService.returnFail(area, "-7");
             }else{
                 if(accountService.resetPassword(phoneNumber,newPassword)){
+                    ret = smsService.returnFail(area,"0");
                     log.info("resetpassword success! phonenumber is:" + phoneNumber);
                 }else {
+                    ret = smsService.returnFail(area,"-1");
                     log.info("resetpassword failed! phonenumber is:" + phoneNumber);
                 }
             }
