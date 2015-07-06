@@ -73,7 +73,7 @@ public class SessionService {
 
     public RetMessage returnFail(String area,String errorCode){
         RetMessage retMessage = new RetMessage();
-        retMessage.setErrorMessage(errorCode);
+        retMessage.setErrorCode(errorCode);
         retMessage.setErrorMessage(GlobalTools.getMessageByLocale(area,errorCode));
         return retMessage;
     }
