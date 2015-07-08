@@ -135,32 +135,10 @@ public class GenController {
 
                     }
                 }else if(functionId == 5){
-                    //修改昵称
-                    if(inputMap.size()!=1){
-                        ret = accountService.returnFail(area, "-14");
-                        log.info("general input param error:" + generalInput);
-                    }else {
-                        String nickName = inputMap.get("nickName");
-                        if (nickName == null || nickName.equals("")) {
-                            ret = accountService.returnFail(area, "-14");
-                            log.info("general input param error:" + generalInput);
-                        }else if(accountService.getNumberOfUsersByNickName(nickName)>0){
-                            ret = accountService.returnFail(area, "-10");
-                            log.info("nickName exists:" + nickName);
-                        }else{
-                            if(accountService.setNickName(umid, nickName)){
-                                ret = accountService.returnFail(area, "0");
-                                log.info("set nickName success:" + umid);
-                            }else{
-                                ret = accountService.returnFail(area, "-1");
-                                log.info("set nickName failed:" + umid);
-                            }
-                        }
 
-                    }
 
                 }else if(functionId == 6){
-                    //查询phoneNUmber,email,nickName等基本信息
+                    //查询phoneNUmber,email等基本信息
                     ret = accountService.getUserInfo(umid,area);
                     log.info("in getUserInfo,umid is:" + umid+" and result:" + ret.getErrorCode());
                 }

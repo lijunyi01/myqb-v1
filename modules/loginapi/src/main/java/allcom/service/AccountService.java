@@ -149,14 +149,14 @@ public class AccountService {
         return ret;
     }
 
-    public int getNumberOfUsersByNickName(String nickName){
-        int ret = 0;
-        Account account = accountRepository.findByNickName(nickName);
-        if(account !=null){
-            ret =1;
-        }
-        return ret;
-    }
+//    public int getNumberOfUsersByNickName(String nickName){
+//        int ret = 0;
+//        Account account = accountRepository.findByNickName(nickName);
+//        if(account !=null){
+//            ret =1;
+//        }
+//        return ret;
+//    }
 
     public int getNumberOfUsersByEmail(String email){
         int ret = 0;
@@ -196,22 +196,22 @@ public class AccountService {
         return ret;
     }
 
-    public boolean setNickName(int umid,String nickName){
-        boolean ret = false;
-        Account account = accountRepository.findOne(umid);
-        if(account!=null){
-            if(!nickName.equals(account.getNickName())) {
-                account.setNickName(nickName);
-                if (accountRepository.save(account) != null) {
-                    ret = true;
-                }
-            }else{
-                //如果nickname未变，则什么都不做，直接返回成功
-                ret = true;
-            }
-        }
-        return ret;
-    }
+//    public boolean setNickName(int umid,String nickName){
+//        boolean ret = false;
+//        Account account = accountRepository.findOne(umid);
+//        if(account!=null){
+//            if(!nickName.equals(account.getNickName())) {
+//                account.setNickName(nickName);
+//                if (accountRepository.save(account) != null) {
+//                    ret = true;
+//                }
+//            }else{
+//                //如果nickname未变，则什么都不做，直接返回成功
+//                ret = true;
+//            }
+//        }
+//        return ret;
+//    }
 
     public boolean setPhoneNumber(int umid,String phoneNumber){
         boolean ret = false;
@@ -274,7 +274,7 @@ public class AccountService {
         if(account !=null){
             ret.setErrorCode("0");
             ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
-            ret.setRetContent("phoneNumber="+account.getPhoneNumber()+"<[CDATA]>email="+account.getEmail()+"<[CDATA]>emailverifyflag="+account.getEmailVerifyFlag()+"<[CDATA]>nickName="+account.getNickName());
+            ret.setRetContent("phoneNumber="+account.getPhoneNumber()+"<[CDATA]>email="+account.getEmail()+"<[CDATA]>emailverifyflag="+account.getEmailVerifyFlag());
         }else{
             ret.setErrorCode("-11");
             ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-11"));
