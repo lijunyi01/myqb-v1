@@ -1,5 +1,6 @@
 package allcom.controller;
 
+import allcom.entity.Account;
 import allcom.service.AccountService;
 import allcom.service.SessionService;
 import allcom.toolkit.GlobalTools;
@@ -47,21 +48,52 @@ public class GenController {
         String clientip = request.getRemoteAddr();
 
 
-        if (sessionService.verifySessionId(umid, sessionId, functionId)) {
-            Map<String,String> inputMap = GlobalTools.parseInput(generalInput);
+        if (sessionService.verifySessionId(umid, sessionId)) {
+            Map<String, String> inputMap = GlobalTools.parseInput(generalInput);
+            Account account = accountService.createAccountIfNotExist(umid);
 
-            if (functionId == 1) {
-                //登录验证
-                ret = accountService.returnFail(area, "0");
-                log.info("login success! umid is:" + umid);
-            }else if(functionId == 2) {
-                //获取phoneNumber,email等基本信息（从loginsite取）
-            }
-            else if(functionId == 3) {
-                //获取本地存储的用户账户信息
+            if (account != null) {
+                if (functionId == 1) {
+                    //登录验证，该步骤可以不用，非强制
+                    ret = accountService.returnFail(area, "0");
+                    log.info("login success! umid is:" + umid);
+                } else if (functionId == 2) {
+                    //设置本地存储的用户账户信息
+
+                    int grade_i = -1;
+                    String grade = inputMap.get("grade");
+                    if(grade == null){
+                        grade = "";
+                    }
+                    try{
+                        grade_i = Integer.parseInt(grade);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+
+                    if(grade_i <1 || grade_i >20){
+                        ret = accountService.returnFail(area,"-14");
+                    }else{
+                        ret = accountService.setLocalInfo(area,umid,inputMap,grade_i);
+                    }
+
+                } else if (functionId == 3) {
+                    //获取本地存储的用户账户信息
+                    ret = accountService.getLocalInfo(area,umid);
+                    log.info("umid:"+umid+" get localinfo result:" + ret.getErrorCode());
+                } else if (functionId == 6) {
+                    //获取phoneNumber,email等基本信息（从loginsite取）
+                    ret = accountService.getBaseInfo(area, umid, sessionId);
+                    log.info("umid:"+umid+" get baseinfo result:" + ret.getErrorCode());
+                }
+
+            }else{
+                //获取account信息失败
+                ret = accountService.returnFail(area, "-15");
+                log.info("umid:" + umid + " failed to get account");
             }
 
-        } else {
+        }else {
             ret = sessionService.returnFail(area, "-4");
             log.info("umid:" + umid + " failed to check sessionid:" + sessionId);
         }

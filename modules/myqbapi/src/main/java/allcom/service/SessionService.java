@@ -2,6 +2,7 @@ package allcom.service;
 
 import allcom.controller.RetMessage;
 import allcom.dao.AccountSessionRepository;
+import allcom.entity.Account;
 import allcom.entity.AccountSession;
 import allcom.toolkit.GlobalTools;
 import org.slf4j.Logger;
@@ -30,25 +31,24 @@ public class SessionService {
     @Autowired
     private AccountSessionRepository accountSessionRepository;
 
-    public boolean verifySessionId(int umid,String sessionId,int functionId){
+    public boolean verifySessionId(int umid,String sessionId){
         boolean ret =false;
-        //functionId ==1 表示是登录验证，此时必须进行远程验证
-        if(functionId!=1) {
-            Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-            AccountSession accountSession = accountSessionRepository.findOne(umid);
-            if (accountSession != null) {
-                long timediff = GlobalTools.getTimeDifference(currentTime, accountSession.getTimestamp());
 
-                if (timediff < sessionIdTimeout) {
-                    if (sessionId.equals(accountSession.getSessionId())) {
-                        ret = true;
-//                    注意： 本地验证通过不更新sessionid最近使用时间，以保证过一定时间就去登录站点验证sessionid
-//                    accountSession.setTimestamp(currentTime);
-//                    accountSessionRepository.save(accountSession);
-                    }
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        AccountSession accountSession = accountSessionRepository.findOne(umid);
+        if (accountSession != null) {
+            long timediff = GlobalTools.getTimeDifference(currentTime, accountSession.getTimestamp());
+
+            if (timediff < sessionIdTimeout) {
+                if (sessionId.equals(accountSession.getSessionId())) {
+                    ret = true;
+//                   注意： 本地验证通过不更新sessionid最近使用时间，以保证过一定时间就去登录站点验证sessionid
+//                   accountSession.setTimestamp(currentTime);
+//                   accountSessionRepository.save(accountSession);
                 }
             }
         }
+
 
         //本地校验未通过，则到登录站点进行校验
         if(ret == false){
@@ -84,9 +84,9 @@ public class SessionService {
     public boolean remoteVerifySessionId(int umid,String sessionId){
         boolean ret = false;
         RestTemplate restTemplate = new RestTemplate();
-        String url = loingUrl + "umid="+umid+"&sessionId="+sessionId;
+        String url = loingUrl + "gi?functionId=1&generalInput=&umid="+umid+"&sessionId="+sessionId;
         RetMessage retMessage = restTemplate.getForObject(url, RetMessage.class);
-        if(retMessage.getErrorCode().equals("0")){
+        if(retMessage!=null && retMessage.getErrorCode().equals("0")){
             ret = true;
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             AccountSession accountSession = accountSessionRepository.findOne(umid);
