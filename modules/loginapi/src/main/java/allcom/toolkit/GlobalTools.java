@@ -178,9 +178,9 @@ public class GlobalTools {
 //        System.out.print(s);
 
 //        测试解析通用输入参数
-//        String input="username=<[CDATA]>pass=111";
+//        String input="username=1";
 //        Map<String,String> map = parseInput(input);
-//        String pass = map.get("pass1");
+//        String pass = map.get("pass");
 //        System.out.print(pass);
 //        System.out.print(map);
 

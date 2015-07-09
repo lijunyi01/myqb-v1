@@ -67,19 +67,26 @@ public class AccountService {
             if(accountList.size()==1) {
                 Account account = accountList.get(0);
                 int umid = account.getId();
-                if (passwordEncoder.matches(password, account.getPassword())) {
+                boolean isPasswordOk = false;
+                try{
+                    isPasswordOk = passwordEncoder.matches(password, account.getPassword());
+                }catch (Exception e){
+                    log.info("password maybe set by hand!!!");
+                    e.printStackTrace();
+                }
+                if (isPasswordOk) {
                     log.info(userName + " auth success! umid is:"+ umid);
                     ret.setErrorCode("0");
                     ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
                     //生成sessionid
                     String sessionid = getSessionId(umid);
-                    retContent = umid + "<{DATA}>" + sessionid + "<{DATA}>" + account.getSite();
+                    retContent = "umid="+umid + "<[CDATA]>sessionId=" + sessionid + "<[CDATA]>site=" + account.getSite();
                     ret.setRetContent(retContent);
                 } else {
                     log.info(userName + " auth failed!");
                     ret.setErrorCode("-9");
                     ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "-9"));
-                    ret.setRetContent(umid+ "<{DATA}>");
+                    ret.setRetContent("umid="+umid);
                 }
             }else{
                 log.info(userName + " auth failed!");

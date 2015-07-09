@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 /**
  * Created by ljy on 15/5/12.
  * class 上的@RequestMapping("/aaa")注释和方法上的@RequestMapping("/greeting")要叠加
@@ -42,8 +44,8 @@ public class LoginController {
         int umid=0;
         String errorCode = ret.getErrorCode();
         if(errorCode.equals("0")||errorCode.equals("-9")){
-            String s[] = ret.getRetContent().split("<[CDATA]>");
-            umid= GlobalTools.convertStringToInt(s[0]);
+            Map<String,String> retContentMap = GlobalTools.parseInput(ret.getRetContent());
+            umid= GlobalTools.convertStringToInt(retContentMap.get("umid"));
         }
         accountService.recordLogin(umid,username,ip,errorCode,devicetype,deviceinfo);
         return ret;
