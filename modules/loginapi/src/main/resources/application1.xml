@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>file:/appconf/loginapi/persistence.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!--<bean id="velocityConfigurer"-->
+          <!--class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">-->
+        <!--<property name="resourceLoaderPath" value="/WEB-INF/templates/" />&lt;!&ndash; 模板存放的路径 &ndash;&gt;-->
+        <!--<property name="configLocation" value="classpath:config/velocity.properties" />-->
+    <!--</bean>-->
+
+
+    <!--<bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">-->
+
+    <!--</bean>-->
+
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="host" value="${email.host}" />
+        <property name="username" value="${email.username}" />
+        <property name="password" value="${email.password}" />
+        <property name="defaultEncoding" value="UTF-8"></property>
+        <property name="javaMailProperties">
+        <props>
+            <prop key="mail.smtp.auth">true</prop>
+            <prop key="mail.smtp.timeout">${email.timeout}</prop>
+        </props>
+        </property>
+    </bean>
+
+    <!--<bean id="mailUtil" class="allcom.email.MailUtil">-->
+        <!--<property name="javaMailSender" ref="mailSender"></property>-->
+    <!--&lt;!&ndash;<property name="velocityEngine" ref="velocityEngine"></property>&ndash;&gt;-->
+    <!--</bean>-->
+</beans>

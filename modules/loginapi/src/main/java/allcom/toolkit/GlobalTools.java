@@ -1,7 +1,13 @@
 package allcom.toolkit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,6 +22,7 @@ import java.util.Random;
  */
 public class GlobalTools {
 
+    private static Logger log = LoggerFactory.getLogger(GlobalTools.class);
     private static ResourceBundleMessageSource resourceBundleMessageSource = new ResourceBundleMessageSource();
 
 
@@ -143,6 +150,35 @@ public class GlobalTools {
             }else {
                 ret.put(str_[0], str_[1]);
             }
+        }
+        return ret;
+    }
+
+    //String数组转String
+    public static String arrayToStr(String[] array){
+        if(array == null || array.length == 0){
+            return null;
+        }
+        StringBuffer sb = new StringBuffer();
+        for(String str : array){
+            sb.append(str+" , ") ;
+        }
+        return sb.toString();
+    }
+
+    //文件读取至String
+    public static String readFileToString(String filePath){
+        String ret = "";
+        try{
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
+            String str = "";
+            while ((str = reader.readLine())!=null){
+                ret += str;
+            }
+            reader.close();
+        }catch (Exception e){
+            log.info("file:"+ filePath +"not found!");
+            e.printStackTrace();
         }
         return ret;
     }
