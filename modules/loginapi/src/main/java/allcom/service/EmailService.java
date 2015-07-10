@@ -30,6 +30,13 @@ public class EmailService {
     private long verifyEmailTimeout;
     @Value("${email.mailTemplatePath}")
     private String mailTemplatePath;
+    @Value("${email.mailfrom}")
+    private String mailFrom;
+    @Value("${email.mailfromname}")
+    private String mailFromName;
+    @Value("${email.subject}")
+    private String mailSubject;
+
 
     @Autowired
     EmailVerifyCodeRepository emailVerifyCodeRepository;
@@ -93,9 +100,9 @@ public class EmailService {
         mailtos[0]=emailto;
 
         MailBean mailBean = new MailBean();
-        mailBean.setFrom("lijunyi@allcomchina.com");
-        mailBean.setFromName("MyqbService");
-        mailBean.setSubject("password reset");
+        mailBean.setFrom(mailFrom);
+        mailBean.setFromName(mailFromName);
+        mailBean.setSubject(mailSubject);
         mailBean.setToEmails(mailtos);
 
         //从模版文件读取内容至template_s
@@ -104,6 +111,8 @@ public class EmailService {
         // map 用于填充模版数据
         Map map = new HashMap();
         map.put("emailVerifyCode", key);
+        map.put("emailTo",emailto);
+        map.put("testSome","testString");
         mailBean.setData(map);
 
         //发送邮件

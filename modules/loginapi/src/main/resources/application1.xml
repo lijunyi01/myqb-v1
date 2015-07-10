@@ -9,6 +9,7 @@
                 <value>file:/appconf/loginapi/persistence.properties</value>
             </list>
         </property>
+        <property name="fileEncoding" value="utf-8" />
     </bean>
 
     <!--<bean id="velocityConfigurer"-->

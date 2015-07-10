@@ -41,7 +41,8 @@ class ApplicationConfig {
 //    @Bean
 //	public static PropertyPlaceholderConfigurer propertyPlaceholderConfigurer() {
 //		PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
-//        ppc.setLocation(new FileSystemResource("/appconf/loginapi/persistence.properties"));        //JPA的标准配置文件
+//      ppc.setFileEncoding("utf-8");
+//      ppc.setLocation(new FileSystemResource("/appconf/loginapi/persistence.properties"));        //JPA的标准配置文件
 //		return ppc;
 //	}
 

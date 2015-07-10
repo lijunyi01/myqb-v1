@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
 
 /**
@@ -84,7 +85,7 @@ public class MailUtil {
             return null;
         }
         MimeMessage msg = javaMailSender.createMimeMessage();
-        MimeMessageHelper messageHelper = new MimeMessageHelper(msg, true, "UTF-8");
+        MimeMessageHelper messageHelper = new MimeMessageHelper(msg, true, "utf-8");
         //messageHelper.setFrom(mailBean.getFrom());
         try {
             messageHelper.setFrom(mailBean.getFrom(), mailBean.getFromName());
@@ -104,37 +105,21 @@ public class MailUtil {
      * @return
      */
     private String getMessage(MailBean mailBean) {
-//        StringWriter writer = null;
-//        try {
-//
-//            writer = new StringWriter();
-//            VelocityContext context = new VelocityContext(mailBean.getData());
-//
-//            velocityEngine.evaluate(context, writer, "", mailBean.getTemplate());
-//
-//            return writer.toString();
-//        } catch (VelocityException e) {
-//            log.error(" VelocityException : " + mailBean.getSubject() + "\n" + e);
-////        } catch (IOException e) {
-////            log.error(" IOException : " + mailBean.getSubject() + "\n" + e);
-//        } finally {
-//            if (writer != null) {
-//                try {
-//                    writer.close();
-//                } catch (IOException e) {
-//                    log.error("###StringWriter close error ... ");
-//                }
-//            }
-//        }
-//        return null;
 
-        //TODO:这里要做得更通用
         String ret = null;
+        Map<String,String> dataMap = mailBean.getData();
         String template_s = mailBean.getTemplate();
-        if(template_s!=null){
-            String replaceString = (String)mailBean.getData().get("emailVerifyCode");
-            ret = template_s.replace("${emailVerifyCode}",replaceString);
+        if(dataMap != null && template_s !=null){
+            for(String key:dataMap.keySet()){
+                String keytmp = "${"+key + "}";
+                if(template_s.indexOf(keytmp)>0){
+                    String replaceString = (String)mailBean.getData().get(key);
+                    template_s = template_s.replace(keytmp,replaceString);
+                }
+            }
+            ret = template_s;
         }
+
         return ret;
     }
 
