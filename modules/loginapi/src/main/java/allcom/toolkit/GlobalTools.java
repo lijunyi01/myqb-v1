@@ -220,5 +220,10 @@ public class GlobalTools {
 //        System.out.print(pass);
 //        System.out.print(map);
 
+
+//        测试字符串替换
+//        String s = "asdf asdf a< > asd ${emailVerifyCode} dsfasdfaasf";
+//        String ret = s.replace("${emailVerifyCode}", "1223");
+//        System.out.print(ret);
     }
 }

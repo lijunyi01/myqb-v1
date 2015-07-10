@@ -128,11 +128,12 @@ public class MailUtil {
 //        }
 //        return null;
 
+        //TODO:这里要做得更通用
         String ret = null;
         String template_s = mailBean.getTemplate();
         if(template_s!=null){
-            template_s.replace("${emailVerifyCode}",(String)mailBean.getData().get("emailVerifyCode"));
-            ret = template_s;
+            String replaceString = (String)mailBean.getData().get("emailVerifyCode");
+            ret = template_s.replace("${emailVerifyCode}",replaceString);
         }
         return ret;
     }
