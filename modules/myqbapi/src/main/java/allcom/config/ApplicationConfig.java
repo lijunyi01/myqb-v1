@@ -27,6 +27,7 @@ class ApplicationConfig {
     @Bean
 	public static PropertyPlaceholderConfigurer propertyPlaceholderConfigurer() {
 		PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
+        ppc.setFileEncoding("utf-8");
         ppc.setLocation(new FileSystemResource("/appconf/myqbapi/persistence.properties"));        //JPA的标准配置文件
 		return ppc;
 	}

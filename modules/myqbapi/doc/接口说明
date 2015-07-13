@@ -1,0 +1,13 @@
+通用接口：
+http://222.46.16.172:83/myqbapi/gi?functionId=1&umid=1&generalInput=user=abc<[CDATA]>pass=abc&sessionId=sdfas232[&area=en]
+functionId:
+1. 登录验证  (generalInput= / 验证sessionId有效性，本地或远程验证，远程functionId:1 / 该步骤可以不用，非强制)
+2. 改密码    (generalInput=newPassword=*** / 远程functionId:2)
+3. 改手机号  (generalInput=phoneNumber=***<[CDATA]>smsVerifyCode=*** / 远程functionId:3)
+4. 改邮箱地址   (generalInput=email=ljy@abc.com / 远程functionId:4)
+5. 发送邮件地址的验证邮件的链接  (generalInput=email=ljy@abc.com / 远程functionId:5)
+6. 查询phoneNUmber,email等基本信息   (generalInput=  /远程获取，远程functionId:6)
+
+//21号开始是本地接口，不涉及向登录站点查询
+21. 设置本地存储的用户账户信息    (generalInput=grade=*<[CDATA]>nickName=***<[CDATA]>address=***)
+22. 获取本地存储的用户账户信息   (generalInput=)

@@ -51,14 +51,50 @@ public class AccountService {
         return retMessage;
     }
 
-    public RetMessage getBaseInfo(String area,int umid,String sessionId){
+//    public RetMessage getBaseInfo(String area,int umid,String sessionId){
+//        RetMessage retMessage = null;
+//        RestTemplate restTemplate = new RestTemplate();
+//        String url = loingUrl + "gi?functionId=6&umid="+umid+"&sessionId="+sessionId+"&area="+area+"&generalInput=";
+//        retMessage = restTemplate.getForObject(url, RetMessage.class);
+//        if(retMessage==null){
+//            retMessage = returnFail(area,"-16");
+//            log.info("get baseinfo failed,umid is:"+umid);
+//        }
+//        return retMessage;
+//    }
+//
+//    public RetMessage resetPassword(String area,int umid,String newPassword,String sessionId){
+//        RetMessage retMessage = null;
+//        RestTemplate restTemplate = new RestTemplate();
+//        String url = loingUrl + "gi?functionId=2&umid="+umid+"&sessionId="+sessionId+"&area="+area+"&generalInput=newPassword="+newPassword;
+//        retMessage = restTemplate.getForObject(url, RetMessage.class);
+//        if(retMessage==null){
+//            retMessage = returnFail(area,"-17");
+//            log.info("resetPassword failed,umid is:"+umid);
+//        }
+//        return retMessage;
+//    }
+//
+//    public RetMessage setPhoneNumber(String area,int umid,String phoneNumber,String smsVerifyCode,String sessionId){
+//        RetMessage retMessage = null;
+//        RestTemplate restTemplate = new RestTemplate();
+//        String url = loingUrl + "gi?functionId=3&umid="+umid+"&sessionId="+sessionId+"&area="+area+"&generalInput=phoneNumber="+phoneNumber+"<[CDATA]>smsVerifyCode="+smsVerifyCode;
+//        retMessage = restTemplate.getForObject(url, RetMessage.class);
+//        if(retMessage==null){
+//            retMessage = returnFail(area,"-17");
+//            log.info("setPhoneNumber failed,umid is:"+umid);
+//        }
+//        return retMessage;
+//    }
+
+    public RetMessage genCall(String area,int umid,String sessionId,String generalInput,int functionId){
         RetMessage retMessage = null;
         RestTemplate restTemplate = new RestTemplate();
-        String url = loingUrl + "gi?functionId=6&generalInput=&umid="+umid+"&sessionId="+sessionId+"&area="+area;
+        String url = loingUrl + "gi?functionId="+functionId+"&umid="+umid+"&sessionId="+sessionId+"&area="+area+"&generalInput="+generalInput;
         retMessage = restTemplate.getForObject(url, RetMessage.class);
         if(retMessage==null){
-            retMessage = returnFail(area,"-16");
-            log.info("get baseinfo failed,umid is:"+umid);
+            retMessage = returnFail(area,"-17");
+            log.info("genCall failed,umid is:"+umid + "functionId is:"+functionId);
         }
         return retMessage;
     }
