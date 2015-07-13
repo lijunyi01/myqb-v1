@@ -196,7 +196,7 @@ public class SigninController {
     }
 
     //发送邮件（内含重置密码的联接）的接口
-    @RequestMapping(value = "/signin/sendemail")
+    @RequestMapping(value = "/signin/sendpassresetmail")
     public RetMessage sendEmail(
             @RequestParam(value = "email",required = true)String email,
             @RequestParam(value = "area",required = false,defaultValue = "cn")String area,
@@ -219,7 +219,7 @@ public class SigninController {
         }
 
         if(vcodeverifyflag.equals("success")){
-            ret = emailService.sendEmail(email, area);
+            ret = emailService.sendEmail(email,"passReset",area);
         }else{
             ret = emailService.returnFail(area, "-5");
         }

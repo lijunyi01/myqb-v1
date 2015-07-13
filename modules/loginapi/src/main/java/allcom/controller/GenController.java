@@ -2,6 +2,7 @@ package allcom.controller;
 
 import allcom.entity.Account;
 import allcom.service.AccountService;
+import allcom.service.EmailService;
 import allcom.service.SessionService;
 import allcom.service.SmsService;
 import allcom.toolkit.GlobalTools;
@@ -37,6 +38,9 @@ public class GenController {
     @Autowired
     private SmsService smsService;
 
+    @Autowired
+    private EmailService emailService;
+
     // 通用接口,用于已经完成登录验证后的其它请求
     @RequestMapping(value = "/gi")
     public RetMessage generalInterface(
@@ -56,7 +60,7 @@ public class GenController {
                 Map<String,String> inputMap = GlobalTools.parseInput(generalInput);
 
                 if (functionId == 1) {
-                    //用于业务平台发起的sessionId验证；由于之前已经完成sessionId校验，此处再校验下ip即可
+                    //用于业务平台发起的sessionId验证
                     ret = sessionService.returnFail(area,"0");
                 } else if (functionId == 2) {
                     //登录完成后的修改密码
@@ -135,7 +139,24 @@ public class GenController {
 
                     }
                 }else if(functionId == 5){
+                    //发送邮件地址的验证邮件
+                    if(inputMap.size()!=1){
+                        ret = accountService.returnFail(area, "-14");
+                        log.info("general input param error:" + generalInput);
+                    }else{
+                        String email = inputMap.get("email");
+                        if(email == null || email.equals("")){
+                            ret = accountService.returnFail(area, "-14");
+                            log.info("general input param error:" + generalInput);
+                        }else if(accountService.getNumberOfUsersByEmail(email)==0) {
+                            ret = accountService.returnFail(area, "-11");
+                            log.info("email not exists:" + email);
+                        }else{
+                            ret = emailService.sendEmail(email,"mailVerify",area);
+                            log.info("send verify mail result:"+ret.getErrorCode());
+                        }
 
+                    }
 
                 }else if(functionId == 6){
                     //查询phoneNUmber,email等基本信息

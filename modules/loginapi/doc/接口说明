@@ -19,8 +19,8 @@ http://222.46.16.172:83/loginapi/signin/resetpassbyphone?phoneNumber=13818000000
 获取某账号对应的邮件地址是否经过验证的接口
 http://222.46.16.172:83/loginapi/signin/isemailverified?email=ljy@allcomchina.com[&area=en]
 
-发送邮件（内含重置密码的联接）的接口
-http://222.46.16.172:83/loginapi/signin/sendemail?email=ljy@allcomchina.com[&area=en]
+发送重置密码的链接：emailType=passReset (默认)
+http://222.46.16.172:83/loginapi/signin/sendpassresetmail?email=ljy@allcomchina.com[&area=en]
 
 登录验证：
 http://222.46.16.172:83/loginapi/login?username=ljy&password=sdf[&devicetype=web&deviceinfo=&area=en]
@@ -28,9 +28,9 @@ http://222.46.16.172:83/loginapi/login?username=ljy&password=sdf[&devicetype=web
 通用接口（用于登录完成后的操作）：
 http://222.46.16.172:83/loginapi/gi?functionId=1&umid=1&generalInput=user=abc<[CDATA]>pass=abc&sessionId=sdfas232[&area=en]
 functionId:
-1. 验证sessionId
-2. 改密码
-3. 改手机号
-4. 改邮箱地址
-5.
-6. 查询phoneNUmber,email等基本信息
+1. 验证sessionId  (generalInput=)
+2. 改密码    (generalInput=newPassword=***)
+3. 改手机号  (generalInput=phoneNumber=***<[CDATA]>smsVerifyCode=***)
+4. 改邮箱地址   (generalInput=email=ljy@abc.com)
+5. 发送邮件地址的验证邮件的链接  (generalInput=email=ljy@abc.com)
+6. 查询phoneNUmber,email等基本信息   (generalInput=)

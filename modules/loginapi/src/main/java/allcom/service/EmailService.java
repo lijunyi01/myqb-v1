@@ -28,14 +28,18 @@ public class EmailService {
 
     @Value("${systemparam.emailverifycodetimeout}")
     private long verifyEmailTimeout;
-    @Value("${email.mailTemplatePath}")
-    private String mailTemplatePath;
+    @Value("${email.passResetMailTemplatePath}")
+    private String passResetMailTemplatePath;
+    @Value("${email.mailVerifyTemplatePath}")
+    private String mailVerifyTemplatePath;
     @Value("${email.mailfrom}")
     private String mailFrom;
     @Value("${email.mailfromname}")
     private String mailFromName;
-    @Value("${email.subject}")
-    private String mailSubject;
+    @Value("${email.passResetSubject}")
+    private String passResetMailSubject;
+    @Value("${email.mailVerifySubject}")
+    private String mailVerifySubject;
 
 
     @Autowired
@@ -43,13 +47,13 @@ public class EmailService {
     @Autowired
     MailUtil mailUtil;
 
-    public RetMessage sendEmail(String email,String area){
+    public RetMessage sendEmail(String email,String emailType,String area){
         RetMessage retMessage = new RetMessage();
         //key 为纯数字6位随机串
         String key = GlobalTools.getRandomString(6,true);
         //调用email发送接口发送email，传入参数为email和key
         boolean sendresult = false;
-        sendresult = mailSend(email,key);
+        sendresult = mailSend(email,key,emailType);
 
         Timestamp sendTime = new Timestamp(System.currentTimeMillis());
         EmailVerifyCode emailVerifyCode = new EmailVerifyCode(email,key,sendTime,"0");
@@ -93,11 +97,24 @@ public class EmailService {
     }
 
     //email 实际发送
-    private boolean mailSend(String emailto,String key){
+    private boolean mailSend(String emailto,String key,String emailType){
         boolean ret =false;
         String template_s = "";
         String[] mailtos = {""};
         mailtos[0]=emailto;
+        String mailSubject="";
+        String mailTemplatePath="";
+
+        if(emailType.equals("passReset")){
+            mailSubject = passResetMailSubject;
+            mailTemplatePath = passResetMailTemplatePath;
+        }else if(emailType.equals("mailVerify")){
+            mailSubject = mailVerifySubject;
+            mailTemplatePath = mailVerifyTemplatePath;
+        }else{
+            log.info("param error in mailsend!!!");
+            return false;
+        }
 
         MailBean mailBean = new MailBean();
         mailBean.setFrom(mailFrom);
