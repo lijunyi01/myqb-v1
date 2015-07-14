@@ -1,32 +1,38 @@
 
 获取图片验证码：
-http://222.46.16.172:83/loginapi/validatecode
+http://112.64.45.6:83/loginapi/validatecode
 验证图片验证码：
-http://222.46.16.172:83/loginapi/vcodeverify?vcode=1111[&area=en]
+http://112.64.45.6:83/loginapi/vcodeverify?vcode=1111[&area=en]
 
 发送短信验证码：
-http://222.46.16.172:83/loginapi/signin/sendsms?phoneNumber=13818000000[&area=en]
+http://112.64.45.6:83/loginapi/signin/sendsms?phoneNumber=13818000000[&area=en]
 
 开户：
-http://222.46.16.172:83/loginapi/signin/createuser?phoneNumber=13818000000&smsVerifyCode=231333&initPassword=111111[&area=en]
+http://112.64.45.6:83/loginapi/signin/createuser?phoneNumber=13818000000&smsVerifyCode=231333&initPassword=111111[&area=en]
 
 获取手机号码是否是已有用户的接口(返回的错误码：0 ：已有用户；－11：用户不存在 ）
-http://222.46.16.172:83/loginapi/signin/isphonenumberexist?phoneNumber=13818000000[&area=en]
+http://112.64.45.6:83/loginapi/signin/isphonenumberexist?phoneNumber=13818000000[&area=en]
 
 忘记密码时通过短信验证码重置密码的接口：
-http://222.46.16.172:83/loginapi/signin/resetpassbyphone?phoneNumber=13818000000&smsverifyCode=111111&newPassword=1111[&area=en]
+http://112.64.45.6:83/loginapi/signin/resetpassbyphone?phoneNumber=13818000000&smsVerifyCode=111111&newPassword=1111[&area=en]
+忘记密码时通过邮件验证码重置密码的接口：
+http://112.64.45.6:83/loginapi/signin/resetpassbymail?email=ljy@qq.com&mailVerifyCode=111111&newPassword=1111[&area=en]
+
 
 获取某账号对应的邮件地址是否经过验证的接口
-http://222.46.16.172:83/loginapi/signin/isemailverified?email=ljy@allcomchina.com[&area=en]
+http://112.64.45.6:83/loginapi/signin/isemailverified?email=ljy@allcomchina.com[&area=en]
 
 发送重置密码的链接：emailType=passReset (默认)
-http://222.46.16.172:83/loginapi/signin/sendpassresetmail?email=ljy@allcomchina.com[&area=en]
+http://112.64.45.6:83/loginapi/signin/sendpassresetmail?email=ljy@allcomchina.com[&area=en]
+
+校验邮件地址是否有效(用于邮件地址校验链接)
+http://112.64.45.6:83/loginapi/signin/ismailverified?email==ljy@allcomchina.com&verifyCode=***[&area=en]
 
 登录验证：
-http://222.46.16.172:83/loginapi/login?username=ljy&password=sdf[&devicetype=web&deviceinfo=&area=en]
+http://112.64.45.6:83/loginapi/login?username=ljy&password=sdf[&devicetype=web&deviceinfo=&area=en]
 
 通用接口（用于登录完成后的操作）：
-http://222.46.16.172:83/loginapi/gi?functionId=1&umid=1&generalInput=user=abc<[CDATA]>pass=abc&sessionId=sdfas232[&area=en]
+http://112.64.45.6:83/loginapi/gi?functionId=1&umid=1&generalInput=user=abc<[CDATA]>pass=abc&sessionId=sdfas232[&area=en]
 functionId:
 1. 验证sessionId  (generalInput=)
 2. 改密码    (generalInput=newPassword=***)

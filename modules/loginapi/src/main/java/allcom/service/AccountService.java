@@ -185,6 +185,17 @@ public class AccountService {
         return ret;
     }
 
+    public boolean resetPasswordByMail(String email,String newPassword){
+        boolean ret = false;
+        Account account = accountRepository.findByEmail(email);
+        if(account !=null){
+            if(resetPassword(account.getId(),newPassword)){
+                ret = true;
+            }
+        }
+        return ret;
+    }
+
     public boolean resetPassword(int umid,String newPassword){
         boolean ret = false;
         Account account = accountRepository.findOne(umid);
@@ -286,6 +297,28 @@ public class AccountService {
             ret.setErrorCode("-11");
             ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-11"));
             log.info("get no userinfo in getUserInfo,umid:" + umid);
+        }
+        return ret;
+    }
+
+    public RetMessage setMailVerified(String email,String area) {
+        RetMessage ret = new RetMessage();
+        Account account = accountRepository.findByEmail(email);
+        if (account != null) {
+            if (account.getEmailVerifyFlag() == 1) {
+                ret.setErrorCode("0");
+                ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
+            } else {
+                account.setEmailVerifyFlag(1);
+                if (accountRepository.save(account) != null) {
+                    ret.setErrorCode("0");
+                    ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
+                }
+            }
+        } else {
+            ret.setErrorCode("-11");
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "-11"));
+            log.info("email not exists:" + email);
         }
         return ret;
     }

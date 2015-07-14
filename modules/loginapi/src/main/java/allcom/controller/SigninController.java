@@ -107,22 +107,20 @@ public class SigninController {
     @RequestMapping(value = "/signin/resetpassbyphone")
     public RetMessage resetPassword(
             @RequestParam(value = "phoneNumber",required = true)String phoneNumber,
-            @RequestParam(value = "smsverifyCode",required = true)String smsverifyCode,
+            @RequestParam(value = "smsVerifyCode",required = true)String smsVerifyCode,
             @RequestParam(value = "newPassword",required = true)String newPassword,
             @RequestParam(value = "area",required = false,defaultValue = "cn")String area
     ) {
-        log.info("resetpassword params:phoneNumber:"+phoneNumber+";verifyCode:"+smsverifyCode);
+        log.info("resetpassword params:phoneNumber:"+phoneNumber+";verifyCode:"+smsVerifyCode);
         RetMessage ret = null;
-
-
 
         //getNumberOfUsersByPhoneNumber()方法返回 非0即1
         if (accountService.getNumberOfUsersByPhoneNumber(phoneNumber) == 0){
             log.info("user not exists! phoneNumber:" + phoneNumber);
             ret = smsService.returnFail(area,"-11");
         }else {
-            if(!smsService.verifySmsVerifyCode(phoneNumber, smsverifyCode)) {
-                log.info("verify VerifyCode failed! phonenumber is:" + phoneNumber + " and verifycode is:"+smsverifyCode);
+            if(!smsService.verifySmsVerifyCode(phoneNumber, smsVerifyCode)) {
+                log.info("verify VerifyCode failed! phonenumber is:" + phoneNumber + " and verifycode is:"+smsVerifyCode);
                 ret = smsService.returnFail(area, "-7");
             }else{
                 if(accountService.resetPassword(phoneNumber,newPassword)){
@@ -131,6 +129,37 @@ public class SigninController {
                 }else {
                     ret = smsService.returnFail(area,"-1");
                     log.info("resetpassword failed! phonenumber is:" + phoneNumber);
+                }
+            }
+        }
+        return ret;
+    }
+
+    //忘记密码时，通过邮件验证码重置密码的接口
+    @RequestMapping(value = "/signin/resetpassbymail")
+    public RetMessage resetPassword2(
+            @RequestParam(value = "email",required = true)String email,
+            @RequestParam(value = "mailVerifyCode",required = true)String mailVerifyCode,
+            @RequestParam(value = "newPassword",required = true)String newPassword,
+            @RequestParam(value = "area",required = false,defaultValue = "cn")String area
+    ) {
+        log.info("resetpassword params:email:"+email+";verifyCode:"+mailVerifyCode);
+        RetMessage ret = null;
+
+        if (accountService.getNumberOfUsersByEmail(email) == 0){
+            log.info("user not exists! email:" + email);
+            ret = emailService.returnFail(area,"-11");
+        }else {
+            if(!emailService.verifyEmailVerifyCode(email, mailVerifyCode)) {
+                log.info("verify VerifyCode failed! email is:" + email + " and verifycode is:"+mailVerifyCode);
+                ret = emailService.returnFail(area, "-7");
+            }else{
+                if(accountService.resetPasswordByMail(email,newPassword)){
+                    ret = emailService.returnFail(area,"0");
+                    log.info("resetpassword success! email is:" + email);
+                }else {
+                    ret = emailService.returnFail(area,"-1");
+                    log.info("resetpassword failed! email is:" + email);
                 }
             }
         }
@@ -226,6 +255,25 @@ public class SigninController {
 
         return ret;
     }
+
+    //判断邮件地址是否有效
+    @RequestMapping(value = "/signin/ismailverified")
+    public RetMessage isMailAddressVerified(
+            @RequestParam(value = "email",required = true)String email,
+            @RequestParam(value = "verifyCode",required = true)String verifyCode,
+            @RequestParam(value = "area",required = false,defaultValue = "cn")String area
+    ) {
+        log.info("verify email address, email:"+email + " and verifyCode:"+verifyCode);
+        RetMessage ret = null;
+        if(emailService.verifyEmailVerifyCode(email,verifyCode)){
+            ret = accountService.setMailVerified(email,area);
+        }else{
+            ret = emailService.returnFail(area, "-2");
+        }
+
+        return  ret;
+    }
+
 
 
 }
