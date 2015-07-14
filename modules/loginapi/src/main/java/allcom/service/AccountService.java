@@ -214,23 +214,6 @@ public class AccountService {
         return ret;
     }
 
-//    public boolean setNickName(int umid,String nickName){
-//        boolean ret = false;
-//        Account account = accountRepository.findOne(umid);
-//        if(account!=null){
-//            if(!nickName.equals(account.getNickName())) {
-//                account.setNickName(nickName);
-//                if (accountRepository.save(account) != null) {
-//                    ret = true;
-//                }
-//            }else{
-//                //如果nickname未变，则什么都不做，直接返回成功
-//                ret = true;
-//            }
-//        }
-//        return ret;
-//    }
-
     public boolean setPhoneNumber(int umid,String phoneNumber){
         boolean ret = false;
         Account account = accountRepository.findOne(umid);
@@ -266,22 +249,13 @@ public class AccountService {
         return ret;
     }
 
-    public RetMessage isEmailVerified(String email,String area){
-        RetMessage ret = new RetMessage();
+    public boolean isEmailVerified(String email){
+        boolean ret = false;
         Account account = accountRepository.findByEmail(email);
         if(account!=null){
             if(account.getEmailVerifyFlag() == 1){
-                ret.setErrorCode("0");
-                ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
-            }else{
-                ret.setErrorCode("-13");
-                ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-13"));
-                log.info("email not verified:" + email);
+                ret = true;
             }
-        }else{
-            ret.setErrorCode("-11");
-            ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-11"));
-            log.info("email not exists:" + email);
         }
         return ret;
     }

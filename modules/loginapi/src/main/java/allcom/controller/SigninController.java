@@ -198,31 +198,31 @@ public class SigninController {
     }
 
     //获取邮件地址是否经过验证的接口
-    @RequestMapping(value = "/signin/isemailverified")
-    public RetMessage isEmailVerified(
-            @RequestParam(value = "email",required = true)String email,
-            @RequestParam(value = "area",required = false,defaultValue = "cn")String area,
-            HttpServletRequest request
-    ) {
-        log.info("ask if email is verified, email:"+email);
-        RetMessage ret = null;
-
-        HttpSession session = request.getSession(false);
-        if (session == null) {
-            session = request.getSession();
-        }
-        String vcodeverifyflag=(String)session.getAttribute("vcodeverifyflag");
-        if(vcodeverifyflag == null){
-            vcodeverifyflag = "";
-        }
-        if(vcodeverifyflag.equals("success")){
-            ret = accountService.isEmailVerified(email, area);
-        }else{
-            ret = accountService.returnFail(area, "-5");
-        }
-
-        return ret;
-    }
+//    @RequestMapping(value = "/signin/isemailverified")
+//    public RetMessage isEmailVerified(
+//            @RequestParam(value = "email",required = true)String email,
+//            @RequestParam(value = "area",required = false,defaultValue = "cn")String area,
+//            HttpServletRequest request
+//    ) {
+//        log.info("ask if email is verified, email:"+email);
+//        RetMessage ret = null;
+//
+//        HttpSession session = request.getSession(false);
+//        if (session == null) {
+//            session = request.getSession();
+//        }
+//        String vcodeverifyflag=(String)session.getAttribute("vcodeverifyflag");
+//        if(vcodeverifyflag == null){
+//            vcodeverifyflag = "";
+//        }
+//        if(vcodeverifyflag.equals("success")){
+//            ret = accountService.isEmailVerified(email, area);
+//        }else{
+//            ret = accountService.returnFail(area, "-5");
+//        }
+//
+//        return ret;
+//    }
 
     //发送邮件（内含重置密码的联接）的接口
     @RequestMapping(value = "/signin/sendpassresetmail")
@@ -248,7 +248,12 @@ public class SigninController {
         }
 
         if(vcodeverifyflag.equals("success")){
-            ret = emailService.sendEmail(email,"passReset",area);
+            if(accountService.isEmailVerified(email)) {
+                ret = emailService.sendEmail(email, "passReset", area);
+            }else{
+                ret = emailService.returnFail(area, "-11");
+                log.info("email:"+email+" not exists or not verified in /signin/sendpassresetmail!");
+            }
         }else{
             ret = emailService.returnFail(area, "-5");
         }
