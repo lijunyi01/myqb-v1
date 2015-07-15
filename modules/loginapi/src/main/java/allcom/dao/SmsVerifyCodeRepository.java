@@ -25,4 +25,11 @@ public interface SmsVerifyCodeRepository extends CrudRepository<SmsVerifyCode, I
     @Modifying
     @Query("delete from SmsVerifyCode a where a.sendTime < :inputTime")
     void deleteOldRecord(@Param("inputTime")Timestamp inputTime);
+
+    @Query("select count(*) from SmsVerifyCode a where a.umid = :umid and a.sendResult = '0'")
+    int findSuccessCountByUmid(@Param("umid")int umid);
+
+    @Query("select count(*) from SmsVerifyCode a where a.sessionId = :sessionId and a.sendResult = '0'")
+    int findSuccessCountBySessionId(@Param("sessionId")String sessionId);
+
 }

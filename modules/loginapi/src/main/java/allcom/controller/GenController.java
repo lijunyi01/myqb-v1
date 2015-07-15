@@ -152,7 +152,7 @@ public class GenController {
                             ret = accountService.returnFail(area, "-11");
                             log.info("email not exists:" + email);
                         }else{
-                            ret = emailService.sendEmail(email,"mailVerify",area);
+                            ret = emailService.sendEmail("",umid,email,"mailVerify",area);
                             log.info("send verify mail result:"+ret.getErrorCode());
                         }
 
@@ -162,6 +162,24 @@ public class GenController {
                     //查询phoneNUmber,email等基本信息
                     ret = accountService.getUserInfo(umid,area);
                     log.info("in getUserInfo,umid is:" + umid+" and result:" + ret.getErrorCode());
+                }else if(functionId == 7){
+                    //修改手机号码时，发送短信验证码
+                    if(inputMap.size()!=1){
+                        ret = accountService.returnFail(area, "-14");
+                        log.info("general input param error:" + generalInput);
+                    }else{
+                        String phoneNumber = inputMap.get("phoneNumber");
+                        if(phoneNumber == null || phoneNumber.equals("") ){
+                            ret = accountService.returnFail(area, "-14");
+                            log.info("general input param error:" + generalInput);
+                        }else if(accountService.getNumberOfUsersByPhoneNumber(phoneNumber)>0) {
+                            ret = accountService.returnFail(area, "-10");
+                            log.info("phoneNumber exists:" + phoneNumber);
+                        }else {
+                            ret = smsService.sendSms("",umid,phoneNumber, area);
+                            log.info("send sms verifycode,umid is:" + umid + "phoneNumber is:"+phoneNumber +" and result:" + ret.getErrorCode());
+                        }
+                    }
                 }
 
             } else {

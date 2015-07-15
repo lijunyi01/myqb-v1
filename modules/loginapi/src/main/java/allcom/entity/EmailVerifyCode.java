@@ -13,6 +13,8 @@ public class EmailVerifyCode implements java.io.Serializable {
     @Id
     @GeneratedValue
     private long id;
+    private int umid;
+    private String sessionId;
     private String email;
     private String emailKey;
     private Timestamp sendTime;
@@ -21,11 +23,13 @@ public class EmailVerifyCode implements java.io.Serializable {
     protected EmailVerifyCode() {
     }
 
-    public EmailVerifyCode(String email, String emailKey, Timestamp sendTime, String sendResult) {
+    public EmailVerifyCode(String sessionId,int umid,String email, String emailKey, Timestamp sendTime, String sendResult) {
         this.email = email;
         this.emailKey = emailKey;
         this.sendTime = sendTime;
         this.sendResult = sendResult;
+        this.sessionId = sessionId;
+        this.umid = umid;
     }
 
     public long getId(){
@@ -51,5 +55,11 @@ public class EmailVerifyCode implements java.io.Serializable {
     public String getEmailKey(){ return this.emailKey;}
 
     public void setEmailKey(String emailkey){ this.emailKey = emailKey;}
+
+    public int getUmid(){return this.umid;}
+    public void setUmid(int umid) {this.umid = umid;}
+
+    public String getSessionId(){return this.sessionId;}
+    public void setSessionId(String sessionId){this.sessionId = sessionId;}
 
 }

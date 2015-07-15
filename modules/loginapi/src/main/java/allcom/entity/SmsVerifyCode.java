@@ -13,6 +13,8 @@ public class SmsVerifyCode implements java.io.Serializable {
     @Id
     @GeneratedValue
     private long id;
+    private int umid;
+    private String sessionId;
     private String phoneNumber;
     private String smsContent;
     private Timestamp sendTime;
@@ -21,11 +23,13 @@ public class SmsVerifyCode implements java.io.Serializable {
     protected SmsVerifyCode() {
     }
 
-    public SmsVerifyCode(String phoneNumber,String smsContent,Timestamp sendTime,String sendResult) {
+    public SmsVerifyCode(String sessionId,int umid,String phoneNumber,String smsContent,Timestamp sendTime,String sendResult) {
         this.phoneNumber = phoneNumber;
         this.smsContent = smsContent;
         this.sendTime = sendTime;
         this.sendResult = sendResult;
+        this.umid=umid;
+        this.sessionId=sessionId;
     }
 
     public long getId(){
@@ -33,23 +37,25 @@ public class SmsVerifyCode implements java.io.Serializable {
     }
 
     public String getPhoneNumber(){ return this.phoneNumber; }
-
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
 
     public Timestamp getSendTime() {
         return this.sendTime;
     }
-
     public void setSendTime(Timestamp sendTime) {
         this.sendTime = sendTime;
     }
 
     public String getSendResult(){ return this.sendResult; }
-
     public void setSendResult(String sendResult){ this.sendResult = sendResult;}
 
     public String getSmsContent(){ return this.smsContent;}
-
     public void setSmsContent(String smsContent){ this.smsContent = smsContent;}
+
+    public int getUmid(){return this.umid;}
+    public void setUmid(int umid) {this.umid = umid;}
+
+    public String getSessionId(){return this.sessionId;}
+    public void setSessionId(String sessionId){this.sessionId = sessionId;}
 
 }

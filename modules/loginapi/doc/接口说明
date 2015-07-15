@@ -18,7 +18,7 @@ http://112.64.45.6:83/loginapi/signin/resetpassbyphone?phoneNumber=13818000000&s
 忘记密码时通过邮件验证码重置密码的接口：
 http://112.64.45.6:83/loginapi/signin/resetpassbymail?email=ljy@qq.com&mailVerifyCode=111111&newPassword=1111[&area=en]
 
-发送重置密码的链接：emailType=passReset (默认)
+发送重置密码的链接：
 http://112.64.45.6:83/loginapi/signin/sendpassresetmail?email=ljy@allcomchina.com[&area=en]
 
 设定邮件地址经过验证(用于邮件地址校验链接)
@@ -36,3 +36,4 @@ functionId:
 4. 改邮箱地址   (generalInput=email=ljy@abc.com)
 5. 发送邮件地址的验证邮件的链接  (generalInput=email=ljy@abc.com)
 6. 查询phoneNUmber,email等基本信息   (generalInput=)
+7. 修改手机号码时，发送短信验证码  (generalInput=phoneNumber=***)

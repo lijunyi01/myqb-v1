@@ -40,6 +40,8 @@ public class EmailService {
     private String passResetMailSubject;
     @Value("${email.mailVerifySubject}")
     private String mailVerifySubject;
+    @Value("${systemparam.mailcountlimit}")
+    private int mailCountLimit;
 
 
     @Autowired
@@ -47,29 +49,40 @@ public class EmailService {
     @Autowired
     MailUtil mailUtil;
 
-    public RetMessage sendEmail(String email,String emailType,String area){
+    public RetMessage sendEmail(String sessionId,int umid,String email,String emailType,String area){
         RetMessage retMessage = new RetMessage();
         //key 为纯数字6位随机串
         String key = GlobalTools.getRandomString(6,true);
         //调用email发送接口发送email，传入参数为email和key
-        boolean sendresult = false;
-        sendresult = mailSend(email,key,emailType);
 
-        Timestamp sendTime = new Timestamp(System.currentTimeMillis());
-        EmailVerifyCode emailVerifyCode = new EmailVerifyCode(email,key,sendTime,"0");
+        if(umid>0 && (emailVerifyCodeRepository.findSuccessCountByUmid(umid)>mailCountLimit)) {
+            retMessage.setErrorCode("-16");
+            retMessage.setErrorMessage(GlobalTools.getMessageByLocale(area, "-16"));
+            log.info("send mail count exceeds limited number!!! umid is:" + umid);
+        }else if(!sessionId.equals("") && (emailVerifyCodeRepository.findSuccessCountBySessionId(sessionId)>mailCountLimit)){
+            retMessage.setErrorCode("-16");
+            retMessage.setErrorMessage(GlobalTools.getMessageByLocale(area, "-16"));
+            log.info("send mail count exceeds limited number!!! sessionId is:" + sessionId);
+        }else {
+            boolean sendresult = false;
+            sendresult = mailSend(email, key, emailType);
 
-        if(sendresult){
-            retMessage.setErrorCode("0");
-            retMessage.setErrorMessage(GlobalTools.getMessageByLocale(area,"0"));
-        }else{
-            retMessage.setErrorCode("-1");
-            retMessage.setErrorMessage(GlobalTools.getMessageByLocale(area,"-1"));
-            emailVerifyCode.setSendResult("-1");
+            Timestamp sendTime = new Timestamp(System.currentTimeMillis());
+            EmailVerifyCode emailVerifyCode = new EmailVerifyCode(sessionId,umid,email, key, sendTime, "0");
+
+            if (sendresult) {
+                retMessage.setErrorCode("0");
+                retMessage.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
+            } else {
+                retMessage.setErrorCode("-1");
+                retMessage.setErrorMessage(GlobalTools.getMessageByLocale(area, "-1"));
+                emailVerifyCode.setSendResult("-1");
+            }
+            emailVerifyCodeRepository.save(emailVerifyCode);
+
+            //删除1天前的邮件验证码记录
+            emailVerifyCodeRepository.deleteOldRecord(GlobalTools.getTimeBefore(3600 * 24));
         }
-        emailVerifyCodeRepository.save(emailVerifyCode);
-
-        //删除1天前的邮件验证码记录
-        emailVerifyCodeRepository.deleteOldRecord(GlobalTools.getTimeBefore(3600*24));
 
         return retMessage;
     }

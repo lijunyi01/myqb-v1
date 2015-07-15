@@ -26,4 +26,10 @@ public interface EmailVerifyCodeRepository extends CrudRepository<EmailVerifyCod
     @Modifying
     @Query("delete from EmailVerifyCode a where a.sendTime < :inputTime")
     void deleteOldRecord(@Param("inputTime") Timestamp inputTime);
+
+    @Query("select count(*) from EmailVerifyCode a where a.umid = :umid and a.sendResult = '0'")
+    int findSuccessCountByUmid(@Param("umid")int umid);
+
+    @Query("select count(*) from EmailVerifyCode a where a.sessionId = :sessionId and a.sendResult = '0'")
+    int findSuccessCountBySessionId(@Param("sessionId")String sessionId);
 }
