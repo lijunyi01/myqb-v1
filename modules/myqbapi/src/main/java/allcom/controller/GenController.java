@@ -57,44 +57,6 @@ public class GenController {
                     //登录验证，该步骤可以不用，非强制
                     ret = accountService.returnFail(area, "0");
                     log.info("login success! umid is:" + umid);
-//                } else if (functionId == 2) {
-//                    //登录完成后的修改密码
-//                    if(inputMap.size()!=1){
-//                        ret = accountService.returnFail(area, "-14");
-//                        log.info("general input param error:" + generalInput);
-//                    }else{
-//                        String newPassword = inputMap.get("newPassword");
-//                        if(newPassword == null || newPassword.equals("")) {
-//                            ret = accountService.returnFail(area, "-14");
-//                            log.info("general input param error:" + generalInput);
-//                        }else{
-//                            ret = accountService.resetPassword(area,umid,newPassword,sessionId);
-//                            log.info("reset pass result:" + ret.getErrorCode());
-//                        }
-//                    }
-//
-//                } else if (functionId == 3) {
-//                    //修改手机号码，强制通过短信验证新的手机号码
-//                    if(inputMap.size()!=2){
-//                        ret = accountService.returnFail(area, "-14");
-//                        log.info("general input param error:" + generalInput);
-//                    }else{
-//                        String phoneNumber = inputMap.get("phoneNumber");
-//                        String smsVerifyCode = inputMap.get("smsVerifyCode");
-//                        if(phoneNumber == null || phoneNumber.equals("") ||smsVerifyCode == null || smsVerifyCode.equals("")){
-//                            ret = accountService.returnFail(area, "-14");
-//                            log.info("general input param error:" + generalInput);
-//                        }else{
-//                            ret = accountService.setPhoneNumber(area, umid, phoneNumber, smsVerifyCode, sessionId);
-//                            log.info("modify phonenumber result:" + ret.getErrorCode());
-//                        }
-//
-//                    }
-//
-//                } else if (functionId == 6) {
-//                    //获取phoneNumber,email等基本信息（从loginsite取）
-//                    ret = accountService.getBaseInfo(area, umid, sessionId);
-//                    log.info("umid:" + umid + " get baseinfo result:" + ret.getErrorCode());
                 }else if(functionId>1 && functionId<20){
                     ret = accountService.genCall(area,umid,sessionId,generalInput,functionId);
                     log.info("umid:" + umid + " functionId:"+functionId +" genCall result:" + ret.getErrorCode());
