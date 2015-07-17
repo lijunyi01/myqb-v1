@@ -24,13 +24,13 @@ class ApplicationConfig {
 
     //在标注了@Configuration的java类中，通过在类方法标注@Bean定义一个Bean。方法必须提供Bean的实例化逻辑。
     //通过@Bean的name属性可以定义Bean的名称，未指定时默认名称为方法名。
-    @Bean
-	public static PropertyPlaceholderConfigurer propertyPlaceholderConfigurer() {
-		PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
-        ppc.setFileEncoding("utf-8");
-        ppc.setLocation(new FileSystemResource("/appconf/myqbapi/persistence.properties"));        //JPA的标准配置文件
-		return ppc;
-	}
+//    @Bean
+//	public static PropertyPlaceholderConfigurer propertyPlaceholderConfigurer() {
+//		PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
+//        ppc.setFileEncoding("utf-8");
+//        ppc.setLocation(new FileSystemResource("/appconf/myqbapi/persistence.properties"));        //JPA的标准配置文件
+//		return ppc;
+//	}
 
     @Bean
     public static JoranConfigurator readLogbackPropertyFile(){

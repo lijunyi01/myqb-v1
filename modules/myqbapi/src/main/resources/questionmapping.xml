@@ -1,0 +1,22 @@
+<mapping>
+    <class name="allcom.oxmapper.QuestionBean">
+
+        <map-to xml="questionbean"/>
+
+        <field name="questionId" type="long">
+            <bind-xml name="questionId" node="element"/>
+        </field>
+
+        <field name="classType" type="string">
+            <bind-xml name="classType" node="element"/>
+        </field>
+
+        <field name="classSubType" type="string">
+            <bind-xml name="classSubType" node="element"/>
+        </field>
+
+        <field name="content" type="string">
+            <bind-xml name="content" node="element"/>
+        </field>
+    </class>
+</mapping>

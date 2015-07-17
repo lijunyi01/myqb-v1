@@ -7,6 +7,8 @@ import allcom.dao.QuestionRepository;
 import allcom.entity.Account;
 import allcom.entity.Question;
 import allcom.entity.QuestionContent;
+import allcom.oxmapper.QuestionBean;
+import allcom.oxmapper.QuestionOmxService;
 import allcom.toolkit.GlobalTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -37,8 +40,10 @@ public class QuestionService {
     private QuestionRepository questionRepository;
     @Autowired
     private QuestionContentRepository questionContentRepository;
+    @Autowired
+    private QuestionOmxService questionOmxService;
 
-    @Transactional
+    //@Transactional
     //保存一个题目(一部分内容存入数据库，一部分存入xml文件)
     //public boolean createQuestion(int umid,int grade,int multiplexFlag,int questionType,int classType,int classSubType,String content){
     public boolean createQuestion(int umid,Map<String,String> inputMap){
@@ -59,7 +64,7 @@ public class QuestionService {
             if (questContentId != -1) {
                 //根据传入的信息生成xml文件并保存到指定的路径
                 String contentPath = "";
-                contentPath = saveInXml(inputMap);
+                contentPath = saveInXml(questContentId,inputMap);
 
                 //将题目相关信息保存到myqb_question表
                 if (contentPath != null && !contentPath.equals("")) {
@@ -110,9 +115,15 @@ public class QuestionService {
         return ret;
     }
 
-    private String saveInXml(Map<String,String> inputMap){
+    //返回生成的xml文件的完整路径
+    private String saveInXml(long questContentId,Map<String,String> inputMap){
         String ret ="";
-
+        QuestionBean questionBean = new QuestionBean(questContentId,inputMap.get("classType"),inputMap.get("classSubType"),inputMap.get("content"));
+        try {
+            ret = questionOmxService.saveQuestionBean(questionBean);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return ret;
     }
 
