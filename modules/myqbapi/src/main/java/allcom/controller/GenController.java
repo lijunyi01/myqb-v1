@@ -2,6 +2,7 @@ package allcom.controller;
 
 import allcom.entity.Account;
 import allcom.service.AccountService;
+import allcom.service.QuestionService;
 import allcom.service.SessionService;
 import allcom.toolkit.GlobalTools;
 import org.slf4j.Logger;
@@ -29,9 +30,10 @@ public class GenController {
 
     @Autowired
     private SessionService sessionService;
-
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private QuestionService questionService;
 
     // 通用接口,用于已经完成登录验证后的其它请求
     @RequestMapping(value = "/gi")
@@ -62,27 +64,37 @@ public class GenController {
                     log.info("umid:" + umid + " functionId:"+functionId +" genCall result:" + ret.getErrorCode());
                 }else if (functionId == 21) {
                     //设置本地存储的用户账户信息
-                    int grade_i = -1;
-                    String grade = inputMap.get("grade");
-                    if(grade == null){
-                        grade = "";
-                    }
-                    try{
-                        grade_i = Integer.parseInt(grade);
-                    }catch (Exception e){
-                        e.printStackTrace();
+                    int grade_i = -1000;
+                    if(GlobalTools.isNumeric(inputMap.get("grade"))) {
+                        grade_i = Integer.parseInt(inputMap.get("grade"));
                     }
 
-                    if(grade_i <1 || grade_i >20){
+                    if(grade_i <-100 || grade_i >1000){
                         ret = accountService.returnFail(area,"-14");
                     }else{
                         ret = accountService.setLocalInfo(area,umid,inputMap,grade_i);
                     }
 
-                } else if (functionId == 22) {
+                }else if (functionId == 22) {
                     //获取本地存储的用户账户信息
                     ret = accountService.getLocalInfo(area,umid);
                     log.info("umid:"+umid+" get localinfo result:" + ret.getErrorCode());
+
+                }else if (functionId == 23) {
+                    //存储题目信息
+                    //generalInput=grade=10<[CDATA]>questionType=1<[CDATA]>classType=1<[CDATA]>classSubType=1<[CDATA]>
+                    //content=小军吃了5个苹果,还剩下3个,小军原有多少个苹果？<[CDATA]>optionItem=A：6<[CDATA1]>B：7<[CDATA1]>C：8<[CDATA1]>D：9<[CDATA]>zqda=CB<[CDATA]>
+                    //cwda=AD<[CDATA]>xinde=哈达
+                    if(inputMap.size()!=9){
+                        ret = questionService.returnFail(area, "-14");
+                        log.info("general input param error:" + generalInput);
+                    }else{
+                        if(questionService.createQuestion(umid,inputMap)){
+                            ret = questionService.returnFail(area, "0");
+                        }else{
+                            ret = questionService.returnFail(area, "-18");
+                        }
+                    }
                 }
 
             }else{

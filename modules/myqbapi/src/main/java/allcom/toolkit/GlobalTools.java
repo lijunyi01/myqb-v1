@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by ljy on 15/6/18.
@@ -147,6 +149,20 @@ public class GlobalTools {
         return ret;
     }
 
+    //判断字符串是否是数字形式（可转为数值型）
+    public static boolean isNumeric(String number_s){
+        boolean ret = false;
+        if(number_s!=null) {
+            //通过正则表达式判断;修改正则表达式可以做到判断正数，负数等
+            Pattern pattern = Pattern.compile("^-?[0-9]+");
+            Matcher isNum = pattern.matcher(number_s);
+            if (isNum.matches()) {
+                ret = true;
+            }
+        }
+        return ret;
+    }
+
     public static void main(String[] args){
 //        1.测试随机串
 //        String rs = GlobalTools.getRandomString(6,true);
@@ -183,6 +199,12 @@ public class GlobalTools {
 //        String pass = map.get("pass1");
 //        System.out.print(pass);
 //        System.out.print(map);
+
+//        测试数字判断
+//        String s=null;
+//        if(isNumeric(s)){
+//            System.out.print("is number!");
+//        }
 
     }
 }

@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 
 @SuppressWarnings("serial")
 @Entity
-@Table(name = "myqb_question",indexes = {@Index(name = "i_1",columnList = "umid,grade",unique = false),@Index(name = "i_2",columnList = "classType,classSubType",unique = false),@Index(name = "i_3",columnList = "questionType",unique = false),@Index(name = "i_4",columnList = "headId",unique = false)})
+@Table(name = "myqb_question",indexes = {@Index(name = "i_1",columnList = "umid,grade",unique = false),@Index(name = "i_2",columnList = "classType,classSubType",unique = false),@Index(name = "i_3",columnList = "questionType",unique = false)})
 public class Question implements java.io.Serializable {
 
     @Id
@@ -14,30 +14,31 @@ public class Question implements java.io.Serializable {
     private long id;
     private int umid;
     private int grade;          //年级   －30：小班；－20:中班；－10:大班；10:小学一年级...50:小学5年级；60:小学6年级；61:初中预备班；70:初一...90:初三；100:高一...120:高三；130:大一...170:大五；180:研一...200:研三
-    private int questionFlag;   // 1:独立的题目；2:复合题目的题头；3：复合题目的子题
-    private int questionType;   //题目类型 0:复合题目的题头；1:选择题；2:填空题； 3:判断题；4:问答题；5:阅读理解
+    private int multiplexFlag;   // 0:独立的题目；1:复合题目(含子题)
+    private int questionType;   //题型 1:选择题；2:填空题； 3:判断题；4:问答题；100:未归类的复合题目；101:阅读理解
     private int classType;      //科目大类 1:基础科目；2:数学专业科目；3:计算机专业科目；4:化学专业科目；5:物理专业科目...
     private int classSubType;      //科目子类型 1:语文；2:数学；3:英语；4:历史；5:地理；6:生物；7:物理；8:化学...
-    private String content;     //题目内容
-    private String optionItem;  //选择题的待选项
-    private String zqda;        //正确答案
+    private int knownFlag;      //0:正常的题目   1:已经完全理解了的题目
+    private String contentPath;     //题目内容文件（xml）的路径
+    //private String optionItem;  //选择题的待选项  (置入xml)
+    //private String zqda;        //正确答案   (置入xml)
     private String cwda;        //之前的错误解答
     private String jtxd;        //解题心得
-    private int attachments;    //附件数
-    private int headId;         //复合题目的子题对应的题头的Id
+    //private int attachments;    //附件数   (置入xml)
+    private long questionContentId;     //对应的内容表的Id,分离出内容表是为了提升本表查询性能；该字段实际是内容表的外键，但考虑性能未定义外键，由应用管理两表关系
 
     protected Question() {
     }
 
-    public Question(int umid,int grade,int questionFlag,int questionType,int classType,int classSubType) {
+    public Question(int umid,int grade,int multiplexFlag,int questionType,int classType,int classSubType,long questionContentId) {
         this.umid = umid;
         this.grade = grade;
-        this.questionFlag = questionFlag;
+        this.multiplexFlag = multiplexFlag;
         this.questionType = questionType;
         this.classType = classType;
         this.classSubType = classSubType;
-        this.attachments = 0;
-        this.headId = 0;
+        this.knownFlag = 0;
+        this.questionContentId = questionContentId;
     }
 
     public long getId(){
@@ -50,8 +51,8 @@ public class Question implements java.io.Serializable {
     public int getGrade(){return this.grade;}
     public void setGrade(int grade){ this.grade = grade;}
 
-    public int getQuestionFlag(){return this.questionFlag;}
-    public void setQuestionFlag(int questionFlag){ this.questionFlag = questionFlag;}
+    public int getMultiplexFlag(){return this.multiplexFlag;}
+    public void setMultiplexFlag(int multiplexFlag){ this.multiplexFlag = multiplexFlag;}
 
     public int getQuestionType(){return this.questionType;}
     public void setQuestionType(int questionType){this.questionType = questionType;}
@@ -62,14 +63,14 @@ public class Question implements java.io.Serializable {
     public int getClassSubType(){return this.classSubType;}
     public void setClassSubType(int classSubType){this.classSubType = classSubType;}
 
-    public String getContent(){return this.content;}
-    public void setContent(String content){this.content = content;}
+    public String getContentPath(){return this.contentPath;}
+    public void setContentPath(String contentPath){this.contentPath = contentPath;}
 
-    public String getOptionItem(){return this.optionItem;}
-    public void setOptionItem(String optionItem) {this.optionItem = optionItem;}
-
-    public String getZqda(){return this.zqda;}
-    public void setZqda(String zqda) {this.zqda = zqda;}
+//    public String getOptionItem(){return this.optionItem;}
+//    public void setOptionItem(String optionItem) {this.optionItem = optionItem;}
+//
+//    public String getZqda(){return this.zqda;}
+//    public void setZqda(String zqda) {this.zqda = zqda;}
 
     public String getCwda(){return this.cwda;}
     public void setCwda(String cwda) {this.cwda = cwda;}
@@ -77,10 +78,10 @@ public class Question implements java.io.Serializable {
     public String getJtxd(){return this.jtxd;}
     public void setJtxd(String jtxd) {this.jtxd = jtxd;}
 
-    public int getAttachments(){return this.attachments;}
-    public void setAttachments(int attachments){this.attachments = attachments;}
+    public int getKnownFlag(){return this.knownFlag;}
+    public void setKnownFlag(int knownFlag){this.knownFlag = knownFlag;}
 
-    public int getHeadId(){return this.headId;}
-    public void setHeadId(int headId){this.headId = headId;}
+    public long getQuestionContentId() {return this.questionContentId;}
+    public void setQuestionContentId(long questionContentId) {this.questionContentId = questionContentId;}
 
 }
