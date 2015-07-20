@@ -84,8 +84,10 @@ public class GenController {
                     //存储题目信息
                     //generalInput=grade=10<[CDATA]>questionType=1<[CDATA]>classType=1<[CDATA]>classSubType=1<[CDATA]>
                     //content=小军吃了5个苹果,还剩下3个,小军原有多少个苹果？<[CDATA]>optionItem=A：6<[CDATA1]>B：7<[CDATA1]>C：8<[CDATA1]>D：9<[CDATA]>zqda=CB<[CDATA]>
-                    //cwda=AD<[CDATA]>xinde=哈达
-                    if(inputMap.size()!=9){
+                    //cwda=AD<[CDATA]>xinde=哈达<[CDATA]>subQuestions=seqId=1<[CDATA2]>qType=1<[CDATA2]>content=3333<[CDATA1]>seqId=2<[CDATA2]>qType=1<[CDATA2]>content=1233
+
+                    //http://localhost:8080/gi?functionId=23&umid=1&generalInput=grade=10<[CDATA]>multiplexFlag=0<[CDATA]>questionType=1<[CDATA]>classType=1<[CDATA]>classSubType=1<[CDATA]>content=小军吃了5个苹果,还剩下3个,小军原有多少个苹果？<[CDATA]>optionItem=A：6<[CDATA1]>B：7<[CDATA1]>C：8<[CDATA1]>D：9<[CDATA]>zqda=CB<[CDATA]>cwda=AD<[CDATA]>xinde=哈达<[CDATA]>subQuestions=seqId=1<[CDATA2]>qType=1<[CDATA2]>content=3333<[CDATA1]>seqId=2<[CDATA2]>qType=1<[CDATA2]>content=1233&sessionId=111
+                    if(inputMap.size()!=11){
                         ret = questionService.returnFail(area, "-14");
                         log.info("general input param error:" + generalInput);
                     }else{

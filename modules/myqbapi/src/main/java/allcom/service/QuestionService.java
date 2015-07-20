@@ -9,6 +9,7 @@ import allcom.entity.Question;
 import allcom.entity.QuestionContent;
 import allcom.oxmapper.QuestionBean;
 import allcom.oxmapper.QuestionOmxService;
+import allcom.oxmapper.SubQuestionBean;
 import allcom.toolkit.GlobalTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,8 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -119,12 +122,25 @@ public class QuestionService {
     private String saveInXml(long questContentId,Map<String,String> inputMap){
         String ret ="";
         QuestionBean questionBean = new QuestionBean(questContentId,inputMap.get("classType"),inputMap.get("classSubType"),inputMap.get("content"));
+        ArrayList<SubQuestionBean> subBeanList = getSubQuestionList(inputMap.get("subQuestions"));
+        questionBean.setSubQuestionBeanList(subBeanList);
         try {
             ret = questionOmxService.saveQuestionBean(questionBean);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return ret;
+    }
+
+    private ArrayList<SubQuestionBean> getSubQuestionList(String subQuestionString){
+        ArrayList<SubQuestionBean> retList = new ArrayList<SubQuestionBean>();
+        String[] a = subQuestionString.split("\\<\\[CDATA1\\]\\>");
+        for(String str:a){
+            Map<String, String> map = GlobalTools.parseInput(str,"\\<\\[CDATA2\\]\\>");
+            SubQuestionBean subQuestionBean = new SubQuestionBean(map.get("seqId"),map.get("qType"),map.get("content"));
+            retList.add(subQuestionBean);
+        }
+        return retList;
     }
 
 }

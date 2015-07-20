@@ -18,5 +18,23 @@
         <field name="content" type="string">
             <bind-xml name="content" node="element"/>
         </field>
+
+        <field name="subQuestionBeanList" collection="arraylist" type="allcom.oxmapper.SubQuestionBean">
+            <bind-xml name="subquestionlist" node="element"/>
+        </field>
+    </class>
+
+    <class name="allcom.oxmapper.SubQuestionBean">
+        <map-to xml="subquestionbean"/>
+
+        <field name="sequenceId" type="string">
+            <bind-xml name="sequenceId" node="element"/>
+        </field>
+        <field name="questionType" type="string">
+            <bind-xml name="questionType" node="element"/>
+        </field>
+        <field name="content" type="string">
+            <bind-xml name="content" node="element"/>
+        </field>
     </class>
 </mapping>

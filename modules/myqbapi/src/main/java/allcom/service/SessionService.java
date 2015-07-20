@@ -24,9 +24,11 @@ public class SessionService {
 
     @Value("${sessionid.timeout}")
     private long sessionIdTimeout;
-
     @Value("${systemparam.loginurl}")
     private String loingUrl;
+    @Value("${systemparam.debug}")
+    private int systemdebugflag;
+
 
     @Autowired
     private AccountSessionRepository accountSessionRepository;
@@ -49,12 +51,15 @@ public class SessionService {
             }
         }
 
-
-        //本地校验未通过，则到登录站点进行校验
-        if(ret == false){
-            if(remoteVerifySessionId(umid,sessionId)){
-                ret = true;
+        if(systemdebugflag !=1) {
+            //本地校验未通过，则到登录站点进行校验
+            if (ret == false) {
+                if (remoteVerifySessionId(umid, sessionId)) {
+                    ret = true;
+                }
             }
+        }else{
+            ret = true;
         }
 
         return ret;

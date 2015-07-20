@@ -138,7 +138,24 @@ public class GlobalTools {
         Map<String,String> ret = new HashMap<String,String>();
         String[] a = input.split("\\<\\[CDATA\\]\\>");
         for(String str:a){
-            String[] str_ = str.split("=");
+            //第二个参数表示做多分成几部分；默认不限制；如果是1则不分割，返回整个输入的串
+            String[] str_ = str.split("=",2);
+            if(str_.length==1){
+                //形如：username=
+                ret.put(str_[0],"");
+            }else {
+                ret.put(str_[0], str_[1]);
+            }
+        }
+        return ret;
+    }
+
+    //更通用的方法，把分割符作参数
+    public static Map<String,String> parseInput(String input,String splitString){
+        Map<String,String> ret = new HashMap<String,String>();
+        String[] a = input.split(splitString);
+        for(String str:a){
+            String[] str_ = str.split("=",2);
             if(str_.length==1){
                 //形如：username=
                 ret.put(str_[0],"");
@@ -194,11 +211,11 @@ public class GlobalTools {
 //        System.out.print(s);
 
 //        测试解析通用输入参数
-//        String input="username=<[CDATA]>pass=111";
-//        Map<String,String> map = parseInput(input);
-//        String pass = map.get("pass1");
-//        System.out.print(pass);
-//        System.out.print(map);
+        String input="username=tt=asdf<[CDATA]>pass=111";
+        Map<String,String> map = parseInput(input);
+        String pass = map.get("pass1");
+        System.out.print(pass);
+        System.out.print(map);
 
 //        测试数字判断
 //        String s=null;
