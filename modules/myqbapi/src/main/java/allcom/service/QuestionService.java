@@ -9,6 +9,7 @@ import allcom.entity.Question;
 import allcom.entity.QuestionContent;
 import allcom.oxmapper.QuestionBean;
 import allcom.oxmapper.QuestionOmxService;
+import allcom.oxmapper.SubQuestion;
 import allcom.oxmapper.SubQuestionBean;
 import allcom.toolkit.GlobalTools;
 import org.slf4j.Logger;
@@ -123,7 +124,10 @@ public class QuestionService {
         String ret ="";
         QuestionBean questionBean = new QuestionBean(questContentId,inputMap.get("classType"),inputMap.get("classSubType"),inputMap.get("content"));
         ArrayList<SubQuestionBean> subBeanList = getSubQuestionList(inputMap.get("subQuestions"));
-        questionBean.setSubQuestionBeanList(subBeanList);
+        //questionBean.setSubQuestionBeanList(subBeanList);
+        SubQuestion subQuestion = new SubQuestion();
+        subQuestion.setSubQuestionBeanList(subBeanList);
+        questionBean.setSubQuestion(subQuestion);
         try {
             ret = questionOmxService.saveQuestionBean(questionBean);
         } catch (IOException e) {

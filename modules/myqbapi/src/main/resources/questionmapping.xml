@@ -19,8 +19,19 @@
             <bind-xml name="content" node="element"/>
         </field>
 
+        <!--<field name="subQuestionBeanList" collection="arraylist" type="allcom.oxmapper.SubQuestionBean">-->
+            <!--<bind-xml name="subquestionlist" node="element"/>-->
+        <!--</field>-->
+
+        <field name="subQuestion" type="allcom.oxmapper.SubQuestion">
+            <bind-xml name="subquestions" node="element"/>
+        </field>
+    </class>
+
+    <class name="allcom.oxmapper.SubQuestion">
+        <map-to xml="subquestions2"/>
         <field name="subQuestionBeanList" collection="arraylist" type="allcom.oxmapper.SubQuestionBean">
-            <bind-xml name="subquestionlist" node="element"/>
+            <bind-xml name="subquestion" node="element"/>
         </field>
     </class>
 

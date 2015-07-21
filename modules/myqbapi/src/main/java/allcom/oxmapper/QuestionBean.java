@@ -14,7 +14,8 @@ public class QuestionBean {
     private String classType;
     private String classSubType;
     private String content;
-    private ArrayList<SubQuestionBean> subQuestionBeanList;
+    //private ArrayList<SubQuestionBean> subQuestionBeanList;
+    private SubQuestion subQuestion;
 
     public QuestionBean(){}
 
@@ -37,7 +38,10 @@ public class QuestionBean {
     public String getContent(){return this.content;}
     public void setContent(String content){this.content = content;}
 
-    public ArrayList<SubQuestionBean> getSubQuestionBeanList(){return this.subQuestionBeanList;}
-    public void setSubQuestionBeanList(ArrayList<SubQuestionBean> subQuestionBeanList){this.subQuestionBeanList = subQuestionBeanList;}
+    //public ArrayList<SubQuestionBean> getSubQuestionBeanList(){return this.subQuestionBeanList;}
+    //public void setSubQuestionBeanList(ArrayList<SubQuestionBean> subQuestionBeanList){this.subQuestionBeanList = subQuestionBeanList;}
+
+    public SubQuestion getSubQuestion(){return this.subQuestion;}
+    public void setSubQuestion(SubQuestion subQuestion){this.subQuestion = subQuestion;}
 
 }
