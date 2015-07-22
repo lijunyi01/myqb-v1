@@ -106,7 +106,7 @@ public class GenController {
                     //获取符合条件的题目id（按question的内容查找）
                     ret = questionService.getIdsByContent(umid,inputMap.get("content"),area);
                 }else if(functionId == 26){
-                    //按参数指定的题目id返回题目内容（题目内容的集合，json形式）
+
                 }
 
             }else{

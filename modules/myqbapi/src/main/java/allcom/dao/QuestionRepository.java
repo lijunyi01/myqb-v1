@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Transactional(readOnly = true)
-public interface QuestionRepository extends CrudRepository<Question, Integer> {
+public interface QuestionRepository extends CrudRepository<Question,Long> {
     List<Question> findByUmid(int umid);
 
     Question findByUmidAndQuestionContentId(int umid,long questionContentId);

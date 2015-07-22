@@ -221,5 +221,10 @@ public class QuestionService {
         return ret;
     }
 
+    public Question getQuestionById(long id){
+        Question question = questionRepository.findOne(id);
+        return question;
+    }
+
 
 }

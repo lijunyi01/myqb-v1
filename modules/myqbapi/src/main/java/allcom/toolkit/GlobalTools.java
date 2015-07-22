@@ -132,6 +132,18 @@ public class GlobalTools {
         return iValue;
     }
 
+    public static long convertStringToLong(String sValue) {
+        long lValue = -10000;
+        if(isNumeric(sValue)) {
+            try {
+                lValue = Long.parseLong(sValue);
+            } catch (NumberFormatException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return lValue;
+    }
+
     public static Map<String,String> parseInput(String input){
         Map<String,String> ret = new HashMap<String,String>();
         String[] a = input.split("\\<\\[CDATA\\]\\>");
