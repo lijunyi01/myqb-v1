@@ -119,19 +119,17 @@ public class GlobalTools {
         return  ret;
     }
 
-//    字符串转数字
+//    字符串转数字,-10000表示转换失败
     public static int convertStringToInt(String sValue) {
-
         int iValue = -10000;
-
-        try {
-            iValue = Integer.parseInt(sValue);
-        }
-        catch (NumberFormatException ex) {
-            System.out.println("The String does not contain a parsable integer");
+        if(isNumeric(sValue)) {
+            try {
+                iValue = Integer.parseInt(sValue);
+            } catch (NumberFormatException ex) {
+                ex.printStackTrace();
+            }
         }
         return iValue;
-
     }
 
     public static Map<String,String> parseInput(String input){

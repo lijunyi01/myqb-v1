@@ -90,6 +90,49 @@ public class QuestionService {
         return ret;
     }
 
+    public RetMessage getIdsByType(int umid,Map<String,String> inputMap,String area){
+        RetMessage ret = new RetMessage();
+        String retContent="";
+        List<Question> questionList = questionRepository.findByUmid(umid);
+        if(!questionList.isEmpty()){
+            for(Question question:questionList){
+                if(questionHitOn(question,inputMap)){
+                    if(retContent.equals("")){
+                        retContent = question.getId()+"";
+                    }else{
+                        retContent = retContent + ":" +question.getId();
+                    }
+                }
+            }
+            ret.setRetContent(retContent);
+        }
+        ret.setErrorCode("0");
+        ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"0"));
+        return ret;
+    }
+
+    public RetMessage getIdsByContent(int umid,String content,String area){
+        RetMessage ret = new RetMessage();
+        String retContent="";
+        List<QuestionContent> questionContentList = questionContentRepository.findByUmidAndContent(umid,content);
+        if(!questionContentList.isEmpty()){
+            for(QuestionContent questionContent:questionContentList){
+                Question question = questionRepository.findByUmidAndQuestionContentId(umid,questionContent.getId());
+                if(question != null){
+                    if(retContent.equals("")){
+                        retContent = question.getId()+"";
+                    }else{
+                        retContent = retContent + ":" +question.getId();
+                    }
+                }
+            }
+            ret.setRetContent(retContent);
+        }
+        ret.setErrorCode("0");
+        ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"0"));
+        return ret;
+    }
+
     public RetMessage returnFail(String area,String errorCode){
         RetMessage retMessage = new RetMessage();
         retMessage.setErrorCode(errorCode);
@@ -146,5 +189,37 @@ public class QuestionService {
         }
         return retList;
     }
+
+    //按question的各种类型核对，完全符合条件才返回true
+    private boolean questionHitOn(Question question,Map<String,String> conditionMap){
+        boolean ret = true;
+        for (String key : conditionMap.keySet()) {
+            //System.out.println("key= "+ key + " and value= " + conditionMap.get(key));
+            if(key.equals("grade")){
+                if(question.getGrade()!=GlobalTools.convertStringToInt(conditionMap.get("grade"))){
+                    ret = false;
+                    break;
+                }
+            }else if(key.equals("classType")){
+                if(question.getClassType()!=GlobalTools.convertStringToInt(conditionMap.get("classType"))){
+                    ret = false;
+                    break;
+                }
+            }else if(key.equals("classSubType")){
+                if(question.getClassSubType()!=GlobalTools.convertStringToInt(conditionMap.get("classSubType"))){
+                    ret = false;
+                    break;
+                }
+            }else if(key.equals("questionType")){
+                if(question.getQuestionType()!=GlobalTools.convertStringToInt(conditionMap.get("questionType"))){
+                    ret = false;
+                    break;
+                }
+            }
+        }
+
+        return ret;
+    }
+
 
 }

@@ -97,6 +97,16 @@ public class GenController {
                             ret = questionService.returnFail(area, "-18");
                         }
                     }
+                }else if(functionId == 24) {
+                    //http://localhost:8080/gi?functionId=24&umid=1&generalInput=grade=10<[CDATA]>classType=1&sessionId=111
+                    //获取符合条件的题目id（按question的各种类型核对）
+                    ret = questionService.getIdsByType(umid,inputMap,area);
+                }else if(functionId == 25) {
+                    //http://localhost:8080/gi?functionId=25&umid=1&generalInput=content=a&sessionId=111
+                    //获取符合条件的题目id（按question的内容查找）
+                    ret = questionService.getIdsByContent(umid,inputMap.get("content"),area);
+                }else if(functionId == 26){
+                    //按参数指定的题目id返回题目内容（题目内容的集合，json形式）
                 }
 
             }else{
