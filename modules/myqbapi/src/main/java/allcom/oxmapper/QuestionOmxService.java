@@ -1,5 +1,6 @@
 package allcom.oxmapper;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.Unmarshaller;
 
@@ -16,8 +17,9 @@ import java.io.IOException;
  */
 public class QuestionOmxService {
 
-    //private static final String FILE_NAME = "questionbean.xml";
-    //private QuestionBean questionBean;
+    @Value("${systemparam.xmlBaseDir}")
+    private String xmlBaseDir;
+
     private Marshaller marshaller;
     private Unmarshaller unmarshaller;
 
@@ -33,7 +35,7 @@ public class QuestionOmxService {
 
     //    object -> xml
     public String saveQuestionBean(QuestionBean questionBean) throws IOException {
-        String filePath = "/appconf/myqbapi/questionxml/"+questionBean.getClassType()+"/"+questionBean.getClassSubType()+"/"+questionBean.getQuestionId()+".xml";
+        String filePath = xmlBaseDir+questionBean.getClassType()+"/"+questionBean.getClassSubType()+"/"+questionBean.getQuestionId()+".xml";
         FileOutputStream os = null;
         try {
             File file = new File(filePath);

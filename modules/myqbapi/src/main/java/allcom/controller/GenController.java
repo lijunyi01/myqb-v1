@@ -81,12 +81,13 @@ public class GenController {
                     log.info("umid:"+umid+" get localinfo result:" + ret.getErrorCode());
 
                 }else if (functionId == 23) {
-                    //存储题目信息
+                    //存储题目信息(心得及正确／错误答案保存于题目对应的xml，每个子题都有正确／错误答案，心得根据需要可有可无)
                     //generalInput=grade=10<[CDATA]>questionType=1<[CDATA]>classType=1<[CDATA]>classSubType=1<[CDATA]>
                     //content=小军吃了5个苹果,还剩下3个,小军原有多少个苹果？<[CDATA]>optionItem=A：6<[CDATA1]>B：7<[CDATA1]>C：8<[CDATA1]>D：9<[CDATA]>zqda=CB<[CDATA]>
                     //cwda=AD<[CDATA]>xinde=哈达<[CDATA]>subQuestions=seqId=1<[CDATA2]>qType=1<[CDATA2]>content=3333<[CDATA1]>seqId=2<[CDATA2]>qType=1<[CDATA2]>content=1233
 
-                    //http://localhost:8080/gi?functionId=23&umid=1&generalInput=grade=10<[CDATA]>multiplexFlag=0<[CDATA]>questionType=1<[CDATA]>classType=1<[CDATA]>classSubType=1<[CDATA]>content=小军吃了5个苹果,还剩下3个,小军原有多少个苹果？<[CDATA]>optionItem=A：6<[CDATA1]>B：7<[CDATA1]>C：8<[CDATA1]>D：9<[CDATA]>zqda=CB<[CDATA]>cwda=AD<[CDATA]>xinde=哈达<[CDATA]>subQuestions=seqId=1<[CDATA2]>qType=1<[CDATA2]>content=3333<[CDATA1]>seqId=2<[CDATA2]>qType=1<[CDATA2]>content=1233&sessionId=111
+                    //http://localhost:8080/gi?functionId=23&umid=1&sessionId=111&generalInput=grade=10<[CDATA]>multiplexFlag=1<[CDATA]>subQuestionCount=2<[CDATA]>contentHeader=content-header-test<[CDATA]>subject=sub<[CDATA]>attachmentIds=<[CDATA]>subQuestions=seqId=1<[CDATA2]>qType=1<[CDATA2]>content=3333<[CDATA1]>seqId=2<[CDATA2]>qType=1<[CDATA2]>content=1233
+                    //<[CDATA]>questionType=1<[CDATA]>classType=1<[CDATA]>classSubType=1<[CDATA]>content=小军吃了5个苹果,还剩下3个,小军原有多少个苹果？<[CDATA]>optionItem=A：6<[CDATA1]>B：7<[CDATA1]>C：8<[CDATA1]>D：9<[CDATA]>zqda=CB<[CDATA]>cwda=AD<[CDATA]>xinde=哈达
                     if(inputMap.size()!=11){
                         ret = questionService.returnFail(area, "-14");
                         log.info("general input param error:" + generalInput);
