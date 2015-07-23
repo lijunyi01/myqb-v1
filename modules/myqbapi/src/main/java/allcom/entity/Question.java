@@ -22,23 +22,25 @@ public class Question implements java.io.Serializable {
     private String contentPath;     //题目内容文件（xml）的路径
     //private String optionItem;  //选择题的待选项  (置入xml)
     //private String zqda;        //正确答案   (置入xml)
-    private String cwda;        //之前的错误解答
-    private String jtxd;        //解题心得
+    //private String cwda;        //之前的错误解答 (置入xml)
+    //private String jtxd;        //解题心得   (置入xml)
     //private int attachments;    //附件数   (置入xml)
     private long questionContentId;     //对应的内容表的Id,分离出内容表是为了提升本表查询性能；该字段实际是内容表的外键，但考虑性能未定义外键，由应用管理两表关系
+    private String subject;
 
     protected Question() {
     }
 
-    public Question(int umid,int grade,int multiplexFlag,int questionType,int classType,int classSubType,long questionContentId) {
+    public Question(int umid,int grade,int multiplexFlag,int questionType,int classType,int classSubType,long questionContentId,String subject) {
         this.umid = umid;
         this.grade = grade;
         this.multiplexFlag = multiplexFlag;
-        this.questionType = questionType;
         this.classType = classType;
         this.classSubType = classSubType;
         this.knownFlag = 0;
         this.questionContentId = questionContentId;
+        this.subject = subject;
+        this.questionType = questionType;
     }
 
     public long getId(){
@@ -72,16 +74,19 @@ public class Question implements java.io.Serializable {
 //    public String getZqda(){return this.zqda;}
 //    public void setZqda(String zqda) {this.zqda = zqda;}
 
-    public String getCwda(){return this.cwda;}
-    public void setCwda(String cwda) {this.cwda = cwda;}
-
-    public String getJtxd(){return this.jtxd;}
-    public void setJtxd(String jtxd) {this.jtxd = jtxd;}
+//    public String getCwda(){return this.cwda;}
+//    public void setCwda(String cwda) {this.cwda = cwda;}
+//
+//    public String getJtxd(){return this.jtxd;}
+//    public void setJtxd(String jtxd) {this.jtxd = jtxd;}
 
     public int getKnownFlag(){return this.knownFlag;}
     public void setKnownFlag(int knownFlag){this.knownFlag = knownFlag;}
 
     public long getQuestionContentId() {return this.questionContentId;}
     public void setQuestionContentId(long questionContentId) {this.questionContentId = questionContentId;}
+
+    public String getSubject(){return this.subject;}
+    public void setSubject(String subject){this.subject = subject;}
 
 }

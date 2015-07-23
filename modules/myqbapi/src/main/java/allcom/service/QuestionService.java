@@ -58,8 +58,16 @@ public class QuestionService {
             log.info("param check failed in checkInpuMap! inputMap is:"+ inputMap);
         }else{
             //将供检索的题目内容保存到myqb_questioncontent表
+            String searchString=inputMap.get("subject");
+            if(!inputMap.get("contentHeader").equals("")){
+                searchString = searchString + "|" + inputMap.get("contentHeader");
+            }
+            //TODO: inputMap.get("subQuestions") 需要进一步处理，提取内容信息，以获取更精准的查询效果；可考虑这里不置入子题信息，
+            //TODO: 待之后解析子题后（getSubQuestionList方法里）再将子题内容update进去
+            searchString = searchString + "|" + inputMap.get("subQuestions");
+
             QuestionContent questionContent = new QuestionContent(umid);
-            questionContent.setContent(inputMap.get("content"));
+            questionContent.setContent(searchString);
             QuestionContent questionContent1 = questionContentRepository.save(questionContent);
             if (questionContent1 != null) {
                 questContentId = questionContent1.getId();
@@ -77,9 +85,9 @@ public class QuestionService {
                     int questionType = Integer.parseInt(inputMap.get("questionType"));
                     int classType = Integer.parseInt(inputMap.get("classType"));
                     int classSubType = Integer.parseInt(inputMap.get("classSubType"));
-                    Question question = new Question(umid, grade, multiplexFlag, questionType, classType, classSubType, questContentId);
+                    Question question = new Question(umid, grade, multiplexFlag,questionType,classType, classSubType, questContentId,inputMap.get("subject"));
                     question.setContentPath(contentPath);
-                    //...
+
                     if (questionRepository.save(question) != null) {
                         ret = true;
                     }
@@ -143,17 +151,17 @@ public class QuestionService {
     //专用于题目数据的保存，不用与其它functionId的generalInput生成的inputMap的校验
     private boolean checkInputMapOfCreateQuestion(Map<String,String> inputMap){
         boolean ret = false;
-        String content = inputMap.get("content");
-        if(content==null || content.equals("") ){
+        String subject = inputMap.get("subject");
+        if(subject==null || subject.equals("") ){
             log.info("fail in checkInputMapOfCreateQuestion: content is empty!");
         }else if(!GlobalTools.isNumeric(inputMap.get("grade"))){
             log.info("fail in checkInputMapOfCreateQuestion: param grade error!");
         }else if(!GlobalTools.isNumeric(inputMap.get("multiplexFlag"))){
             log.info("fail in checkInputMapOfCreateQuestion: param multiplexFlag error!");
-        }else if(!GlobalTools.isNumeric(inputMap.get("questionType"))){
-            log.info("fail in checkInputMapOfCreateQuestion: param questionType error!");
         }else if(!GlobalTools.isNumeric(inputMap.get("classType"))){
             log.info("fail in checkInputMapOfCreateQuestion: param classType error!");
+        }else if(!GlobalTools.isNumeric(inputMap.get("questionType"))){
+            log.info("fail in checkInputMapOfCreateQuestion: param questionType error!");
         }else if(!GlobalTools.isNumeric(inputMap.get("classSubType"))){
             log.info("fail in checkInputMapOfCreateQuestion: param classSubType error!");
         }else{
@@ -167,10 +175,10 @@ public class QuestionService {
         String ret ="";
         QuestionBean questionBean = new QuestionBean(questContentId,inputMap.get("classType"),inputMap.get("classSubType"),inputMap.get("multiplexFlag"),inputMap.get("subQuestionCount"),inputMap.get("subject"));
         ArrayList<SubQuestionBean> subBeanList = getSubQuestionList(inputMap.get("subQuestions"));
-        //questionBean.setSubQuestionBeanList(subBeanList);
         SubQuestion subQuestion = new SubQuestion();
         subQuestion.setSubQuestionBeanList(subBeanList);
         questionBean.setSubQuestion(subQuestion);
+        questionBean.setContentHeader(inputMap.get("contentHeader"));
         try {
             ret = questionOmxService.saveQuestionBean(questionBean);
         } catch (IOException e) {
@@ -183,8 +191,14 @@ public class QuestionService {
         ArrayList<SubQuestionBean> retList = new ArrayList<SubQuestionBean>();
         String[] a = subQuestionString.split("\\<\\[CDATA1\\]\\>");
         for(String str:a){
+            //一个map就是一个子题
             Map<String, String> map = GlobalTools.parseInput(str,"\\<\\[CDATA2\\]\\>");
             SubQuestionBean subQuestionBean = new SubQuestionBean(map.get("seqId"),map.get("qType"),map.get("content"));
+            subQuestionBean.setAttachedInfo(map.get("attachedInfo"));
+            subQuestionBean.setAttachmentIds(map.get("attachmentIds"));
+            subQuestionBean.setCorrectAnswer(map.get("correctAnswer"));
+            subQuestionBean.setWrongAnswer(map.get("wrongAnswer"));
+            subQuestionBean.setNote(map.get("note"));
             retList.add(subQuestionBean);
         }
         return retList;
