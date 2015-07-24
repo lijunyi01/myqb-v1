@@ -28,6 +28,7 @@ public class AttachmentService {
 
     //创建一条记录
     public Attachment createAttachment(int umid,String orgName,int fileType){
+
         Attachment attachment = new Attachment(umid);
         Attachment attachmentRet = null;
         attachment.setOrgName(orgName);
