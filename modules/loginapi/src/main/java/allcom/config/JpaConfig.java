@@ -57,6 +57,7 @@ class JpaConfig implements TransactionManagementConfigurer {
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
         config.addDataSourceProperty("useServerPrepStmts", "true");
+        config.addDataSourceProperty("characterEncoding","utf8");
         //config.setAutoCommit(true);
 
         return new HikariDataSource(config);
