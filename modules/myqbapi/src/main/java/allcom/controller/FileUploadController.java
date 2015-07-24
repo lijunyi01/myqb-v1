@@ -87,6 +87,7 @@ public class FileUploadController {
                             stream.close();
                             if(attachmentService.setFilePath(attachmentId,saveName)) {
                                 ret = sessionService.returnFail(area, "0");
+                                ret.setRetContent("attachmentId="+attachmentId);
                                 log.info("successfully uploaded " + name + "! umid is:" + umid);
                             }else{
                                 //删除文件
