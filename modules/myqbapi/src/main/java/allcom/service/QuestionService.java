@@ -73,7 +73,7 @@ public class QuestionService {
             if (questContentId != -1) {
                 //根据传入的信息生成xml文件并保存到指定的路径
                 String contentPath = "";
-                contentPath = saveInXml(questContentId,inputMap);
+                contentPath = saveInXml(umid,questContentId,inputMap);
 
                 //将题目相关信息保存到myqb_question表
                 if (contentPath != null && !contentPath.equals("")) {
@@ -170,7 +170,7 @@ public class QuestionService {
     }
 
     //返回生成的xml文件的完整路径
-    private String saveInXml(long questContentId,Map<String,String> inputMap){
+    private String saveInXml(int umid,long questContentId,Map<String,String> inputMap){
         String ret ="";
         QuestionBean questionBean = new QuestionBean(questContentId,inputMap.get("classType"),inputMap.get("classSubType"),inputMap.get("multiplexFlag"),inputMap.get("subQuestionCount"),inputMap.get("subject"));
         ArrayList<SubQuestionBean> subBeanList = getSubQuestionList(inputMap.get("subQuestions"));
@@ -179,7 +179,7 @@ public class QuestionService {
         questionBean.setSubQuestion(subQuestion);
         questionBean.setContentHeader(inputMap.get("contentHeader"));
         try {
-            ret = questionOmxService.saveQuestionBean(questionBean);
+            ret = questionOmxService.saveQuestionBean(umid,questionBean);
         } catch (IOException e) {
             e.printStackTrace();
         }

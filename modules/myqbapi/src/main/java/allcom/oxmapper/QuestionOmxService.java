@@ -34,8 +34,8 @@ public class QuestionOmxService {
     }
 
     //    object -> xml
-    public String saveQuestionBean(QuestionBean questionBean) throws IOException {
-        String filePath = xmlBaseDir+questionBean.getClassType()+"/"+questionBean.getClassSubType()+"/"+questionBean.getQuestionId()+".xml";
+    public String saveQuestionBean(int umid,QuestionBean questionBean) throws IOException {
+        String filePath = xmlBaseDir+umid+"/"+questionBean.getQuestionId()+".xml";
         FileOutputStream os = null;
         try {
             File file = new File(filePath);
