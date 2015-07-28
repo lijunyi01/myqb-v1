@@ -63,15 +63,15 @@
         <field name="attachedInfo" type="string">
             <bind-xml name="attachedInfo" node="element"/>
         </field>
-        <field name="correctAnswer" type="string">
-            <bind-xml name="correctAnswer" node="element"/>
-        </field>
-        <field name="wrongAnswer" type="string">
-            <bind-xml name="wrongAnswer" node="element"/>
-        </field>
-        <field name="note" type="string">
-            <bind-xml name="note" node="element"/>
-        </field>
+        <!--<field name="correctAnswer" type="string">-->
+            <!--<bind-xml name="correctAnswer" node="element"/>-->
+        <!--</field>-->
+        <!--<field name="wrongAnswer" type="string">-->
+            <!--<bind-xml name="wrongAnswer" node="element"/>-->
+        <!--</field>-->
+        <!--<field name="note" type="string">-->
+            <!--<bind-xml name="note" node="element"/>-->
+        <!--</field>-->
         <field name="attachmentIds" type="string">
             <bind-xml name="attachmentIds" node="element"/>
         </field>

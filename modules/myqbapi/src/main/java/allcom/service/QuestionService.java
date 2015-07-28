@@ -1,12 +1,8 @@
 package allcom.service;
 
 import allcom.controller.RetMessage;
-import allcom.dao.AccountRepository;
-import allcom.dao.QuestionContentRepository;
-import allcom.dao.QuestionRepository;
-import allcom.entity.Account;
-import allcom.entity.Question;
-import allcom.entity.QuestionContent;
+import allcom.dao.*;
+import allcom.entity.*;
 import allcom.oxmapper.QuestionBean;
 import allcom.oxmapper.QuestionOmxService;
 import allcom.oxmapper.SubQuestion;
@@ -44,6 +40,8 @@ public class QuestionService {
     private QuestionRepository questionRepository;
     @Autowired
     private QuestionContentRepository questionContentRepository;
+    @Autowired
+    private AnswerAndNoteRepository answerAndNoteRepository;
     @Autowired
     private QuestionOmxService questionOmxService;
 
@@ -87,8 +85,10 @@ public class QuestionService {
                     int classSubType = Integer.parseInt(inputMap.get("classSubType"));
                     Question question = new Question(umid, grade, multiplexFlag,questionType,classType, classSubType, questContentId,inputMap.get("subject"));
                     question.setContentPath(contentPath);
-
-                    if (questionRepository.save(question) != null) {
+                    Question question1 = questionRepository.save(question);
+                    if (question1 != null) {
+                        //保存正确答案，心得备注等信息至数据库
+                        saveAnswerAndNote(umid,question1.getId(),inputMap.get("subQuestions"));
                         ret = true;
                     }
                 }
@@ -196,9 +196,9 @@ public class QuestionService {
             SubQuestionBean subQuestionBean = new SubQuestionBean(map.get("seqId"),map.get("qType"),map.get("content"));
             subQuestionBean.setAttachedInfo(map.get("attachedInfo"));
             subQuestionBean.setAttachmentIds(map.get("attachmentIds"));
-            subQuestionBean.setCorrectAnswer(map.get("correctAnswer"));
-            subQuestionBean.setWrongAnswer(map.get("wrongAnswer"));
-            subQuestionBean.setNote(map.get("note"));
+//            subQuestionBean.setCorrectAnswer(map.get("correctAnswer"));
+//            subQuestionBean.setWrongAnswer(map.get("wrongAnswer"));
+//            subQuestionBean.setNote(map.get("note"));
             retList.add(subQuestionBean);
         }
         return retList;
@@ -238,6 +238,32 @@ public class QuestionService {
     public Question getQuestionById(long id){
         Question question = questionRepository.findOne(id);
         return question;
+    }
+
+    private void saveAnswerAndNote(int umid,long questionId,String subQuestionString){
+        String[] a = subQuestionString.split("\\<\\[CDATA1\\]\\>");
+        for(String str:a){
+            //一个map就是一个子题
+            Map<String, String> map = GlobalTools.parseInput(str,"\\<\\[CDATA2\\]\\>");
+            int sequenceId = Integer.parseInt(map.get("seqId"));
+            String correctAnswer_s = map.get("correctAnswer");
+            String wrongAnswer_s = map.get("wrongAnswer");
+            String note = map.get("note");
+
+            if((correctAnswer_s!=null && !correctAnswer_s.equals("")) || (wrongAnswer_s!=null && !wrongAnswer_s.equals("")) || (note!=null && !note.equals(""))){
+                AnswerAndNote answerAndNote = new AnswerAndNote(umid,questionId,sequenceId);
+                if(correctAnswer_s!=null && !correctAnswer_s.equals("")){
+                    answerAndNote.setCorrectAnswer(correctAnswer_s);
+                }
+                if(wrongAnswer_s!=null && !wrongAnswer_s.equals("")){
+                    answerAndNote.setWrongAnswer(wrongAnswer_s);
+                }
+                if(note!=null && !note.equals("")){
+                    answerAndNote.setNote(note);
+                }
+                answerAndNoteRepository.save(answerAndNote);
+            }
+        }
     }
 
 

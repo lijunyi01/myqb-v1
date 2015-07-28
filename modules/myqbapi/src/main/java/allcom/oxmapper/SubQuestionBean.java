@@ -14,12 +14,6 @@ public class SubQuestionBean {
     private String attachedInfo;
     //附件的ID，对应于附件表，形如：1:3:9
     private String attachmentIds;
-    //参考答案
-    private String correctAnswer;
-    //错误答案
-    private String wrongAnswer;
-    //心得、备注
-    private String note;
 
 
     public SubQuestionBean(){}
@@ -45,13 +39,13 @@ public class SubQuestionBean {
     public String getAttachmentIds(){return this.attachmentIds;}
     public void setAttachmentIds(String attachmentIds) {this.attachmentIds = attachmentIds;}
 
-    public String getCorrectAnswer(){return this.correctAnswer;}
-    public void setCorrectAnswer(String correctAnswer){this.correctAnswer = correctAnswer;}
-
-    public String getWrongAnswer(){return this.wrongAnswer;}
-    public void setWrongAnswer(String wrongAnswer){this.wrongAnswer = wrongAnswer;}
-
-    public String getNote(){return this.note;}
-    public void setNote(String note){this.note = note;}
+//    public String getCorrectAnswer(){return this.correctAnswer;}
+//    public void setCorrectAnswer(String correctAnswer){this.correctAnswer = correctAnswer;}
+//
+//    public String getWrongAnswer(){return this.wrongAnswer;}
+//    public void setWrongAnswer(String wrongAnswer){this.wrongAnswer = wrongAnswer;}
+//
+//    public String getNote(){return this.note;}
+//    public void setNote(String note){this.note = note;}
 
 }
