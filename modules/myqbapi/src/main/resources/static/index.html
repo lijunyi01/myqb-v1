@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<form method="POST" enctype="multipart/form-data" action="/upload">
+    File to upload: <input type="file" name="file"><br />
+              umid: <input type="text" name="umid"><br />
+         sessionId: <input type="text" name="sessionId"><br />
+                    <input type="submit" value="Upload"> Press here to upload the file!
+</form>
+
+<p>batch upload</p>
+<form method="POST" enctype="multipart/form-data" action="/batchupload">
+    File to upload: <input type="file" name="file"><br />
+    File to upload: <input type="file" name="file"><br />
+    <input type="submit" value="batchupload"> Press here to upload the files!
+</form>
+
+</body>
+</html>

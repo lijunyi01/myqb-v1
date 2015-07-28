@@ -60,9 +60,8 @@ public class QuestionService {
             if(!inputMap.get("contentHeader").equals("")){
                 searchString = searchString + "|" + inputMap.get("contentHeader");
             }
-            //TODO: inputMap.get("subQuestions") 需要进一步处理，提取内容信息，以获取更精准的查询效果；可考虑这里不置入子题信息，
-            //TODO: 待之后解析子题后（getSubQuestionList方法里）再将子题内容update进去
-            searchString = searchString + "|" + inputMap.get("subQuestions");
+
+            //待之后解析子题后（saveAnswerAndNote方法里）再将子题内容，心得等update进myqb_questioncontent
 
             QuestionContent questionContent = new QuestionContent(umid);
             questionContent.setContent(searchString);
@@ -196,11 +195,9 @@ public class QuestionService {
             SubQuestionBean subQuestionBean = new SubQuestionBean(map.get("seqId"),map.get("qType"),map.get("content"));
             subQuestionBean.setAttachedInfo(map.get("attachedInfo"));
             subQuestionBean.setAttachmentIds(map.get("attachmentIds"));
-//            subQuestionBean.setCorrectAnswer(map.get("correctAnswer"));
-//            subQuestionBean.setWrongAnswer(map.get("wrongAnswer"));
-//            subQuestionBean.setNote(map.get("note"));
             retList.add(subQuestionBean);
         }
+
         return retList;
     }
 
@@ -242,6 +239,8 @@ public class QuestionService {
 
     private void saveAnswerAndNote(int umid,long questionId,String subQuestionString){
         String[] a = subQuestionString.split("\\<\\[CDATA1\\]\\>");
+        String searchContent = "";
+        String searchNote = "||"; //用“||“ 分割搜索字段的内容和心得，便于之后分别修改
         for(String str:a){
             //一个map就是一个子题
             Map<String, String> map = GlobalTools.parseInput(str,"\\<\\[CDATA2\\]\\>");
@@ -249,6 +248,11 @@ public class QuestionService {
             String correctAnswer_s = map.get("correctAnswer");
             String wrongAnswer_s = map.get("wrongAnswer");
             String note = map.get("note");
+            if(searchContent.equals("")) {
+                searchContent = map.get("content");
+            }else{
+                searchContent = searchContent + "|" + map.get("content");
+            }
 
             if((correctAnswer_s!=null && !correctAnswer_s.equals("")) || (wrongAnswer_s!=null && !wrongAnswer_s.equals("")) || (note!=null && !note.equals(""))){
                 AnswerAndNote answerAndNote = new AnswerAndNote(umid,questionId,sequenceId);
@@ -260,11 +264,35 @@ public class QuestionService {
                 }
                 if(note!=null && !note.equals("")){
                     answerAndNote.setNote(note);
+                    if(searchNote.equals("||")) {
+                        searchNote = searchNote + note;
+                    }else{
+                        searchNote = searchNote +"|"+ note;
+                    }
                 }
                 answerAndNoteRepository.save(answerAndNote);
             }
         }
+        if(appendToQuestionContent(questionId,searchContent+searchNote)){
+            log.info("success in update question content for search,questionid is:" + questionId);
+        }
     }
 
+    private boolean appendToQuestionContent(long questionId,String appendString){
+        boolean ret= false;
+        Question question = questionRepository.findOne(questionId);
+        if(question !=null){
+            QuestionContent questionContent = questionContentRepository.findOne(question.getQuestionContentId());
+            if(questionContent !=null){
+                String searchString = questionContent.getContent();
+                searchString = searchString + "|" + appendString;
+                questionContent.setContent(searchString);
+                if(questionContentRepository.save(questionContent)!=null){
+                    ret = true;
+                }
+            }
+        }
+        return ret;
+    }
 
 }
