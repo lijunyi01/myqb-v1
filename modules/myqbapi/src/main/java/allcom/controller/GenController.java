@@ -80,10 +80,9 @@ public class GenController {
                     ret = accountService.getLocalInfo(area,umid);
                     log.info("umid:"+umid+" get localinfo result:" + ret.getErrorCode());
 
-                }else if (functionId == 23) {
-                    //存储题目信息(心得及正确／错误答案保存于题目对应的xml，每个子题都有正确／错误答案，心得根据需要可有可无)
-
-                    //http://localhost:8080/gi?functionId=23&umid=1&sessionId=111&generalInput=grade=10<[CDATA]>questionType=101<[CDATA]>classType=1<[CDATA]>classSubType=1<[CDATA]>multiplexFlag=1<[CDATA]>subQuestionCount=2<[CDATA]>contentHeader=content-header-test<[CDATA]>subject=sub<[CDATA]>attachmentIds=<[CDATA]>subQuestions=seqId=1<[CDATA2]>qType=1<[CDATA2]>content=content1<[CDATA2]>attachedInfo=A:6<[CDATA3]>B:7<[CDATA3]>C:8<[CDATA3]>D:9<[CDATA2]>attachmentIds=<[CDATA2]>correctAnswer=C<[CDATA2]>wrongAnswer=A<[CDATA2]>note=note1<[CDATA1]>seqId=2<[CDATA2]>qType=1<[CDATA2]>content=content2<[CDATA2]>attachedInfo=A:1<[CDATA3]>B:2<[CDATA3]>C:3<[CDATA3]>D:4<[CDATA2]>attachmentIds=<[CDATA2]>correctAnswer=A<[CDATA2]>wrongAnswer=D<[CDATA2]>note=note2
+                }else if (functionId == 30) {
+                    //存储题目信息(心得及正确／错误答案保存于数据库表myqb_answerandnote；创建题目时，子题的正确／错误答案及心得不一定有，可以后期添加)
+                    //http://localhost:8080/gi?functionId=30&umid=1&sessionId=111&generalInput=grade=10<[CDATA]>questionType=101<[CDATA]>classType=1<[CDATA]>classSubType=1<[CDATA]>multiplexFlag=1<[CDATA]>subQuestionCount=2<[CDATA]>contentHeader=content-header-test<[CDATA]>subject=sub<[CDATA]>attachmentIds=<[CDATA]>subQuestions=seqId=1<[CDATA2]>qType=1<[CDATA2]>content=content1<[CDATA2]>attachedInfo=A:6<[CDATA3]>B:7<[CDATA3]>C:8<[CDATA3]>D:9<[CDATA2]>attachmentIds=<[CDATA2]>correctAnswer=C<[CDATA2]>wrongAnswer=A<[CDATA2]>note=note1<[CDATA1]>seqId=2<[CDATA2]>qType=1<[CDATA2]>content=content2<[CDATA2]>attachedInfo=A:1<[CDATA3]>B:2<[CDATA3]>C:3<[CDATA3]>D:4<[CDATA2]>attachmentIds=<[CDATA2]>correctAnswer=A<[CDATA2]>wrongAnswer=D<[CDATA2]>note=note2
                     if(inputMap.size()!=10){
                         ret = questionService.returnFail(area, "-14");
                         log.info("general input param error:" + generalInput);
@@ -94,15 +93,28 @@ public class GenController {
                             ret = questionService.returnFail(area, "-18");
                         }
                     }
-                }else if(functionId == 24) {
+                }else if (functionId == 31) {
+                    //修改题目信息(包含心得及正确／错误答案)
+                    //http://localhost:8080/gi?functionId=31&umid=1&sessionId=111&generalInput=questionId=18<[CDATA]>grade=10<[CDATA]>questionType=101<[CDATA]>classType=1<[CDATA]>classSubType=1<[CDATA]>multiplexFlag=1<[CDATA]>subQuestionCount=2<[CDATA]>contentHeader=content-header-test<[CDATA]>subject=sub<[CDATA]>attachmentIds=<[CDATA]>subQuestions=seqId=1<[CDATA2]>qType=1<[CDATA2]>content=content1<[CDATA2]>attachedInfo=A:6<[CDATA3]>B:7<[CDATA3]>C:8<[CDATA3]>D:9<[CDATA2]>attachmentIds=<[CDATA2]>correctAnswer=C<[CDATA2]>wrongAnswer=A<[CDATA2]>note=note1<[CDATA1]>seqId=2<[CDATA2]>qType=1<[CDATA2]>content=content2<[CDATA2]>attachedInfo=A:1<[CDATA3]>B:2<[CDATA3]>C:3<[CDATA3]>D:4<[CDATA2]>attachmentIds=<[CDATA2]>correctAnswer=A<[CDATA2]>wrongAnswer=D<[CDATA2]>note=note2
+                    if(inputMap.size()!=11){
+                        ret = questionService.returnFail(area, "-14");
+                        log.info("general input param error:" + generalInput);
+                    }else{
+                        if(questionService.modifyQuestion(umid,inputMap)){
+                            ret = questionService.returnFail(area, "0");
+                        }else{
+                            ret = questionService.returnFail(area, "-18");
+                        }
+                    }
+                }else if(functionId == 40) {
                     //http://localhost:8080/gi?functionId=24&umid=1&generalInput=grade=10<[CDATA]>classType=1&sessionId=111
                     //获取符合条件的题目id（按question的各种类型核对）
-                    ret = questionService.getIdsByType(umid,inputMap,area);
-                }else if(functionId == 25) {
+                    ret = questionService.getIdsByType(umid, inputMap, area);
+                }else if(functionId == 41) {
                     //http://localhost:8080/gi?functionId=25&umid=1&generalInput=content=a&sessionId=111
                     //获取符合条件的题目id（按question的内容查找）
                     ret = questionService.getIdsByContent(umid,inputMap.get("content"),area);
-                }else if(functionId == 26){
+                }else if(functionId == 50){
 
                 }
 

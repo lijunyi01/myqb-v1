@@ -1,5 +1,7 @@
 package allcom.oxmapper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.Unmarshaller;
@@ -16,6 +18,8 @@ import java.io.IOException;
  * ok
  */
 public class QuestionOmxService {
+
+    private static Logger log = LoggerFactory.getLogger(QuestionOmxService.class);
 
     @Value("${systemparam.xmlBaseDir}")
     private String xmlBaseDir;
@@ -41,12 +45,12 @@ public class QuestionOmxService {
             File file = new File(filePath);
             //必须先以下列方式准备好目录，否则os = new FileOutputStream(file,false); 会抛出异常
             File parent = file.getParentFile();
-            if(parent!=null&&!parent.exists()){
+            if (parent != null && !parent.exists()) {
                 parent.mkdirs();
             }
-            os = new FileOutputStream(file,false);  //false表示覆盖写文件；true表示从文件尾写文件
+            os = new FileOutputStream(file, false);  //false表示覆盖写文件；true表示从文件尾写文件
             this.marshaller.marshal(questionBean, new StreamResult(os));
-        } finally {
+        }finally {
             if (os != null) {
                 os.close();
             }

@@ -31,6 +31,12 @@ public class Question implements java.io.Serializable {
     protected Question() {
     }
 
+    public Question(int umid,long questionContentId) {
+        this.umid = umid;
+        this.knownFlag = 0;
+        this.questionContentId = questionContentId;
+    }
+
     public Question(int umid,int grade,int multiplexFlag,int questionType,int classType,int classSubType,long questionContentId,String subject) {
         this.umid = umid;
         this.grade = grade;

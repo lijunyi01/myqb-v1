@@ -50,48 +50,90 @@ public class QuestionService {
     //public boolean createQuestion(int umid,int grade,int multiplexFlag,int questionType,int classType,int classSubType,String content){
     public boolean createQuestion(int umid,Map<String,String> inputMap){
         boolean ret = false;
-        long questContentId=-1;
+        long questionContentId=-1;
+        //long questionId=-1;
 
         if(checkInputMapOfCreateQuestion(inputMap)==false){
             log.info("param check failed in checkInpuMap! inputMap is:"+ inputMap);
         }else{
-            //将供检索的题目内容保存到myqb_questioncontent表
-            String searchString=inputMap.get("subject");
-            if(!inputMap.get("contentHeader").equals("")){
-                searchString = searchString + "|" + inputMap.get("contentHeader");
-            }
-
-            //待之后解析子题后（saveAnswerAndNote方法里）再将子题内容，心得等update进myqb_questioncontent
-
+            //先在myqb_questioncontent表里插条记录
+            //待之后解析子题后再将子题内容，心得等update进myqb_questioncontent （modifyQuestionContent）
             QuestionContent questionContent = new QuestionContent(umid);
-            questionContent.setContent(searchString);
             QuestionContent questionContent1 = questionContentRepository.save(questionContent);
             if (questionContent1 != null) {
-                questContentId = questionContent1.getId();
+                questionContentId = questionContent1.getId();
             }
 
-            if (questContentId != -1) {
-                //根据传入的信息生成xml文件并保存到指定的路径
-                String contentPath = "";
-                contentPath = saveInXml(umid,questContentId,inputMap);
+            if (questionContentId != -1) {
+                //在myqb_question表先生成一条记录，以获取questionId(即该表的id字段；如果该记录大量字段为空，则说明xml文件未生成或后续数据更新未完成)
+                Question question = new Question(umid,questionContentId);
+                Question question1 = questionRepository.save(question);
+                if(question1 != null){
+                    //根据传入的信息生成xml文件并保存到指定的路径
+                    String contentPath = "";
+                    contentPath = saveInXml(umid,question1.getId(),inputMap);
+                    //将题目相关具体信息保存到myqb_question表
+                    if (contentPath != null && !contentPath.equals("")) {
+                        int grade = Integer.parseInt(inputMap.get("grade"));
+                        int multiplexFlag = Integer.parseInt(inputMap.get("multiplexFlag"));
+                        int questionType = Integer.parseInt(inputMap.get("questionType"));
+                        int classType = Integer.parseInt(inputMap.get("classType"));
+                        int classSubType = Integer.parseInt(inputMap.get("classSubType"));
+                        question1.setGrade(grade);
+                        question1.setMultiplexFlag(multiplexFlag);
+                        question1.setQuestionType(questionType);
+                        question1.setClassType(classType);
+                        question1.setClassSubType(classSubType);
+                        question1.setContentPath(contentPath);
+                        question1.setSubject(inputMap.get("subject"));
+                        if (questionRepository.save(question1) != null) {
+                            //保存正确答案，心得备注等信息至数据库
+                            saveAnswerAndNote(umid,question1.getId(),inputMap.get("subQuestions"));
+                            //保存检索内容至myqb_qestioncontent
+                            modifyQuestionContent(umid,questionContentId,inputMap.get("subject"),inputMap.get("contentHeader"),inputMap.get("subQuestions"));
+                            ret = true;
+                        }
+                    }
+                }
+            }
+        }
+        return ret;
+    }
 
-                //将题目相关信息保存到myqb_question表
-                if (contentPath != null && !contentPath.equals("")) {
+    public boolean modifyQuestion(int umid,Map<String,String> inputMap){
+        boolean ret = false;
+
+        if(checkInputMapOfModifyQuestion(inputMap)==false){
+            log.info("param check failed in checkInpuMap! inputMap is:"+ inputMap);
+        }else{
+            long questionId=Long.parseLong(inputMap.get("questionId"));
+            //先修改xml文件，文件名不会变，以questionId命名
+            String contentPath = "";
+            contentPath = saveInXml(umid,questionId,inputMap);
+            if (contentPath != null && !contentPath.equals("")) {
+                //该xml成功再处理表
+                Question question = questionRepository.findOne(questionId);
+                if(question !=null){
                     int grade = Integer.parseInt(inputMap.get("grade"));
                     int multiplexFlag = Integer.parseInt(inputMap.get("multiplexFlag"));
                     int questionType = Integer.parseInt(inputMap.get("questionType"));
                     int classType = Integer.parseInt(inputMap.get("classType"));
                     int classSubType = Integer.parseInt(inputMap.get("classSubType"));
-                    Question question = new Question(umid, grade, multiplexFlag,questionType,classType, classSubType, questContentId,inputMap.get("subject"));
+                    question.setGrade(grade);
+                    question.setMultiplexFlag(multiplexFlag);
+                    question.setQuestionType(questionType);
+                    question.setClassType(classType);
+                    question.setClassSubType(classSubType);
                     question.setContentPath(contentPath);
-                    Question question1 = questionRepository.save(question);
-                    if (question1 != null) {
+                    question.setSubject(inputMap.get("subject"));
+                    if (questionRepository.save(question) != null) {
                         //保存正确答案，心得备注等信息至数据库
-                        saveAnswerAndNote(umid,question1.getId(),inputMap.get("subQuestions"));
+                        saveAnswerAndNote(umid, questionId, inputMap.get("subQuestions"));
+                        //保存检索内容至myqb_qestioncontent
+                        modifyQuestionContent(umid,question.getQuestionContentId(),inputMap.get("subject"),inputMap.get("contentHeader"),inputMap.get("subQuestions"));
                         ret = true;
                     }
                 }
-
             }
         }
         return ret;
@@ -147,7 +189,7 @@ public class QuestionService {
         return retMessage;
     }
 
-    //专用于题目数据的保存，不用与其它functionId的generalInput生成的inputMap的校验
+    //专用于题目数据的保存(createQuestion)，不用与其它functionId的generalInput生成的inputMap的校验
     private boolean checkInputMapOfCreateQuestion(Map<String,String> inputMap){
         boolean ret = false;
         String subject = inputMap.get("subject");
@@ -169,10 +211,34 @@ public class QuestionService {
         return ret;
     }
 
+    //专用于题目数据的修改(modifyQuestion)，不用与其它functionId的generalInput生成的inputMap的校验
+    private boolean checkInputMapOfModifyQuestion(Map<String,String> inputMap){
+        boolean ret = false;
+        String subject = inputMap.get("subject");
+        if(subject==null || subject.equals("") ){
+            log.info("fail in checkInputMapOfModifyQuestion: content is empty!");
+        }else if(!GlobalTools.isNumeric(inputMap.get("grade"))){
+            log.info("fail in checkInputMapOfModifyQuestion: param grade error!");
+        }else if(!GlobalTools.isNumeric(inputMap.get("multiplexFlag"))){
+            log.info("fail in checkInputMapOfModifyQuestion: param multiplexFlag error!");
+        }else if(!GlobalTools.isNumeric(inputMap.get("classType"))){
+            log.info("fail in checkInputMapOfModifyQuestion: param classType error!");
+        }else if(!GlobalTools.isNumeric(inputMap.get("questionType"))){
+            log.info("fail in checkInputMapOfModifyQuestion: param questionType error!");
+        }else if(!GlobalTools.isNumeric(inputMap.get("classSubType"))){
+            log.info("fail in checkInputMapOfModifyQuestion: param classSubType error!");
+        }else if(!GlobalTools.isNumeric(inputMap.get("questionId"))){
+            log.info("fail in checkInputMapOfModifyQuestion: param questionId error!");
+        }else{
+            ret = true;
+        }
+        return ret;
+    }
+
     //返回生成的xml文件的完整路径
-    private String saveInXml(int umid,long questContentId,Map<String,String> inputMap){
+    private String saveInXml(int umid,long questionId,Map<String,String> inputMap){
         String ret ="";
-        QuestionBean questionBean = new QuestionBean(questContentId,inputMap.get("classType"),inputMap.get("classSubType"),inputMap.get("multiplexFlag"),inputMap.get("subQuestionCount"),inputMap.get("subject"));
+        QuestionBean questionBean = new QuestionBean(questionId,inputMap.get("classType"),inputMap.get("classSubType"),inputMap.get("multiplexFlag"),inputMap.get("subQuestionCount"),inputMap.get("subject"));
         ArrayList<SubQuestionBean> subBeanList = getSubQuestionList(inputMap.get("subQuestions"));
         SubQuestion subQuestion = new SubQuestion();
         subQuestion.setSubQuestionBeanList(subBeanList);
@@ -181,6 +247,7 @@ public class QuestionService {
         try {
             ret = questionOmxService.saveQuestionBean(umid,questionBean);
         } catch (IOException e) {
+            log.info("save file error,umid is:"+umid+" and questionId is:"+questionId);
             e.printStackTrace();
         }
         return ret;
@@ -237,10 +304,14 @@ public class QuestionService {
         return question;
     }
 
+    //用于新题目创建以及老题目修改
     private void saveAnswerAndNote(int umid,long questionId,String subQuestionString){
         String[] a = subQuestionString.split("\\<\\[CDATA1\\]\\>");
-        String searchContent = "";
-        String searchNote = "||"; //用“||“ 分割搜索字段的内容和心得，便于之后分别修改
+        //修改的情况下，先删除原记录
+        if(!answerAndNoteRepository.findByQuestionIdAndUmid(questionId,umid).isEmpty()){
+            answerAndNoteRepository.deleteByQuestionIdAndUmid(questionId,umid);
+        }
+
         for(String str:a){
             //一个map就是一个子题
             Map<String, String> map = GlobalTools.parseInput(str,"\\<\\[CDATA2\\]\\>");
@@ -248,11 +319,6 @@ public class QuestionService {
             String correctAnswer_s = map.get("correctAnswer");
             String wrongAnswer_s = map.get("wrongAnswer");
             String note = map.get("note");
-            if(searchContent.equals("")) {
-                searchContent = map.get("content");
-            }else{
-                searchContent = searchContent + "|" + map.get("content");
-            }
 
             if((correctAnswer_s!=null && !correctAnswer_s.equals("")) || (wrongAnswer_s!=null && !wrongAnswer_s.equals("")) || (note!=null && !note.equals(""))){
                 AnswerAndNote answerAndNote = new AnswerAndNote(umid,questionId,sequenceId);
@@ -264,34 +330,42 @@ public class QuestionService {
                 }
                 if(note!=null && !note.equals("")){
                     answerAndNote.setNote(note);
-                    if(searchNote.equals("||")) {
-                        searchNote = searchNote + note;
-                    }else{
-                        searchNote = searchNote +"|"+ note;
-                    }
                 }
                 answerAndNoteRepository.save(answerAndNote);
             }
         }
-        if(appendToQuestionContent(questionId,searchContent+searchNote)){
-            log.info("success in update question content for search,questionid is:" + questionId);
-        }
     }
 
-    private boolean appendToQuestionContent(long questionId,String appendString){
-        boolean ret= false;
-        Question question = questionRepository.findOne(questionId);
-        if(question !=null){
-            QuestionContent questionContent = questionContentRepository.findOne(question.getQuestionContentId());
-            if(questionContent !=null){
-                String searchString = questionContent.getContent();
-                searchString = searchString + "|" + appendString;
-                questionContent.setContent(searchString);
-                if(questionContentRepository.save(questionContent)!=null){
-                    ret = true;
+    private boolean modifyQuestionContent(int umid,long questionContentId,String subject,String contentHeader,String subQuestionString){
+        boolean ret = false;
+        QuestionContent questionContent = questionContentRepository.findOne(questionContentId);
+        String searchContent=subject;
+        String[] a = subQuestionString.split("\\<\\[CDATA1\\]\\>");
+        String searchNote = "||"; //用“||“ 分割搜索字段的内容和心得，便于之后分别修改
+
+        if(!contentHeader.equals("")){
+            searchContent = searchContent +"|"+ contentHeader;
+        }
+
+        for(String str:a){
+            //一个map就是一个子题
+            Map<String, String> map = GlobalTools.parseInput(str,"\\<\\[CDATA2\\]\\>");
+            String note = map.get("note");
+            searchContent = searchContent + "|" + map.get("content");
+
+            if(note!=null && !note.equals("")){
+                if(searchNote.equals("||")) {
+                    searchNote = searchNote + note;
+                }else{
+                    searchNote = searchNote +"|"+ note;
                 }
             }
         }
+        questionContent.setContent(searchContent+searchNote);
+        if(questionContentRepository.save(questionContent)!=null){
+            ret = true;
+        }
+
         return ret;
     }
 
