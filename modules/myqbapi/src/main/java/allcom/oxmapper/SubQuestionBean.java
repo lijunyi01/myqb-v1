@@ -7,7 +7,7 @@ package allcom.oxmapper;
 public class SubQuestionBean {
     //子题序号
     private String  sequenceId;
-    //题型 1:选择题；2:填空题； 3:判断题；4:问答题；100:未归类的复合题目；101:阅读理解
+    //题型 1:选择题；2:填空题； 3:判断题；4:问答题
     private String questionType;
     private String content;
     //用于存储题目的附加信息,如选择题的选项

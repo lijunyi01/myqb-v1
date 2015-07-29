@@ -369,4 +369,10 @@ public class QuestionService {
         return ret;
     }
 
+    public List<AnswerAndNote> getAnswerAndNoteList(int umid,long questionId){
+        List<AnswerAndNote> answerAndNoteList = null;
+        answerAndNoteList = answerAndNoteRepository.findByQuestionIdAndUmid(questionId,umid);
+        return answerAndNoteList;
+    }
+
 }

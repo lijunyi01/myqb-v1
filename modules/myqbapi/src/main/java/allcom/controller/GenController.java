@@ -107,11 +107,11 @@ public class GenController {
                         }
                     }
                 }else if(functionId == 40) {
-                    //http://localhost:8080/gi?functionId=24&umid=1&generalInput=grade=10<[CDATA]>classType=1&sessionId=111
+                    //http://localhost:8080/gi?functionId=40&umid=1&generalInput=grade=10<[CDATA]>classType=1&sessionId=111
                     //获取符合条件的题目id（按question的各种类型核对）
                     ret = questionService.getIdsByType(umid, inputMap, area);
                 }else if(functionId == 41) {
-                    //http://localhost:8080/gi?functionId=25&umid=1&generalInput=content=a&sessionId=111
+                    //http://localhost:8080/gi?functionId=41&umid=1&generalInput=content=a&sessionId=111
                     //获取符合条件的题目id（按question的内容查找）
                     ret = questionService.getIdsByContent(umid,inputMap.get("content"),area);
                 }else if(functionId == 50){
