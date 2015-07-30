@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.transaction.Transactional;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,8 @@ public class QuestionService {
     private AnswerAndNoteRepository answerAndNoteRepository;
     @Autowired
     private QuestionOmxService questionOmxService;
+    @Autowired
+    private AttachmentRepository attachmentRepository;
 
     //@Transactional
     //保存一个题目(一部分内容存入数据库，一部分存入xml文件)
@@ -91,6 +94,8 @@ public class QuestionService {
                             saveAnswerAndNote(umid,question1.getId(),inputMap.get("subQuestions"));
                             //保存检索内容至myqb_qestioncontent
                             modifyQuestionContent(umid,questionContentId,inputMap.get("subject"),inputMap.get("contentHeader"),inputMap.get("subQuestions"));
+                            //处理附件以及附件表
+                            modifyAttachment(umid,question1.getId(),inputMap.get("attachmentIds"),inputMap.get("subQuestions"));
                             ret = true;
                         }
                     }
@@ -131,6 +136,8 @@ public class QuestionService {
                         saveAnswerAndNote(umid, questionId, inputMap.get("subQuestions"));
                         //保存检索内容至myqb_qestioncontent
                         modifyQuestionContent(umid,question.getQuestionContentId(),inputMap.get("subject"),inputMap.get("contentHeader"),inputMap.get("subQuestions"));
+                        //处理附件以及附件表
+                        modifyAttachment(umid,questionId,inputMap.get("attachmentIds"),inputMap.get("subQuestions"));
                         ret = true;
                     }
                 }
@@ -239,11 +246,12 @@ public class QuestionService {
     private String saveInXml(int umid,long questionId,Map<String,String> inputMap){
         String ret ="";
         QuestionBean questionBean = new QuestionBean(questionId,inputMap.get("classType"),inputMap.get("classSubType"),inputMap.get("multiplexFlag"),inputMap.get("subQuestionCount"),inputMap.get("subject"));
-        ArrayList<SubQuestionBean> subBeanList = getSubQuestionList(inputMap.get("subQuestions"));
+        List<SubQuestionBean> subQuestionBeanList = getSubQuestionList(inputMap.get("subQuestions"));
         SubQuestion subQuestion = new SubQuestion();
-        subQuestion.setSubQuestionBeanList(subBeanList);
+        subQuestion.setSubQuestionBeanList(subQuestionBeanList);
         questionBean.setSubQuestion(subQuestion);
         questionBean.setContentHeader(inputMap.get("contentHeader"));
+        questionBean.setAttachmentIds(inputMap.get("attachmentIds"));
         try {
             ret = questionOmxService.saveQuestionBean(umid,questionBean);
         } catch (IOException e) {
@@ -253,8 +261,8 @@ public class QuestionService {
         return ret;
     }
 
-    private ArrayList<SubQuestionBean> getSubQuestionList(String subQuestionString){
-        ArrayList<SubQuestionBean> retList = new ArrayList<SubQuestionBean>();
+    private List<SubQuestionBean> getSubQuestionList(String subQuestionString){
+        List<SubQuestionBean> retList = new ArrayList<SubQuestionBean>();
         String[] a = subQuestionString.split("\\<\\[CDATA1\\]\\>");
         for(String str:a){
             //一个map就是一个子题
@@ -366,6 +374,45 @@ public class QuestionService {
             ret = true;
         }
 
+        return ret;
+    }
+
+    //attachment表里设置questionId，并处理无效的文件和记录
+    private boolean modifyAttachment(int umid,long questionId,String ids,String subQuestionString){
+        boolean ret = false;
+        //所有附件id的合集，形如：1:3:5:7；传入参数ids是复合题目的题头的附件，各子题可能还有附件
+        String attachmentIds="";
+        if(ids!=null && !ids.equals("")){
+            attachmentIds=ids;
+        }
+        String[] a = subQuestionString.split("\\<\\[CDATA1\\]\\>");
+        for(String str:a){
+            //一个map就是一个子题
+            Map<String, String> map = GlobalTools.parseInput(str,"\\<\\[CDATA2\\]\\>");
+            String ids1 = map.get("attachmentIds");
+            if(ids1!=null && !ids1.equals("")){
+                attachmentIds = attachmentIds+":"+ids1;
+            }
+        }
+        String[] b = attachmentIds.split(":");
+        //将符合条件的attachment记录的questionId字段都设为－1，便于后续处理
+        attachmentRepository.resetQuestionIdByQuestionId(questionId,umid);
+        for(String str1:b){
+            long attatchmentId = GlobalTools.convertStringToLong(str1);
+            if(attatchmentId!=-10000){
+                attachmentRepository.setQuestionIdById(questionId,umid,attatchmentId);
+            }
+        }
+        //获得questionId为－1的所有记录
+        List<Attachment> attachmentList = attachmentRepository.findByUmidAndQuestionId(umid,-1);
+        for(Attachment attachment:attachmentList){
+            String filePath = attachment.getFilePath();
+            File file = new File(filePath);
+            if(file.exists()){
+                file.delete();
+            }
+            attachmentRepository.delete(attachment.getId());
+        }
         return ret;
     }
 

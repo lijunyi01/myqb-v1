@@ -12,6 +12,7 @@ public class Attachment implements java.io.Serializable {
     @GeneratedValue
     private long id;
     private int umid;
+    private long questionId;
     //文件类型：1:jpg； 2:doc ...
     private int fileType;
     private String filePath;
@@ -23,6 +24,7 @@ public class Attachment implements java.io.Serializable {
 
     public Attachment(int umid) {
         this.umid = umid;
+        this.questionId = -1;
     }
 
     public long getId(){
@@ -38,7 +40,10 @@ public class Attachment implements java.io.Serializable {
     public String getFilePath(){return this.filePath;}
     public void setFilePath(String filePath){this.filePath = filePath;}
 
-    public String getOrgName(){return orgName;}
+    public String getOrgName(){return this.orgName;}
     public void setOrgName(String orgName){this.orgName = orgName;}
+
+    public long getQuestionId(){return this.questionId;}
+    public void setQuestionId(long questionId){this.questionId = questionId;}
 
 }
