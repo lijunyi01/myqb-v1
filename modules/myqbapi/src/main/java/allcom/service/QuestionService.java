@@ -111,34 +111,36 @@ public class QuestionService {
         if(checkInputMapOfModifyQuestion(inputMap)==false){
             log.info("param check failed in checkInpuMap! inputMap is:"+ inputMap);
         }else{
-            long questionId=Long.parseLong(inputMap.get("questionId"));
-            //先修改xml文件，文件名不会变，以questionId命名
-            String contentPath = "";
-            contentPath = saveInXml(umid,questionId,inputMap);
-            if (contentPath != null && !contentPath.equals("")) {
-                //该xml成功再处理表
-                Question question = questionRepository.findOne(questionId);
-                if(question !=null){
-                    int grade = Integer.parseInt(inputMap.get("grade"));
-                    int multiplexFlag = Integer.parseInt(inputMap.get("multiplexFlag"));
-                    int questionType = Integer.parseInt(inputMap.get("questionType"));
-                    int classType = Integer.parseInt(inputMap.get("classType"));
-                    int classSubType = Integer.parseInt(inputMap.get("classSubType"));
-                    question.setGrade(grade);
-                    question.setMultiplexFlag(multiplexFlag);
-                    question.setQuestionType(questionType);
-                    question.setClassType(classType);
-                    question.setClassSubType(classSubType);
-                    question.setContentPath(contentPath);
-                    question.setSubject(inputMap.get("subject"));
-                    if (questionRepository.save(question) != null) {
-                        //保存正确答案，心得备注等信息至数据库
-                        saveAnswerAndNote(umid, questionId, inputMap.get("subQuestions"));
-                        //保存检索内容至myqb_qestioncontent
-                        modifyQuestionContent(umid,question.getQuestionContentId(),inputMap.get("subject"),inputMap.get("contentHeader"),inputMap.get("subQuestions"));
-                        //处理附件以及附件表
-                        modifyAttachment(umid,questionId,inputMap.get("attachmentIds"),inputMap.get("subQuestions"));
-                        ret = true;
+            long questionId=GlobalTools.convertStringToLong(inputMap.get("questionId"));
+            if(questionId!=-10000) {
+                //先修改xml文件，文件名不会变，以questionId命名
+                String contentPath = "";
+                contentPath = saveInXml(umid, questionId, inputMap);
+                if (contentPath != null && !contentPath.equals("")) {
+                    //该xml成功再处理表
+                    Question question = questionRepository.findOne(questionId);
+                    if (question != null) {
+                        int grade = Integer.parseInt(inputMap.get("grade"));
+                        int multiplexFlag = Integer.parseInt(inputMap.get("multiplexFlag"));
+                        int questionType = Integer.parseInt(inputMap.get("questionType"));
+                        int classType = Integer.parseInt(inputMap.get("classType"));
+                        int classSubType = Integer.parseInt(inputMap.get("classSubType"));
+                        question.setGrade(grade);
+                        question.setMultiplexFlag(multiplexFlag);
+                        question.setQuestionType(questionType);
+                        question.setClassType(classType);
+                        question.setClassSubType(classSubType);
+                        question.setContentPath(contentPath);
+                        question.setSubject(inputMap.get("subject"));
+                        if (questionRepository.save(question) != null) {
+                            //保存正确答案，心得备注等信息至数据库
+                            saveAnswerAndNote(umid, questionId, inputMap.get("subQuestions"));
+                            //保存检索内容至myqb_qestioncontent
+                            modifyQuestionContent(umid, question.getQuestionContentId(), inputMap.get("subject"), inputMap.get("contentHeader"), inputMap.get("subQuestions"));
+                            //处理附件以及附件表
+                            modifyAttachment(umid, questionId, inputMap.get("attachmentIds"), inputMap.get("subQuestions"));
+                            ret = true;
+                        }
                     }
                 }
             }

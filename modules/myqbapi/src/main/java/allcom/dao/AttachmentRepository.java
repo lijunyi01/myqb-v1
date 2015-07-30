@@ -22,6 +22,6 @@ public interface AttachmentRepository extends CrudRepository<Attachment,Long> {
 
     @Transactional
     @Modifying
-    @Query("update Attachment a set a.questionId=:questionId where a.id = :id and a.umid = :umid")
+    @Query("update Attachment a set a.questionId=:questionId where a.id = :id and a.umid = :umid and a.questionId = -1")
     void setQuestionIdById(@Param("questionId") long questionId,@Param("umid") int umid,@Param("id") long id);
 }
