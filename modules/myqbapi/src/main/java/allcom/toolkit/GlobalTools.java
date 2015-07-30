@@ -221,17 +221,22 @@ public class GlobalTools {
 //        System.out.print(s);
 
 //        测试解析通用输入参数
-        String input="username=tt=asdf<[CDATA]>pass=111";
-        Map<String,String> map = parseInput(input);
-        String pass = map.get("pass1");
-        System.out.print(pass);
-        System.out.print(map);
+//        String input="username=tt=asdf<[CDATA]>pass=111";
+//        Map<String,String> map = parseInput(input);
+//        String pass = map.get("pass1");
+//        System.out.print(pass);
+//        System.out.print(map);
 
 //        测试数字判断
 //        String s=null;
 //        if(isNumeric(s)){
 //            System.out.print("is number!");
 //        }
+
+//        String input = "sub|sdfa|dsafasd||cont|cot";
+//        String[] a = input.split("\\|\\|");
+//        String b = a[0];
+
 
     }
 }

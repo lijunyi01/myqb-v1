@@ -100,7 +100,20 @@ public class GenController {
                         ret = questionService.returnFail(area, "-14");
                         log.info("general input param error:" + generalInput);
                     }else{
-                        if(questionService.modifyQuestion(umid,inputMap)){
+                        if(questionService.modifyQuestion(umid, inputMap)){
+                            ret = questionService.returnFail(area, "0");
+                        }else{
+                            ret = questionService.returnFail(area, "-18");
+                        }
+                    }
+                }else if (functionId == 32) {
+                    //修改含心得及正确／错误答案(不包含题目本身)
+                    //http://localhost:8080/gi?functionId=32&umid=1&sessionId=111&generalInput=questionId=21<[CDATA]>subQuestions=seqId=1<[CDATA2]>correctAnswer=C<[CDATA2]>wrongAnswer=A<[CDATA2]>note=note1<[CDATA1]>seqId=2<[CDATA2]>correctAnswer=A<[CDATA2]>wrongAnswer=D<[CDATA2]>note=note21
+                    if(inputMap.size()!=2){
+                        ret = questionService.returnFail(area, "-14");
+                        log.info("general input param error:" + generalInput);
+                    }else{
+                        if(questionService.modifyAnswerAndNote(umid,inputMap)){
                             ret = questionService.returnFail(area, "0");
                         }else{
                             ret = questionService.returnFail(area, "-18");

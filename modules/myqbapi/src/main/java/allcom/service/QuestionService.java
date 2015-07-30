@@ -105,6 +105,8 @@ public class QuestionService {
         return ret;
     }
 
+
+    //完整地修改题目
     public boolean modifyQuestion(int umid,Map<String,String> inputMap){
         boolean ret = false;
 
@@ -113,13 +115,13 @@ public class QuestionService {
         }else{
             long questionId=GlobalTools.convertStringToLong(inputMap.get("questionId"));
             if(questionId!=-10000) {
-                //先修改xml文件，文件名不会变，以questionId命名
-                String contentPath = "";
-                contentPath = saveInXml(umid, questionId, inputMap);
-                if (contentPath != null && !contentPath.equals("")) {
-                    //该xml成功再处理表
-                    Question question = questionRepository.findOne(questionId);
-                    if (question != null) {
+                Question question = questionRepository.findOne(questionId);
+                if (question != null && question.getUmid() == umid) {
+                    //先修改xml文件，文件名不会变，以questionId命名
+                    String contentPath = "";
+                    contentPath = saveInXml(umid, questionId, inputMap);
+                    if (contentPath != null && !contentPath.equals("")) {
+                        //该xml成功再处理表
                         int grade = Integer.parseInt(inputMap.get("grade"));
                         int multiplexFlag = Integer.parseInt(inputMap.get("multiplexFlag"));
                         int questionType = Integer.parseInt(inputMap.get("questionType"));
@@ -145,6 +147,24 @@ public class QuestionService {
                 }
             }
         }
+        return ret;
+    }
+
+    //修改题目中的答案和心得
+    public boolean modifyAnswerAndNote(int umid,Map<String,String> inputMap){
+        boolean ret = false;
+        long questionId=GlobalTools.convertStringToLong(inputMap.get("questionId"));
+        if(questionId!=-10000) {
+            Question question = questionRepository.findOne(questionId);
+            if (question != null && question.getUmid() == umid) {
+                //保存正确答案，心得备注等信息至数据库
+                saveAnswerAndNote(umid, questionId, inputMap.get("subQuestions"));
+                //在myqb_qestioncontent修改检索内容
+                modifyQuestionContent2(umid, question.getQuestionContentId(), inputMap.get("subject"), inputMap.get("contentHeader"), inputMap.get("subQuestions"));
+                ret = true;
+            }
+        }
+
         return ret;
     }
 
@@ -314,7 +334,7 @@ public class QuestionService {
         return question;
     }
 
-    //用于新题目创建以及老题目修改
+    //用于新题目创建以及老题目修改,要求传入所有子题的答案及心得，不能只传入部分
     private void saveAnswerAndNote(int umid,long questionId,String subQuestionString){
         String[] a = subQuestionString.split("\\<\\[CDATA1\\]\\>");
         //修改的情况下，先删除原记录
@@ -346,34 +366,69 @@ public class QuestionService {
         }
     }
 
+    //传入的部分包含题目的内容
     private boolean modifyQuestionContent(int umid,long questionContentId,String subject,String contentHeader,String subQuestionString){
         boolean ret = false;
         QuestionContent questionContent = questionContentRepository.findOne(questionContentId);
-        String searchContent=subject;
-        String[] a = subQuestionString.split("\\<\\[CDATA1\\]\\>");
-        String searchNote = "||"; //用“||“ 分割搜索字段的内容和心得，便于之后分别修改
+        if(questionContent != null) {
+            String searchContent = subject;
+            String[] a = subQuestionString.split("\\<\\[CDATA1\\]\\>");
+            String searchNote = "||"; //用“||“ 分割搜索字段的内容和心得，便于之后分别修改
 
-        if(!contentHeader.equals("")){
-            searchContent = searchContent +"|"+ contentHeader;
-        }
+            if (!contentHeader.equals("")) {
+                searchContent = searchContent + "|" + contentHeader;
+            }
 
-        for(String str:a){
-            //一个map就是一个子题
-            Map<String, String> map = GlobalTools.parseInput(str,"\\<\\[CDATA2\\]\\>");
-            String note = map.get("note");
-            searchContent = searchContent + "|" + map.get("content");
+            for (String str : a) {
+                //一个map就是一个子题
+                Map<String, String> map = GlobalTools.parseInput(str, "\\<\\[CDATA2\\]\\>");
+                String note = map.get("note");
+                searchContent = searchContent + "|" + map.get("content");
 
-            if(note!=null && !note.equals("")){
-                if(searchNote.equals("||")) {
-                    searchNote = searchNote + note;
-                }else{
-                    searchNote = searchNote +"|"+ note;
+                if (note != null && !note.equals("")) {
+                    if (searchNote.equals("||")) {
+                        searchNote = searchNote + note;
+                    } else {
+                        searchNote = searchNote + "|" + note;
+                    }
                 }
             }
+            questionContent.setContent(searchContent + searchNote);
+            if (questionContentRepository.save(questionContent) != null) {
+                ret = true;
+            }
         }
-        questionContent.setContent(searchContent+searchNote);
-        if(questionContentRepository.save(questionContent)!=null){
-            ret = true;
+
+        return ret;
+    }
+
+    //传入的部分只包含题目的答案及心得
+    private boolean modifyQuestionContent2(int umid,long questionContentId,String subject,String contentHeader,String subQuestionString){
+        boolean ret = false;
+        QuestionContent questionContent = questionContentRepository.findOne(questionContentId);
+        if(questionContent !=null) {
+            String searchContent = questionContent.getContent();
+            // searchContent1是||分割的两部分中的第一部分，不含心得
+            String searchContent1 = searchContent.split("\\|\\|")[0];
+            String[] a = subQuestionString.split("\\<\\[CDATA1\\]\\>");
+            String searchNote = "||"; //用“||“ 分割搜索字段的内容和心得
+
+            for (String str : a) {
+                //一个map就是一个子题的答案和心得
+                Map<String, String> map = GlobalTools.parseInput(str, "\\<\\[CDATA2\\]\\>");
+                String note = map.get("note");
+                if (note != null && !note.equals("")) {
+                    if (searchNote.equals("||")) {
+                        searchNote = searchNote + note;
+                    } else {
+                        searchNote = searchNote + "|" + note;
+                    }
+                }
+            }
+            questionContent.setContent(searchContent1 + searchNote);
+            if (questionContentRepository.save(questionContent) != null) {
+                ret = true;
+            }
         }
 
         return ret;
