@@ -12,6 +12,8 @@ import java.util.List;
  */
 public class QuestionBean {
     private long questionId;
+    //年级 －30：小班；－20:中班；－10:大班；10:小学一年级...50:小学5年级；60:小学6年级；61:初中预备班；70:初一...90:初三；100:高一...120:高三；130:大一...170:大五；180:研一...200:研三
+    private String grade;
     private String classType;
     private String classSubType;
     //题头，复合题目的题目内容（例如阅读理解的文章）；对于普通题目（multiplexFlag＝0）contentHeader＝“”
@@ -27,7 +29,7 @@ public class QuestionBean {
 
     public QuestionBean(){}
 
-    public QuestionBean(long questionId,String classType,String classSubType,String multiplexFlag,String subQuestionCount,String subject){
+    public QuestionBean(long questionId,String classType,String classSubType,String multiplexFlag,String subQuestionCount,String subject,String grade){
         this.questionId = questionId;
         this.classType = classType;
         this.classSubType = classSubType;
@@ -36,6 +38,7 @@ public class QuestionBean {
         this.contentHeader = "";
         this.attachmentIds = "";
         this.subject = subject;
+        this.grade = grade;
     }
 
     public long getQuestionId(){ return this.questionId;}
@@ -64,5 +67,8 @@ public class QuestionBean {
 
     public String getSubject(){return this.subject;}
     public void setSubject(String subject) {this.subject = subject;}
+
+    public String getGrade(){return this.grade;}
+    public void setGrade(String grade){this.grade = grade;}
 
 }

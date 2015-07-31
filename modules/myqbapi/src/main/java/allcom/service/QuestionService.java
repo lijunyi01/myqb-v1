@@ -267,7 +267,7 @@ public class QuestionService {
     //返回生成的xml文件的完整路径
     private String saveInXml(int umid,long questionId,Map<String,String> inputMap){
         String ret ="";
-        QuestionBean questionBean = new QuestionBean(questionId,inputMap.get("classType"),inputMap.get("classSubType"),inputMap.get("multiplexFlag"),inputMap.get("subQuestionCount"),inputMap.get("subject"));
+        QuestionBean questionBean = new QuestionBean(questionId,inputMap.get("classType"),inputMap.get("classSubType"),inputMap.get("multiplexFlag"),inputMap.get("subQuestionCount"),inputMap.get("subject"),inputMap.get("grade"));
         List<SubQuestionBean> subQuestionBeanList = getSubQuestionList(inputMap.get("subQuestions"));
         SubQuestion subQuestion = new SubQuestion();
         subQuestion.setSubQuestionBeanList(subQuestionBeanList);

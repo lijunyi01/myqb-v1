@@ -4,6 +4,7 @@ import allcom.entity.Account;
 import allcom.service.AccountService;
 import allcom.service.QuestionService;
 import allcom.service.SessionService;
+import allcom.service.ClassTypeService;
 import allcom.toolkit.GlobalTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,8 @@ public class GenController {
     private AccountService accountService;
     @Autowired
     private QuestionService questionService;
+    @Autowired
+    private ClassTypeService classTypeService;
 
     // 通用接口,用于已经完成登录验证后的其它请求
     @RequestMapping(value = "/gi")
@@ -79,6 +82,22 @@ public class GenController {
                     //获取本地存储的用户账户信息
                     ret = accountService.getLocalInfo(area,umid);
                     log.info("umid:"+umid+" get localinfo result:" + ret.getErrorCode());
+                }else if (functionId == 23) {
+                    //获取科目大类信息
+                    //http://localhost:8080/gi?functionId=23&umid=1&sessionId=111&generalInput=
+                    ret = classTypeService.getClassTypeInfo(area);
+                    log.info("umid:"+umid+" get classType result:" + ret.getErrorCode());
+                }else if (functionId == 24) {
+                    //获取科目子类信息
+                    //http://localhost:8080/gi?functionId=24&umid=1&sessionId=111&generalInput=classType=1
+                    int classType = GlobalTools.convertStringToInt(inputMap.get("classType"));
+                    if(inputMap.size()!=1 || classType==-10000){
+                        ret = classTypeService.returnFail(area, "-14");
+                        log.info("general input param error:" + generalInput);
+                    }else{
+                        ret = classTypeService.getClassSubTypeInfo(area,classType);
+                        log.info("umid:"+umid+" get classSubType result:" + ret.getErrorCode());
+                    }
 
                 }else if (functionId == 30) {
                     //存储题目信息(心得及正确／错误答案保存于数据库表myqb_answerandnote；创建题目时，子题的正确／错误答案及心得不一定有，可以后期添加)
@@ -87,7 +106,7 @@ public class GenController {
                         ret = questionService.returnFail(area, "-14");
                         log.info("general input param error:" + generalInput);
                     }else{
-                        if(questionService.createQuestion(umid,inputMap)){
+                        if(questionService.createQuestion(umid, inputMap)){
                             ret = questionService.returnFail(area, "0");
                         }else{
                             ret = questionService.returnFail(area, "-18");
@@ -107,7 +126,7 @@ public class GenController {
                         }
                     }
                 }else if (functionId == 32) {
-                    //修改含心得及正确／错误答案(不包含题目本身)
+                    //修改含心得及正确／错误答案(不包含题目本身);必须包含所有子题的答案和心得
                     //http://localhost:8080/gi?functionId=32&umid=1&sessionId=111&generalInput=questionId=21<[CDATA]>subQuestions=seqId=1<[CDATA2]>correctAnswer=C<[CDATA2]>wrongAnswer=A<[CDATA2]>note=note1<[CDATA1]>seqId=2<[CDATA2]>correctAnswer=A<[CDATA2]>wrongAnswer=D<[CDATA2]>note=note21
                     if(inputMap.size()!=2){
                         ret = questionService.returnFail(area, "-14");
