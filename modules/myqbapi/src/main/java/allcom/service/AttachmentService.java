@@ -60,6 +60,17 @@ public class AttachmentService {
         return  ret;
     }
 
+    public String getFilePath(long id,int umid){
+        String ret = "";
+        Attachment attachment = attachmentRepository.findOne(id);
+        if(attachment !=null){
+            if(attachment.getUmid()==umid){
+                ret = attachment.getFilePath();
+            }
+        }
+        return  ret;
+    }
+
     public void deleteAttachment(long id){
         Attachment attachment = attachmentRepository.findOne(id);
         if(attachment !=null){

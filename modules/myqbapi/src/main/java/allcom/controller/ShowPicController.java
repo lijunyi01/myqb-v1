@@ -186,5 +186,64 @@ public class ShowPicController {
         response.setDateHeader("Expires", time);
     }
 
+    protected void setResponseHeadersForFile(HttpServletResponse response) {
+        response.setContentType("application/msword");
+        response.setHeader("Cache-Control", "no-cache, no-store");
+        response.setHeader("Pragma", "no-cache");
+        long time = System.currentTimeMillis();
+        response.setDateHeader("Last-Modified", time);
+        response.setDateHeader("Date", time);
+        response.setDateHeader("Expires", time);
+    }
+
+
+    //http://localhost:8080/showfile?umid=1&sessionId=1&fileId=15
+    @RequestMapping(value = "/showfile")
+    public
+    void showFile(
+            @RequestParam(value = "umid",required = true)int umid,
+            @RequestParam(value = "sessionId",required = true)String sessionId,
+            @RequestParam(value = "fileId",required = true)long fileId,
+            @RequestParam(value = "area",required = false,defaultValue = "cn")String area,
+            HttpServletRequest request,
+            HttpServletResponse response
+
+    ) {
+
+        if (sessionService.verifySessionId(umid, sessionId)) {
+            FileInputStream in = null;
+            OutputStream outputStream = null;
+            String filePath = "";
+            int i=-1;
+            byte[] data = null;
+
+            filePath = attachmentService.getFilePath(fileId, umid);
+            if (!filePath.equals("")) {
+                try {
+                    in = new FileInputStream(filePath);
+                    i=in.available();
+                    if(i!=-1) {
+                        data = new byte[i];
+                        in.read(data);
+                        in.close();
+                    }
+
+                    if(data !=null){
+                        setResponseHeadersForFile(response);
+                        outputStream =new BufferedOutputStream(response.getOutputStream());
+                        outputStream.write(data);
+                        outputStream.flush();
+                        outputStream.close();
+                    }
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+
+            }
+        }
+    }
+
 }
 
