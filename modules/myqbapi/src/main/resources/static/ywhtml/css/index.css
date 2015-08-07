@@ -1,0 +1,108 @@
+*{margin: 0; padding: 0;}
+body{overflow: hidden; font-family: "Microsoft YaHei"; background-color: #fff; overflow: auto;}
+
+.mian{width: auto; height: auto; margin: 0; padding: 0; overflow: hidden;}
+
+.left{width: 75px; height: 100%; border-right: 1px solid #ececec; background-color: #f8f8f8; float: left;}
+.left_div{width: 75px; height: 100%; position: relative; left: 0px; top: 0px; background-color: #f8f8f8; z-index: 100;}
+.gntb_div{width: 75px; height: auto; overflow: hidden;}
+.logo_div{width: 75px; height: 75px; border-bottom: 1px solid #ccc;}
+.add_div{width: 75px; height: 46px; margin-top: 20px; cursor: pointer; overflow: hidden;}
+.add_div_img{width: 36px; height: 36px; margin-left: 15px; margin-top: 5px; }
+.add_div:hover{background-color: #ECE9E9;}
+.add_div:hover .add_div_img{ -webkit-animation: gndh 0.5s forwards;}
+@-webkit-keyframes gndh{0%{margin-left:15px;} 100%{margin-left: 25px;}}
+.add_div_mar_top{margin-top: 10px;}
+
+.user_div{width: 75px; height: 75px; border-top: 1px solid #ececec; overflow: hidden;}
+.user_div>img{width: 36px; height: 36px; margin-top: 19.5px; margin-left: 19.5px; border-radius:50%; cursor: pointer;}
+.user_head_div{width: 100px; height: 90px; border: 1px solid #ececec; position: absolute; left: -26px; bottom: 0px; z-index: 99; display: none;}
+.user_head_div>div{width: 100%; height: 30px; margin-top: 10px; text-align: center; line-height: 30px; cursor: pointer; font-size: 14px;}
+.user_head_div>div:hover{background-color: #ccc;}
+
+.middle{width: 455px; height: 100%; border-right: 1px solid #ececec; background-color: #fff; float: left;}
+
+.right{width: auto; height: 100%; float: left;}
+.tmlx{width: 100%; height: 100%; overflow: auto;}
+.tmlx_title{width: 94%; height: 50px; margin: 0 auto; border-bottom: 1px solid #ccc; line-height: 50px; font-size: 14px; font-weight: bold;}
+.tmlx_title>div{width: auto; height: 30px; line-height: 30px; float: right; margin-right: 20px; margin-top: 10px; border: 1px solid #49C4F0; cursor: pointer;}
+.tmlx_context{width: 94%; height: auto; margin: 0 auto; overflow: hidden;}
+.tmlx_context>div{width: 150px; height: 50px; float: left; margin-top: 10px; margin-left: 10px; border: 1px solid #ccc; text-align: center; line-height: 50px; cursor: pointer;}
+.tmlx_context>div:hover{border-color: #493FE5;}
+.tmlx_tmnr{width: 94%; height: 200px; border: 1px solid #ccc; margin: 20px auto;}
+.tmlx_tmnr>textarea{width: 100%; height: 100%; min-width: 100%; min-height: 100%; max-width: 100%; max-height: 100%; border: 0px; outline: none; font-size: 14px;}
+.tmlx_xzxx{width: 94%; height: 220px; margin: 20px auto; border: 1px solid #ccc; display: none; overflow: auto;}
+.tmlx_xzxx_div{width: 94%; height: 40px; margin: 10px auto; line-height: 40px; font-size: 14px; border: 1px solid #fff;}
+.tmlx_xzxx_div>div{width: auto; height: 100%; float: left;}
+.tmlx_xzxx_div input[type=text]{width: 90%; height: 25px; font-size: 14px; outline: none;}
+.tmlx_xzxx_div input[type=checkbox]{width: 25px; height: 25px; font-size: 14px; outline: none; margin-top: 9px;}
+.tmlx_xzxx_div_border{border: 1px solid #ddd; cursor: pointer;}
+.tmlx_xzxx_div_border:hover{border-color: #493FE5;}
+.tmlx_button{width: 94%; height: 30px; margin: 20px auto;}
+.tmlx_button>div{width: auto; height: 28px; font-size: 14px; border: 1px solid #ccc; float: left; text-align: center; cursor: pointer; margin-left: 10px; line-height: 30px;}
+.tmlx_xinde{width: 94%; height: 200px; border: 1px solid #ccc; margin: 20px auto; display: none;}
+.tmlx_xinde>textarea{width: 100%; height: 100%; min-width: 100%; min-height: 100%; max-width: 100%; max-height: 100%; border: 0px; outline: none; font-size: 14px;}
+
+.html_jiaodian{width: 1px; height: 1px; border: 0px; position: absolute; left: 0px; top: 0px;}
+.html_zezhao1{width: 100%; height: 100%; display: none; background-color: rgba(255, 253, 253, 0.5);}
+.html_zezhao2{width: 100%; height: 100%; display: none; background-color: rgba(255, 253, 253, 0);}
+
+.html_tanchu_a{width: 100%; height: 100%; position: absolute; top: 0px; left: 0px; z-index: 110; overflow: hidden; background-color: rgba(255, 253, 253, 0.5); display: none;}
+.html_tanchu_a_div{width: 800px; height: 500px; margin: 70px auto; border: 1px solid #ccc; background-color: #fff;}
+
+.html_alert{width: 100%; height: 100%; position: absolute; top: 0px; left: 0px; z-index: 1000; overflow: hidden; background-color: rgba(255, 253, 253, 0.9); display: none;}
+.html_alert>div{width: 350px; height: 150px; border: 1px solid #ccc; margin: 8% auto; background-color: #fff; border-radius: 5px;}
+
+.user_setting{width: 100%; height: 100%; overflow: auto;}
+.user_setting_title{width: 95%; height: 50px; border-bottom: 1px solid #ccc; margin: 0 auto; line-height: 50px; font-size: 16px; font-weight: bold; color: #000;}
+.user_setting_title div{width: 22px; height: 22px; float: right; cursor: pointer; font-size: 28px; font-weight: bold; margin-top: 13px; line-height: 20px; border: 1px solid #fff;}
+.user_setting_title div:hover{color: #ff0000; border-color: #ccc;}
+.user_setting_xinxi{width: 95%; height: 50px; margin: 20px auto; border: 1px solid #ccc; cursor: pointer; line-height: 50px; font-size: 14px; text-indent:2em;}
+.user_setting_xinxi:hover{border-color: #493FE5;}
+.user_setting_xinxi_bordercolor{border-color: #493FE5;}
+.user_setting_jiben_xinxi{width: 95%; height: 100px; margin: 20px auto; border: 1px solid #ccc; background-color: #f5f5f5; border-radius: 5px; display: none;}
+.user_setting_xinxi_A{width: 94%; height: 50px; margin: 0 auto; line-height: 50px; font-size: 14px; color: #000;}
+.user_setting_xinxi_A button{width: auto; height: 30px; line-height: 30px; font-size: 12px; color: #000; background-color: #fff; border: 1px solid #ccc; outline: none; cursor: pointer;}
+.user_setting_xinxi_A img{width: 65px; height: 65px; margin-left: 7.5px; margin-top: 7.5px; border-radius: 50%;}
+.user_setting_xinxi_A input{width: 150px; height: 25px; font-size: 12px; outline: none;}
+.user_setting_xinxi_A select{width: 154px; height: 28px; line-height: 28px; font-size: 12px; outline: none; -webkit-appearance: none;}
+/* .user_setting_xinxi_B{width: 94%; height: 80px; margin: 0 auto; line-height: 80px; font-size: 14px; color: #000;} */
+/* .user_setting_xinxi_B img{width: 65px; height: 65px; margin-left: 7.5px; margin-top: 7.5px; border-radius: 50%;} */
+.user_setting_xinxi_border{border-bottom: 1px solid #ccc;}
+.user_setting_xiangxi_xinxi{width: 95%; height: 300px; margin: 20px auto; border: 1px solid #ccc; background-color: #f5f5f5; border-radius: 5px; display: none;}
+.user_setting_xiangxi_tj{width: 90%; height: 30px; line-height: 30px; border: 1px solid #2e6da4; background-color: #337ab7; margin: 15px auto; text-align: center; cursor: pointer; border-radius: 5px; vertical-align:middle; color: #fff; font-size: 16px; font-weight: bold;}
+.user_setting_xiangxi_tj:hover{background-color: #493FE5;}
+.user_setting_uppass_xinxi{width: 95%; height: 213px; margin: 20px auto; border: 1px solid #ccc; background-color: #f5f5f5; border-radius: 5px; display: none;}
+
+.alert_div{width: 100%; height: 100%; overflow: hidden;}
+.alert_div_title{width: 100%; height: 20px;}
+.alert_div_context{width: 90%; height: 85px; margin: 0 auto;}
+.alert_div_button{width: 100%; height: 44px; border-top: 1px solid #ccc;}
+.alert_div_button_alert{width: 100%; height: 100%; line-height: 44px; text-align: center; cursor: pointer;}
+.alert_div_button_alert:hover{color: #337ab7;}
+.alert_div_button_confirm{width: 100%; height: 100%;}
+.alert_div_button_confirm>div{width: 174px; height: 100%; line-height: 44px; text-align: center; cursor: pointer; float: left; border-left: 1px solid #ccc;}
+.alert_div_button_confirm>div:hover{color: #337ab7;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

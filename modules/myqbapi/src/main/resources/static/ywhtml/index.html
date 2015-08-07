@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>用户首页</title>
+<link rel="stylesheet" type="text/css" href="css/index.css">
+</head>
+<body>
+	<div class="mian">
+	
+		<div class="left">
+			<div class="left_div">
+				<div class="gntb_div">
+					<div class="logo_div"></div>
+					<div id="gn_add_img" class="add_div"><img class="add_div_img" src="images/add.png" /></div>
+					<div id="gn_ss_img" class="add_div add_div_mar_top"><img class="add_div_img" src="images/suosou.png" /></div>
+				</div>
+				<div class="user_div">
+					<img id="user_head_img" src="images/user_head.png" />
+				</div>
+				
+			</div>
+			<div class="user_head_div">
+				<div id="user_setting">设置</div>
+				<div id="user_quit">退出</div>
+			</div>
+		</div>
+		
+		<div class="middle"></div>
+		
+		<div id="right" class="right"></div>
+		
+		<input id="html_jiaodian" class="html_jiaodian" type="text">
+		<div id="html_zezhao1" class="html_zezhao1"></div>
+		<div id="html_zezhao2" class="html_zezhao2"></div>
+		
+		<div id="html_tanchu_a" class="html_tanchu_a">
+			<div id="html_tanchu_a_div" class="html_tanchu_a_div"></div>
+		</div>
+		<div id="html_alert" class="html_alert">
+			<div id="html_alert_div"></div>
+		</div>
+	</div>
+	
+	<input type="hidden" id="html_load_type" value="0" />
+	
+	<script src="js/jquery/jquery-1.7.min.js"></script>
+	<script src="js/react/react.min.js"></script>
+	<script src="js/react/JSXTransformer.js"></script>
+	<script src="config/config.js"></script>
+	<script src="js/public.js"></script>
+	<script src="js/index.js"></script>
+	<script type="text/jsx" src="js/components/component_setting.js"></script>
+	<script type="text/jsx" src="js/components/component_alert.js"></script>
+	<script type="text/jsx" src="js/components/component_tmlx.js"></script>
+	<script type="text/jsx" src="js/render_component.js"></script>
+</body>
+</html>

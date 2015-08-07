@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>业务登录窗口</title>
+</head>
+<body>
+<script src="js/jquery/jquery-1.7.min.js"></script>
+<script src="config/config.js"></script>
+<script src="js/public.js"></script>
+<script type="text/javascript">
+	var loca = "";
+	var umid = "";
+	var sessionid = "";
+	$(function(){
+		try{
+			loca = location.href;
+			umid = loca.split("?")[1].split("&")[0].split("=")[1];
+			sessionid = loca.split("?")[1].split("&")[1].split("=")[1];
+		} catch (e){
+			location.href=config.loginapiurl;
+		}
+		
+		//调用获取用户信息接口,判断sessionid是否合法,提取用户信息
+		var url = config.yw_myqbapi+config.yw_login;
+		var data = {umid:umid,sessionId:sessionid,functionId:"22",generalInput:""};
+		publics.post(url,data,login_yw_yhxx);
+	});
+	
+	function login_yw_yhxx(json){
+		if(json.errorCode == -4){
+			location.href=config.loginapiurl;
+		}else if(json.errorCode == 0){
+			var content = json.retContent;
+			//如果年级未设置,则自动跳转到详细信息设置界面
+			if(publics.data_fg(content,2)==0){
+				//跳转到用户信息设置界面
+				localStorage.setItem("indextype","1");
+			}else{
+				//跳转到登录后首页
+				localStorage.setItem("nianji",publics.data_fg(content,2));
+				localStorage.setItem("indextype","0");
+			}
+			localStorage.setItem("umid",umid);
+			localStorage.setItem("sessionid",sessionid);
+			location.href="index.html";
+		}
+	}
+</script>
+</body>
+</html>
