@@ -23,6 +23,8 @@ public class QuestionOmxService {
 
     @Value("${systemparam.xmlBaseDir}")
     private String xmlBaseDir;
+    @Value("${systemparam.cgXmlBaseDir}")
+    private String cgXmlBaseDir;
 
     private Marshaller marshaller;
     private Unmarshaller unmarshaller;
@@ -38,8 +40,14 @@ public class QuestionOmxService {
     }
 
     //    object -> xml
-    public String saveQuestionBean(int umid,QuestionBean questionBean) throws IOException {
-        String filePath = xmlBaseDir+umid+"/"+questionBean.getQuestionId()+".xml";
+    public String saveQuestionBean(int umid,QuestionBean questionBean,boolean cgFlag) throws IOException {
+        String filePath = "";
+        if(cgFlag){
+            filePath = cgXmlBaseDir+umid+"/"+questionBean.getQuestionId()+".xml";
+        }else{
+            filePath = xmlBaseDir+umid+"/"+questionBean.getQuestionId()+".xml";
+        }
+
         FileOutputStream os = null;
         try {
             File file = new File(filePath);

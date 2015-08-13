@@ -7,6 +7,10 @@
             <bind-xml name="questionId" node="element"/>
         </field>
 
+        <field name="grade" type="string">
+            <bind-xml name="grade" node="element"/>
+        </field>
+
         <field name="classType" type="string">
             <bind-xml name="classType" node="element"/>
         </field>

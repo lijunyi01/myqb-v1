@@ -1,8 +1,6 @@
 package allcom.controller;
 
-import allcom.entity.Account;
-import allcom.entity.AnswerAndNote;
-import allcom.entity.Question;
+import allcom.entity.*;
 import allcom.oxmapper.QuestionBean;
 import allcom.oxmapper.QuestionOmxService;
 import allcom.oxmapper.SubQuestionBean;
@@ -43,55 +41,7 @@ public class QuestionController {
     @Autowired
     private QuestionOmxService questionOmxService;
 
-//    // 通过id获得题目列表（同时获得多个题目，数组＋json形式）
-//    @RequestMapping(value = "/getquestions")
-//    public List<RetQuestionBean> getRetQuestions(
-//            @RequestParam(value = "umid",required = true)int umid,
-//            @RequestParam(value = "ids",required = true) String ids,
-//            @RequestParam(value = "sessionId",required = true)String sessionId,
-//            @RequestParam(value = "area",required = false,defaultValue = "cn")String area,
-//            HttpServletRequest request
-//    ) {
-//        log.info("ids is:"+ ids);
-//        List<RetQuestionBean> retQuestionBeanList = new ArrayList<RetQuestionBean>();
-//
-//        if (sessionService.verifySessionId(umid, sessionId)) {
-//            String[]  a= ids.split(":");
-//            Account account = accountService.createAccountIfNotExist(umid);
-//
-//            if (account != null) {
-//                for(String str:a){
-//                    Question question = questionService.getQuestionById(GlobalTools.convertStringToLong(str));
-//                    if(question!=null){
-//                        String xmlPath = question.getContentPath();
-//                        QuestionBean questionBean = null;
-//                        try {
-//                            questionBean = questionOmxService.loadQuestionBean(xmlPath);
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                        if(questionBean!=null) {
-//                            questionBeanList.add(questionBean);
-//                        }
-//                    }
-//                }
-//
-//            }else{
-//                //获取account信息失败
-//                retQuestionBean.setErrorCode("-15");
-//                retQuestionBean.setErrorMessage(GlobalTools.getMessageByLocale(area,"-15"));
-//                log.info("umid:" + umid + " failed to get account");
-//            }
-//
-//        }else {
-//            //ret = sessionService.returnFail(area, "-4");
-//            log.info("umid:" + umid + " failed to check sessionid:" + sessionId);
-//        }
-//
-//        return questionBeanList;
-//    }
-
-    // 通过id获得题目列表（同时获得多个题目，数组＋json形式）
+    // 通过id获得题目（json形式）
     // http://localhost:8080/getquestion?umid=1&id=19&sessionId=111
     @RequestMapping(value = "/getquestion")
     public RetQuestionBean getRetQuestion(
@@ -142,6 +92,60 @@ public class QuestionController {
             log.info("umid:" + umid + " failed to check sessionid:" + sessionId);
         }
         return retQuestionBean;
+    }
+
+
+    // 通过id获得题目草稿（json形式）
+    // http://localhost:8080/getquestioncg?umid=1&id=19&sessionId=111
+    @RequestMapping(value = "/getquestioncg")
+    public RetQuestionCgBean getRetQuestionCg(
+            @RequestParam(value = "umid",required = true)int umid,
+            @RequestParam(value = "id",required = true) long id,
+            @RequestParam(value = "sessionId",required = true)String sessionId,
+            @RequestParam(value = "area",required = false,defaultValue = "cn")String area,
+            HttpServletRequest request
+    ) {
+        log.info("cg id is:"+ id);
+        RetQuestionCgBean retQuestionCgBean = new RetQuestionCgBean("-1");
+
+        if (sessionService.verifySessionId(umid, sessionId)) {
+            Account account = accountService.createAccountIfNotExist(umid);
+            if (account != null) {
+                QuestionCg questionCg = questionService.getQuestionCgById(id);
+                if(questionCg!=null && questionCg.getUmid()==umid){
+                    String xmlPath = questionCg.getContentPath();
+                    try {
+                        QuestionBean questionBean = questionOmxService.loadQuestionBean(xmlPath);
+                        if(questionBean!=null) {
+                            retQuestionCgBean.setErrorCode("0");
+                            retQuestionCgBean.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
+                            retQuestionCgBean.setQuestionBean(questionBean);
+                            List<AnswerAndNoteCg> answerAndNoteCgList = questionService.getAnswerAndNoteCgList(umid, id);
+                            if(answerAndNoteCgList !=null){
+                                retQuestionCgBean.setAnswerAndNoteCgList(answerAndNoteCgList);
+                            }
+                        }
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }else{
+                    retQuestionCgBean.setErrorCode("-23");
+                    retQuestionCgBean.setErrorMessage(GlobalTools.getMessageByLocale(area,"-23"));
+                    log.info("umid:" + umid + " found no questioncg,questionId is:"+id);
+                }
+            }else{
+                //获取account信息失败
+                retQuestionCgBean.setErrorCode("-15");
+                retQuestionCgBean.setErrorMessage(GlobalTools.getMessageByLocale(area,"-15"));
+                log.info("umid:" + umid + " failed to get account");
+            }
+        }else {
+            retQuestionCgBean.setErrorCode("-4");
+            retQuestionCgBean.setErrorMessage(GlobalTools.getMessageByLocale(area,"-4"));
+            log.info("umid:" + umid + " failed to check sessionid:" + sessionId);
+        }
+        return retQuestionCgBean;
     }
 
 }

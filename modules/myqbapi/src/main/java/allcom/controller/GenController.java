@@ -106,8 +106,10 @@ public class GenController {
                         ret = questionService.returnFail(area, "-14");
                         log.info("general input param error:" + generalInput);
                     }else{
-                        if(questionService.createQuestion(umid, inputMap)){
+                        long questionid = questionService.createQuestion(umid, inputMap);
+                        if(questionid != -1){
                             ret = questionService.returnFail(area, "0");
+                            ret.setRetContent("questionId="+questionid);
                         }else{
                             ret = questionService.returnFail(area, "-18");
                         }
@@ -138,6 +140,21 @@ public class GenController {
                             ret = questionService.returnFail(area, "-18");
                         }
                     }
+                }else if (functionId == 33) {
+                    //存储及修改题目草稿信息(心得及正确／错误答案保存于数据库表myqb_answerandnote；创建题目时，子题的正确／错误答案及心得不一定有，可以后期添加)
+                    //http://localhost:8080/gi?functionId=33&umid=1&sessionId=111&generalInput=questionId=<[CDATA]>grade=10<[CDATA]>questionType=101<[CDATA]>classType=1<[CDATA]>classSubType=1<[CDATA]>multiplexFlag=1<[CDATA]>subQuestionCount=2<[CDATA]>contentHeader=content-header-test<[CDATA]>subject=sub<[CDATA]>attachmentIds=<[CDATA]>subQuestions=seqId=1<[CDATA2]>qType=1<[CDATA2]>content=content1<[CDATA2]>attachedInfo=A:6<[CDATA3]>B:7<[CDATA3]>C:8<[CDATA3]>D:9<[CDATA2]>attachmentIds=<[CDATA2]>correctAnswer=C<[CDATA2]>wrongAnswer=A<[CDATA2]>note=note1<[CDATA1]>seqId=2<[CDATA2]>qType=1<[CDATA2]>content=content2<[CDATA2]>attachedInfo=A:1<[CDATA3]>B:2<[CDATA3]>C:3<[CDATA3]>D:4<[CDATA2]>attachmentIds=<[CDATA2]>correctAnswer=A<[CDATA2]>wrongAnswer=D<[CDATA2]>note=note2
+                    if(inputMap.size()!=11){
+                        ret = questionService.returnFail(area, "-14");
+                        log.info("general input param error:" + generalInput);
+                    }else{
+                        long questionid = questionService.createQuestionCg(umid, inputMap);
+                        if(questionid != -1){
+                            ret = questionService.returnFail(area, "0");
+                            ret.setRetContent("questionId="+questionid);
+                        }else{
+                            ret = questionService.returnFail(area, "-18");
+                        }
+                    }
                 }else if(functionId == 40) {
                     //http://localhost:8080/gi?functionId=40&umid=1&generalInput=grade=10<[CDATA]>classType=1&sessionId=111
                     //获取符合条件的题目id（按question的各种类型核对）
@@ -146,6 +163,10 @@ public class GenController {
                     //http://localhost:8080/gi?functionId=41&umid=1&generalInput=content=a&sessionId=111
                     //获取符合条件的题目id（按question的内容查找）
                     ret = questionService.getIdsByContent(umid,inputMap.get("content"),area);
+                }else if(functionId == 42) {
+                    //http://localhost:8080/gi?functionId=42&umid=1&generalInput=&sessionId=111
+                    //获取符合条件的题目草稿id（按umid查找）
+                    ret = questionService.getCgIds(umid,area);
                 }else if(functionId == 50){
 
                 }

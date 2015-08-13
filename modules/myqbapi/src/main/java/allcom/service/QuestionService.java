@@ -40,9 +40,13 @@ public class QuestionService {
     @Autowired
     private QuestionRepository questionRepository;
     @Autowired
+    private QuestionCgRepository questionCgRepository;
+    @Autowired
     private QuestionContentRepository questionContentRepository;
     @Autowired
     private AnswerAndNoteRepository answerAndNoteRepository;
+    @Autowired
+    private AnswerAndNoteCgRepository answerAndNoteCgRepository;
     @Autowired
     private QuestionOmxService questionOmxService;
     @Autowired
@@ -51,8 +55,8 @@ public class QuestionService {
     //@Transactional
     //保存一个题目(一部分内容存入数据库，一部分存入xml文件)
     //public boolean createQuestion(int umid,int grade,int multiplexFlag,int questionType,int classType,int classSubType,String content){
-    public boolean createQuestion(int umid,Map<String,String> inputMap){
-        boolean ret = false;
+    public long createQuestion(int umid,Map<String,String> inputMap){
+        long ret = -1;
         long questionContentId=-1;
         //long questionId=-1;
 
@@ -74,7 +78,7 @@ public class QuestionService {
                 if(question1 != null){
                     //根据传入的信息生成xml文件并保存到指定的路径
                     String contentPath = "";
-                    contentPath = saveInXml(umid,question1.getId(),inputMap);
+                    contentPath = saveInXml(umid,question1.getId(),inputMap,false);
                     //将题目相关具体信息保存到myqb_question表
                     if (contentPath != null && !contentPath.equals("")) {
                         int grade = Integer.parseInt(inputMap.get("grade"));
@@ -96,11 +100,86 @@ public class QuestionService {
                             modifyQuestionContent(umid,questionContentId,inputMap.get("subject"),inputMap.get("contentHeader"),inputMap.get("subQuestions"));
                             //处理附件以及附件表
                             modifyAttachment(umid,question1.getId(),inputMap.get("attachmentIds"),inputMap.get("subQuestions"));
-                            ret = true;
+                            ret = question1.getId();
                         }
                     }
                 }
             }
+        }
+        return ret;
+    }
+
+
+    //保存及修改题目草稿
+    public long createQuestionCg(int umid,Map<String,String> inputMap){
+        long ret = -1;
+
+        if(checkInputMapOfCreateQuestion(inputMap)==false){
+            log.info("param check failed in checkInpuMap2! inputMap is:"+ inputMap);
+        }else{
+            long questionCgId=GlobalTools.convertStringToLong(inputMap.get("questionId"));
+            // -10000表示传入的questionId是空，是新增草稿，否则是修改草稿
+            if(questionCgId==-10000) {
+                QuestionCg questionCg = new QuestionCg(umid);
+                QuestionCg questionCg1 = questionCgRepository.save(questionCg);
+                if(questionCg1 != null){
+                    //根据传入的信息生成xml文件并保存到指定的路径
+                    String cgXmlPath = "";
+                    cgXmlPath = saveInXml(umid,questionCg1.getId(),inputMap,true);
+                    //将题目相关具体信息保存到myqb_question表
+                    if (cgXmlPath != null && !cgXmlPath.equals("")) {
+                        int grade = Integer.parseInt(inputMap.get("grade"));
+                        int multiplexFlag = Integer.parseInt(inputMap.get("multiplexFlag"));
+                        int questionType = Integer.parseInt(inputMap.get("questionType"));
+                        int classType = Integer.parseInt(inputMap.get("classType"));
+                        int classSubType = Integer.parseInt(inputMap.get("classSubType"));
+                        questionCg.setGrade(grade);
+                        questionCg.setMultiplexFlag(multiplexFlag);
+                        questionCg.setQuestionType(questionType);
+                        questionCg.setClassType(classType);
+                        questionCg.setClassSubType(classSubType);
+                        questionCg.setContentPath(cgXmlPath);
+                        questionCg.setSubject(inputMap.get("subject"));
+                        if (questionCgRepository.save(questionCg) != null) {
+                            //保存正确答案，心得备注等信息至数据库
+                            saveAnswerAndNoteCg(umid, questionCg.getId(), inputMap.get("subQuestions"));
+                            //草稿暂时不处理附件
+                            ret = questionCg.getId();
+                        }
+                    }
+                }
+            }else{
+                QuestionCg questionCg = questionCgRepository.findOne(questionCgId);
+                if (questionCg != null && questionCg.getUmid() == umid) {
+                    String cgXmlPath = "";
+                    cgXmlPath = saveInXml(umid,questionCgId,inputMap,true);
+                    //将题目相关具体信息保存到myqb_question表
+                    if (cgXmlPath != null && !cgXmlPath.equals("")) {
+                        int grade = Integer.parseInt(inputMap.get("grade"));
+                        int multiplexFlag = Integer.parseInt(inputMap.get("multiplexFlag"));
+                        int questionType = Integer.parseInt(inputMap.get("questionType"));
+                        int classType = Integer.parseInt(inputMap.get("classType"));
+                        int classSubType = Integer.parseInt(inputMap.get("classSubType"));
+                        questionCg.setGrade(grade);
+                        questionCg.setMultiplexFlag(multiplexFlag);
+                        questionCg.setQuestionType(questionType);
+                        questionCg.setClassType(classType);
+                        questionCg.setClassSubType(classSubType);
+                        questionCg.setContentPath(cgXmlPath);
+                        questionCg.setSubject(inputMap.get("subject"));
+                        if (questionCgRepository.save(questionCg) != null) {
+                            //保存正确答案，心得备注等信息至数据库
+                            saveAnswerAndNoteCg(umid, questionCg.getId(), inputMap.get("subQuestions"));
+                            //草稿暂时不处理附件
+                            ret = questionCg.getId();
+                        }
+                    }
+
+                }
+
+            }
+
+
         }
         return ret;
     }
@@ -119,7 +198,7 @@ public class QuestionService {
                 if (question != null && question.getUmid() == umid) {
                     //先修改xml文件，文件名不会变，以questionId命名
                     String contentPath = "";
-                    contentPath = saveInXml(umid, questionId, inputMap);
+                    contentPath = saveInXml(umid, questionId, inputMap,false);
                     if (contentPath != null && !contentPath.equals("")) {
                         //该xml成功再处理表
                         int grade = Integer.parseInt(inputMap.get("grade"));
@@ -211,6 +290,25 @@ public class QuestionService {
         return ret;
     }
 
+    public RetMessage getCgIds(int umid,String area){
+        RetMessage ret = new RetMessage();
+        String retContent="";
+        List<QuestionCg> questionCgList = questionCgRepository.findByUmid(umid);
+        if(!questionCgList.isEmpty()){
+            for(QuestionCg questionCg:questionCgList){
+                if(retContent.equals("")){
+                    retContent = questionCg.getId()+"";
+                }else{
+                    retContent = retContent + ":" +questionCg.getId();
+                }
+            }
+            ret.setRetContent(retContent);
+        }
+        ret.setErrorCode("0");
+        ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"0"));
+        return ret;
+    }
+
     public RetMessage returnFail(String area,String errorCode){
         RetMessage retMessage = new RetMessage();
         retMessage.setErrorCode(errorCode);
@@ -264,8 +362,8 @@ public class QuestionService {
         return ret;
     }
 
-    //返回生成的xml文件的完整路径
-    private String saveInXml(int umid,long questionId,Map<String,String> inputMap){
+    //返回生成的xml文件的完整路径,cgFlag 区分是草稿还是正式的，以区别存储路径
+    private String saveInXml(int umid,long questionId,Map<String,String> inputMap,boolean cgFlag){
         String ret ="";
         QuestionBean questionBean = new QuestionBean(questionId,inputMap.get("classType"),inputMap.get("classSubType"),inputMap.get("multiplexFlag"),inputMap.get("subQuestionCount"),inputMap.get("subject"),inputMap.get("grade"));
         List<SubQuestionBean> subQuestionBeanList = getSubQuestionList(inputMap.get("subQuestions"));
@@ -275,13 +373,32 @@ public class QuestionService {
         questionBean.setContentHeader(inputMap.get("contentHeader"));
         questionBean.setAttachmentIds(inputMap.get("attachmentIds"));
         try {
-            ret = questionOmxService.saveQuestionBean(umid,questionBean);
+            ret = questionOmxService.saveQuestionBean(umid,questionBean,cgFlag);
         } catch (IOException e) {
             log.info("save file error,umid is:"+umid+" and questionId is:"+questionId);
             e.printStackTrace();
         }
         return ret;
     }
+
+    //生成草稿xml,返回生成的xml文件的完整路径
+//    private String saveCgInXml(int umid,long questionId,Map<String,String> inputMap){
+//        String ret ="";
+//        QuestionBean questionBean = new QuestionBean(questionId,inputMap.get("classType"),inputMap.get("classSubType"),inputMap.get("multiplexFlag"),inputMap.get("subQuestionCount"),inputMap.get("subject"),inputMap.get("grade"));
+//        List<SubQuestionBean> subQuestionBeanList = getSubQuestionList(inputMap.get("subQuestions"));
+//        SubQuestion subQuestion = new SubQuestion();
+//        subQuestion.setSubQuestionBeanList(subQuestionBeanList);
+//        questionBean.setSubQuestion(subQuestion);
+//        questionBean.setContentHeader(inputMap.get("contentHeader"));
+//        questionBean.setAttachmentIds(inputMap.get("attachmentIds"));
+//        try {
+//            ret = questionOmxService.saveQuestionBean(umid,questionBean,true);
+//        } catch (IOException e) {
+//            log.info("save file error,umid is:"+umid);
+//            e.printStackTrace();
+//        }
+//        return ret;
+//    }
 
     private List<SubQuestionBean> getSubQuestionList(String subQuestionString){
         List<SubQuestionBean> retList = new ArrayList<SubQuestionBean>();
@@ -334,6 +451,11 @@ public class QuestionService {
         return question;
     }
 
+    public QuestionCg getQuestionCgById(long id){
+        QuestionCg questionCg = questionCgRepository.findOne(id);
+        return questionCg;
+    }
+
     //用于新题目创建以及老题目修改,要求传入所有子题的答案及心得，不能只传入部分
     private void saveAnswerAndNote(int umid,long questionId,String subQuestionString){
         String[] a = subQuestionString.split("\\<\\[CDATA1\\]\\>");
@@ -362,6 +484,38 @@ public class QuestionService {
                     answerAndNote.setNote(note);
                 }
                 answerAndNoteRepository.save(answerAndNote);
+            }
+        }
+    }
+
+    //用于草稿中的答案和心得
+    private void saveAnswerAndNoteCg(int umid,long questionId,String subQuestionString){
+        String[] a = subQuestionString.split("\\<\\[CDATA1\\]\\>");
+        //修改的情况下，先删除原记录
+        if(!answerAndNoteCgRepository.findByQuestionIdAndUmid(questionId,umid).isEmpty()){
+            answerAndNoteCgRepository.deleteByQuestionIdAndUmid(questionId,umid);
+        }
+
+        for(String str:a){
+            //一个map就是一个子题
+            Map<String, String> map = GlobalTools.parseInput(str,"\\<\\[CDATA2\\]\\>");
+            int sequenceId = Integer.parseInt(map.get("seqId"));
+            String correctAnswer_s = map.get("correctAnswer");
+            String wrongAnswer_s = map.get("wrongAnswer");
+            String note = map.get("note");
+
+            if((correctAnswer_s!=null && !correctAnswer_s.equals("")) || (wrongAnswer_s!=null && !wrongAnswer_s.equals("")) || (note!=null && !note.equals(""))){
+                AnswerAndNoteCg answerAndNoteCg = new AnswerAndNoteCg(umid,questionId,sequenceId);
+                if(correctAnswer_s!=null && !correctAnswer_s.equals("")){
+                    answerAndNoteCg.setCorrectAnswer(correctAnswer_s);
+                }
+                if(wrongAnswer_s!=null && !wrongAnswer_s.equals("")){
+                    answerAndNoteCg.setWrongAnswer(wrongAnswer_s);
+                }
+                if(note!=null && !note.equals("")){
+                    answerAndNoteCg.setNote(note);
+                }
+                answerAndNoteCgRepository.save(answerAndNoteCg);
             }
         }
     }
@@ -477,6 +631,12 @@ public class QuestionService {
         List<AnswerAndNote> answerAndNoteList = null;
         answerAndNoteList = answerAndNoteRepository.findByQuestionIdAndUmid(questionId,umid);
         return answerAndNoteList;
+    }
+
+    public List<AnswerAndNoteCg> getAnswerAndNoteCgList(int umid,long questionId){
+        List<AnswerAndNoteCg> answerAndNoteCgList = null;
+        answerAndNoteCgList = answerAndNoteCgRepository.findByQuestionIdAndUmid(questionId,umid);
+        return answerAndNoteCgList;
     }
 
 }
