@@ -5,6 +5,7 @@ import allcom.oxmapper.QuestionBean;
 import allcom.oxmapper.QuestionOmxService;
 import allcom.oxmapper.SubQuestionBean;
 import allcom.service.AccountService;
+import allcom.service.QuestionCgService;
 import allcom.service.QuestionService;
 import allcom.service.SessionService;
 import allcom.toolkit.GlobalTools;
@@ -38,6 +39,8 @@ public class QuestionController {
     private AccountService accountService;
     @Autowired
     private QuestionService questionService;
+    @Autowired
+    private QuestionCgService questionCgService;
     @Autowired
     private QuestionOmxService questionOmxService;
 
@@ -111,7 +114,7 @@ public class QuestionController {
         if (sessionService.verifySessionId(umid, sessionId)) {
             Account account = accountService.createAccountIfNotExist(umid);
             if (account != null) {
-                QuestionCg questionCg = questionService.getQuestionCgById(id);
+                QuestionCg questionCg = questionCgService.getQuestionCgById(id);
                 if(questionCg!=null && questionCg.getUmid()==umid){
                     String xmlPath = questionCg.getContentPath();
                     try {
@@ -120,7 +123,7 @@ public class QuestionController {
                             retQuestionCgBean.setErrorCode("0");
                             retQuestionCgBean.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
                             retQuestionCgBean.setQuestionBean(questionBean);
-                            List<AnswerAndNoteCg> answerAndNoteCgList = questionService.getAnswerAndNoteCgList(umid, id);
+                            List<AnswerAndNoteCg> answerAndNoteCgList = questionCgService.getAnswerAndNoteCgList(umid, id);
                             if(answerAndNoteCgList !=null){
                                 retQuestionCgBean.setAnswerAndNoteCgList(answerAndNoteCgList);
                             }
@@ -146,6 +149,37 @@ public class QuestionController {
             log.info("umid:" + umid + " failed to check sessionid:" + sessionId);
         }
         return retQuestionCgBean;
+    }
+
+
+    //分页获取草稿摘要
+    //http://localhost:8080/getcgsummary?umid=1&id=19&sessionId=111&pageNumber=1&pageSize=2
+    @RequestMapping(value = "/getcgsummary")
+    public RetQuestionSummary getCgSummary(
+            @RequestParam(value = "umid",required = true)int umid,
+            @RequestParam(value = "pageNumber",required = true) int pageNumber,
+            @RequestParam(value = "pageSize",required = false,defaultValue = "20") int pageSize,
+            @RequestParam(value = "sessionId",required = true)String sessionId,
+            @RequestParam(value = "area",required = false,defaultValue = "cn")String area
+    ) {
+        log.info("in getcgsummary,umid is:"+umid +"pageNumber is:"+pageNumber +"pageSize is:"+pageSize);
+        RetQuestionSummary ret = new RetQuestionSummary("-1");
+        if (sessionService.verifySessionId(umid, sessionId)) {
+            Account account = accountService.createAccountIfNotExist(umid);
+            if (account != null) {
+                ret = questionCgService.getCgSummary(umid, pageNumber, pageSize, area);
+            }else{
+                //获取account信息失败
+                ret.setErrorCode("-15");
+                ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-15"));
+                log.info("umid:" + umid + " failed to get account");
+            }
+        }else {
+            ret.setErrorCode("-4");
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-4"));
+            log.info("umid:" + umid + " failed to check sessionid:" + sessionId);
+        }
+        return ret;
     }
 
 }

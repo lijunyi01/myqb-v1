@@ -27,6 +27,7 @@ public class Question implements java.io.Serializable {
     //private int attachments;    //附件数   (置入xml)
     private long questionContentId;     //对应的内容表的Id,分离出内容表是为了提升本表查询性能；该字段实际是内容表的外键，但考虑性能未定义外键，由应用管理两表关系
     private String subject;
+    private Timestamp createTime;    //创建时间
 
     protected Question() {
     }
@@ -74,18 +75,6 @@ public class Question implements java.io.Serializable {
     public String getContentPath(){return this.contentPath;}
     public void setContentPath(String contentPath){this.contentPath = contentPath;}
 
-//    public String getOptionItem(){return this.optionItem;}
-//    public void setOptionItem(String optionItem) {this.optionItem = optionItem;}
-//
-//    public String getZqda(){return this.zqda;}
-//    public void setZqda(String zqda) {this.zqda = zqda;}
-
-//    public String getCwda(){return this.cwda;}
-//    public void setCwda(String cwda) {this.cwda = cwda;}
-//
-//    public String getJtxd(){return this.jtxd;}
-//    public void setJtxd(String jtxd) {this.jtxd = jtxd;}
-
     public int getKnownFlag(){return this.knownFlag;}
     public void setKnownFlag(int knownFlag){this.knownFlag = knownFlag;}
 
@@ -94,5 +83,8 @@ public class Question implements java.io.Serializable {
 
     public String getSubject(){return this.subject;}
     public void setSubject(String subject){this.subject = subject;}
+
+    public Timestamp getCreateTime(){return this.createTime;}
+    public void setCreateTime(Timestamp createTime){this.createTime = createTime;}
 
 }

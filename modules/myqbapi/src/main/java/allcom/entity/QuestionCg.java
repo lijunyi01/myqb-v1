@@ -1,6 +1,7 @@
 package allcom.entity;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 //草稿表
 @SuppressWarnings("serial")
@@ -26,6 +27,7 @@ public class QuestionCg implements java.io.Serializable {
     //private int attachments;    //附件数   (置入xml)
     //private long questionContentId;     //对应的内容表的Id,分离出内容表是为了提升本表查询性能；该字段实际是内容表的外键，但考虑性能未定义外键，由应用管理两表关系
     private String subject;
+    private Timestamp createTime;    //创建时间
 
     protected QuestionCg() {
     }
@@ -71,5 +73,8 @@ public class QuestionCg implements java.io.Serializable {
 
     public String getSubject(){return this.subject;}
     public void setSubject(String subject){this.subject = subject;}
+
+    public Timestamp getCreateTime(){return this.createTime;}
+    public void setCreateTime(Timestamp createTime){this.createTime = createTime;}
 
 }

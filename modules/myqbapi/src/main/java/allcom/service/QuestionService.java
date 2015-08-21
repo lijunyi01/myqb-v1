@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,23 +31,13 @@ import java.util.Map;
 public class QuestionService {
     private static Logger log = LoggerFactory.getLogger(QuestionService.class);
 
-//    @Value("${sessionid.timeout}")
-//    private long sessionIdTimeout;
-//
-//    @Value("${systemparam.loginurl}")
-//    private String loingUrl;
-
     //可以理解QuestionContent是Question的附属表，分离出来是为了性能
     @Autowired
     private QuestionRepository questionRepository;
     @Autowired
-    private QuestionCgRepository questionCgRepository;
-    @Autowired
     private QuestionContentRepository questionContentRepository;
     @Autowired
     private AnswerAndNoteRepository answerAndNoteRepository;
-    @Autowired
-    private AnswerAndNoteCgRepository answerAndNoteCgRepository;
     @Autowired
     private QuestionOmxService questionOmxService;
     @Autowired
@@ -93,6 +84,8 @@ public class QuestionService {
                         question1.setClassSubType(classSubType);
                         question1.setContentPath(contentPath);
                         question1.setSubject(inputMap.get("subject"));
+                        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+                        question1.setCreateTime(currentTime);
                         if (questionRepository.save(question1) != null) {
                             //保存正确答案，心得备注等信息至数据库
                             saveAnswerAndNote(umid,question1.getId(),inputMap.get("subQuestions"));
@@ -109,81 +102,71 @@ public class QuestionService {
         return ret;
     }
 
+    //删除题目
+    public boolean deleteQuestion(int umid,Map<String,String> inputMap){
+        boolean ret = false;
+        boolean fileDeleted = false;
+        long questionId=GlobalTools.convertStringToLong(inputMap.get("questionId"));
+        if(questionId!=-10000) {
+            Question question = questionRepository.findOne(questionId);
+            if (question != null && question.getUmid() == umid) {
 
-    //保存及修改题目草稿
-    public long createQuestionCg(int umid,Map<String,String> inputMap){
-        long ret = -1;
-
-        if(checkInputMapOfCreateQuestion(inputMap)==false){
-            log.info("param check failed in checkInpuMap2! inputMap is:"+ inputMap);
-        }else{
-            long questionCgId=GlobalTools.convertStringToLong(inputMap.get("questionId"));
-            // -10000表示传入的questionId是空，是新增草稿，否则是修改草稿
-            if(questionCgId==-10000) {
-                QuestionCg questionCg = new QuestionCg(umid);
-                QuestionCg questionCg1 = questionCgRepository.save(questionCg);
-                if(questionCg1 != null){
-                    //根据传入的信息生成xml文件并保存到指定的路径
-                    String cgXmlPath = "";
-                    cgXmlPath = saveInXml(umid,questionCg1.getId(),inputMap,true);
-                    //将题目相关具体信息保存到myqb_question表
-                    if (cgXmlPath != null && !cgXmlPath.equals("")) {
-                        int grade = Integer.parseInt(inputMap.get("grade"));
-                        int multiplexFlag = Integer.parseInt(inputMap.get("multiplexFlag"));
-                        int questionType = Integer.parseInt(inputMap.get("questionType"));
-                        int classType = Integer.parseInt(inputMap.get("classType"));
-                        int classSubType = Integer.parseInt(inputMap.get("classSubType"));
-                        questionCg.setGrade(grade);
-                        questionCg.setMultiplexFlag(multiplexFlag);
-                        questionCg.setQuestionType(questionType);
-                        questionCg.setClassType(classType);
-                        questionCg.setClassSubType(classSubType);
-                        questionCg.setContentPath(cgXmlPath);
-                        questionCg.setSubject(inputMap.get("subject"));
-                        if (questionCgRepository.save(questionCg) != null) {
-                            //保存正确答案，心得备注等信息至数据库
-                            saveAnswerAndNoteCg(umid, questionCg.getId(), inputMap.get("subQuestions"));
-                            //草稿暂时不处理附件
-                            ret = questionCg.getId();
+                //删附件
+                List<Attachment> attachmentList = attachmentRepository.findByUmidAndQuestionId(umid,questionId);
+                if(attachmentList.isEmpty()){
+                    fileDeleted = true;
+                }else {
+                    for (Attachment attachment : attachmentList) {
+                        String filePath1 = attachment.getFilePath();
+                        if (filePath1 != null) {
+                            File attachmentFile = new File(filePath1);
+                            if (attachmentFile.exists()) {
+                                if (!attachmentFile.delete()) {
+                                    fileDeleted = false;
+                                    break;
+                                } else {
+                                    fileDeleted = true;
+                                }
+                            }
                         }
                     }
                 }
-            }else{
-                QuestionCg questionCg = questionCgRepository.findOne(questionCgId);
-                if (questionCg != null && questionCg.getUmid() == umid) {
-                    String cgXmlPath = "";
-                    cgXmlPath = saveInXml(umid,questionCgId,inputMap,true);
-                    //将题目相关具体信息保存到myqb_question表
-                    if (cgXmlPath != null && !cgXmlPath.equals("")) {
-                        int grade = Integer.parseInt(inputMap.get("grade"));
-                        int multiplexFlag = Integer.parseInt(inputMap.get("multiplexFlag"));
-                        int questionType = Integer.parseInt(inputMap.get("questionType"));
-                        int classType = Integer.parseInt(inputMap.get("classType"));
-                        int classSubType = Integer.parseInt(inputMap.get("classSubType"));
-                        questionCg.setGrade(grade);
-                        questionCg.setMultiplexFlag(multiplexFlag);
-                        questionCg.setQuestionType(questionType);
-                        questionCg.setClassType(classType);
-                        questionCg.setClassSubType(classSubType);
-                        questionCg.setContentPath(cgXmlPath);
-                        questionCg.setSubject(inputMap.get("subject"));
-                        if (questionCgRepository.save(questionCg) != null) {
-                            //保存正确答案，心得备注等信息至数据库
-                            saveAnswerAndNoteCg(umid, questionCg.getId(), inputMap.get("subQuestions"));
-                            //草稿暂时不处理附件
-                            ret = questionCg.getId();
+
+                //在附件都删成功的情况下删xml文件
+                if(fileDeleted) {
+                    fileDeleted = false;
+                    String filePath = question.getContentPath();
+                    if (filePath != null) {
+                        File cgFile = new File(filePath);
+                        if (cgFile.exists()) {
+                            if (cgFile.delete()) {
+                                fileDeleted = true;
+                            }
                         }
                     }
-
                 }
 
+                //在删除文件成功的前提下，删myqb_answerandnote表、myqb_attachment表、myqb_questioncontent表和myqb_question表里的相关内容
+                if(fileDeleted){
+                    long questionContentId = question.getQuestionContentId();
+                    deleteQuestionTable(questionId, umid,questionContentId);
+                    if(!questionRepository.exists(questionId)){
+                        ret = true;
+                    }
+                }
             }
-
 
         }
         return ret;
     }
 
+    @Transactional
+    private void deleteQuestionTable(long questionId,int umid,long questionContentId){
+        answerAndNoteRepository.deleteByQuestionIdAndUmid(questionId,umid);
+        questionContentRepository.delete(questionContentId);
+        attachmentRepository.deleteByUmidAndQuestionId(questionId,umid);
+        questionRepository.delete(questionId);
+    }
 
     //完整地修改题目
     public boolean modifyQuestion(int umid,Map<String,String> inputMap){
@@ -290,25 +273,6 @@ public class QuestionService {
         return ret;
     }
 
-    public RetMessage getCgIds(int umid,String area){
-        RetMessage ret = new RetMessage();
-        String retContent="";
-        List<QuestionCg> questionCgList = questionCgRepository.findByUmid(umid);
-        if(!questionCgList.isEmpty()){
-            for(QuestionCg questionCg:questionCgList){
-                if(retContent.equals("")){
-                    retContent = questionCg.getId()+"";
-                }else{
-                    retContent = retContent + ":" +questionCg.getId();
-                }
-            }
-            ret.setRetContent(retContent);
-        }
-        ret.setErrorCode("0");
-        ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"0"));
-        return ret;
-    }
-
     public RetMessage returnFail(String area,String errorCode){
         RetMessage retMessage = new RetMessage();
         retMessage.setErrorCode(errorCode);
@@ -381,25 +345,6 @@ public class QuestionService {
         return ret;
     }
 
-    //生成草稿xml,返回生成的xml文件的完整路径
-//    private String saveCgInXml(int umid,long questionId,Map<String,String> inputMap){
-//        String ret ="";
-//        QuestionBean questionBean = new QuestionBean(questionId,inputMap.get("classType"),inputMap.get("classSubType"),inputMap.get("multiplexFlag"),inputMap.get("subQuestionCount"),inputMap.get("subject"),inputMap.get("grade"));
-//        List<SubQuestionBean> subQuestionBeanList = getSubQuestionList(inputMap.get("subQuestions"));
-//        SubQuestion subQuestion = new SubQuestion();
-//        subQuestion.setSubQuestionBeanList(subQuestionBeanList);
-//        questionBean.setSubQuestion(subQuestion);
-//        questionBean.setContentHeader(inputMap.get("contentHeader"));
-//        questionBean.setAttachmentIds(inputMap.get("attachmentIds"));
-//        try {
-//            ret = questionOmxService.saveQuestionBean(umid,questionBean,true);
-//        } catch (IOException e) {
-//            log.info("save file error,umid is:"+umid);
-//            e.printStackTrace();
-//        }
-//        return ret;
-//    }
-
     private List<SubQuestionBean> getSubQuestionList(String subQuestionString){
         List<SubQuestionBean> retList = new ArrayList<SubQuestionBean>();
         String[] a = subQuestionString.split("\\<\\[CDATA1\\]\\>");
@@ -451,11 +396,6 @@ public class QuestionService {
         return question;
     }
 
-    public QuestionCg getQuestionCgById(long id){
-        QuestionCg questionCg = questionCgRepository.findOne(id);
-        return questionCg;
-    }
-
     //用于新题目创建以及老题目修改,要求传入所有子题的答案及心得，不能只传入部分
     private void saveAnswerAndNote(int umid,long questionId,String subQuestionString){
         String[] a = subQuestionString.split("\\<\\[CDATA1\\]\\>");
@@ -484,38 +424,6 @@ public class QuestionService {
                     answerAndNote.setNote(note);
                 }
                 answerAndNoteRepository.save(answerAndNote);
-            }
-        }
-    }
-
-    //用于草稿中的答案和心得
-    private void saveAnswerAndNoteCg(int umid,long questionId,String subQuestionString){
-        String[] a = subQuestionString.split("\\<\\[CDATA1\\]\\>");
-        //修改的情况下，先删除原记录
-        if(!answerAndNoteCgRepository.findByQuestionIdAndUmid(questionId,umid).isEmpty()){
-            answerAndNoteCgRepository.deleteByQuestionIdAndUmid(questionId,umid);
-        }
-
-        for(String str:a){
-            //一个map就是一个子题
-            Map<String, String> map = GlobalTools.parseInput(str,"\\<\\[CDATA2\\]\\>");
-            int sequenceId = Integer.parseInt(map.get("seqId"));
-            String correctAnswer_s = map.get("correctAnswer");
-            String wrongAnswer_s = map.get("wrongAnswer");
-            String note = map.get("note");
-
-            if((correctAnswer_s!=null && !correctAnswer_s.equals("")) || (wrongAnswer_s!=null && !wrongAnswer_s.equals("")) || (note!=null && !note.equals(""))){
-                AnswerAndNoteCg answerAndNoteCg = new AnswerAndNoteCg(umid,questionId,sequenceId);
-                if(correctAnswer_s!=null && !correctAnswer_s.equals("")){
-                    answerAndNoteCg.setCorrectAnswer(correctAnswer_s);
-                }
-                if(wrongAnswer_s!=null && !wrongAnswer_s.equals("")){
-                    answerAndNoteCg.setWrongAnswer(wrongAnswer_s);
-                }
-                if(note!=null && !note.equals("")){
-                    answerAndNoteCg.setNote(note);
-                }
-                answerAndNoteCgRepository.save(answerAndNoteCg);
             }
         }
     }
@@ -631,12 +539,6 @@ public class QuestionService {
         List<AnswerAndNote> answerAndNoteList = null;
         answerAndNoteList = answerAndNoteRepository.findByQuestionIdAndUmid(questionId,umid);
         return answerAndNoteList;
-    }
-
-    public List<AnswerAndNoteCg> getAnswerAndNoteCgList(int umid,long questionId){
-        List<AnswerAndNoteCg> answerAndNoteCgList = null;
-        answerAndNoteCgList = answerAndNoteCgRepository.findByQuestionIdAndUmid(questionId,umid);
-        return answerAndNoteCgList;
     }
 
 }

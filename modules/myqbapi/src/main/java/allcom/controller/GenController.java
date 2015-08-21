@@ -1,10 +1,7 @@
 package allcom.controller;
 
 import allcom.entity.Account;
-import allcom.service.AccountService;
-import allcom.service.QuestionService;
-import allcom.service.SessionService;
-import allcom.service.ClassTypeService;
+import allcom.service.*;
 import allcom.toolkit.GlobalTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +32,8 @@ public class GenController {
     private AccountService accountService;
     @Autowired
     private QuestionService questionService;
+    @Autowired
+    private QuestionCgService questionCgService;
     @Autowired
     private ClassTypeService classTypeService;
 
@@ -144,13 +143,39 @@ public class GenController {
                     //存储及修改题目草稿信息(心得及正确／错误答案保存于数据库表myqb_answerandnote；创建题目时，子题的正确／错误答案及心得不一定有，可以后期添加)
                     //http://localhost:8080/gi?functionId=33&umid=1&sessionId=111&generalInput=questionId=<[CDATA]>grade=10<[CDATA]>questionType=101<[CDATA]>classType=1<[CDATA]>classSubType=1<[CDATA]>multiplexFlag=1<[CDATA]>subQuestionCount=2<[CDATA]>contentHeader=content-header-test<[CDATA]>subject=sub<[CDATA]>attachmentIds=<[CDATA]>subQuestions=seqId=1<[CDATA2]>qType=1<[CDATA2]>content=content1<[CDATA2]>attachedInfo=A:6<[CDATA3]>B:7<[CDATA3]>C:8<[CDATA3]>D:9<[CDATA2]>attachmentIds=<[CDATA2]>correctAnswer=C<[CDATA2]>wrongAnswer=A<[CDATA2]>note=note1<[CDATA1]>seqId=2<[CDATA2]>qType=1<[CDATA2]>content=content2<[CDATA2]>attachedInfo=A:1<[CDATA3]>B:2<[CDATA3]>C:3<[CDATA3]>D:4<[CDATA2]>attachmentIds=<[CDATA2]>correctAnswer=A<[CDATA2]>wrongAnswer=D<[CDATA2]>note=note2
                     if(inputMap.size()!=11){
+                        ret = questionCgService.returnFail(area, "-14");
+                        log.info("general input param error:" + generalInput);
+                    }else{
+                        long questionid = questionCgService.createQuestionCg(umid, inputMap);
+                        if(questionid != -1){
+                            ret = questionCgService.returnFail(area, "0");
+                            ret.setRetContent("questionId="+questionid);
+                        }else{
+                            ret = questionCgService.returnFail(area, "-18");
+                        }
+                    }
+                }else if (functionId == 34) {
+                    //删除某条草稿
+                    //http://localhost:8080/gi?functionId=34&umid=1&sessionId=111&generalInput=questionId=1
+                    if(inputMap.size()!=1){
+                        ret = questionCgService.returnFail(area, "-14");
+                        log.info("general input param error:" + generalInput);
+                    }else{
+                        if(questionCgService.deleteQuestionCg(umid, inputMap)){
+                            ret = questionCgService.returnFail(area, "0");
+                        }else{
+                            ret = questionCgService.returnFail(area, "-18");
+                        }
+                    }
+                }else if (functionId == 35) {
+                    //删除某条题目
+                    //http://localhost:8080/gi?functionId=35&umid=1&sessionId=111&generalInput=questionId=1
+                    if(inputMap.size()!=1){
                         ret = questionService.returnFail(area, "-14");
                         log.info("general input param error:" + generalInput);
                     }else{
-                        long questionid = questionService.createQuestionCg(umid, inputMap);
-                        if(questionid != -1){
+                        if(questionService.deleteQuestion(umid, inputMap)){
                             ret = questionService.returnFail(area, "0");
-                            ret.setRetContent("questionId="+questionid);
                         }else{
                             ret = questionService.returnFail(area, "-18");
                         }
@@ -162,11 +187,11 @@ public class GenController {
                 }else if(functionId == 41) {
                     //http://localhost:8080/gi?functionId=41&umid=1&generalInput=content=a&sessionId=111
                     //获取符合条件的题目id（按question的内容查找）
-                    ret = questionService.getIdsByContent(umid,inputMap.get("content"),area);
+                    ret = questionService.getIdsByContent(umid, inputMap.get("content"), area);
                 }else if(functionId == 42) {
                     //http://localhost:8080/gi?functionId=42&umid=1&generalInput=&sessionId=111
                     //获取符合条件的题目草稿id（按umid查找）
-                    ret = questionService.getCgIds(umid,area);
+                    ret = questionCgService.getCgIds(umid,area);
                 }else if(functionId == 50){
 
                 }
