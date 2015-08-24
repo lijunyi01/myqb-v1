@@ -312,7 +312,7 @@ public class QuestionCgService {
         PageRequest pageRequest = new PageRequest(pageNumber-1,pageSize,sort);
         //分页查询
         Page<QuestionCg> questionCgPage = questionCgRepository.findByUmid(umid,pageRequest);
-        if(questionCgPage.hasContent()) {
+        if(questionCgPage!= null) {
             List<QuestionSummaryBean> questionSummaryBeanList = new ArrayList<QuestionSummaryBean>();
             for (QuestionCg questionCg : questionCgPage) {
                 QuestionSummaryBean questionSummaryBean = new QuestionSummaryBean();
@@ -324,6 +324,10 @@ public class QuestionCgService {
             retQuestionSummary.setErrorCode("0");
             retQuestionSummary.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
             retQuestionSummary.setQuestionSummaryBeanList(questionSummaryBeanList);
+            retQuestionSummary.setCurrentCounts(questionCgPage.getNumberOfElements());
+            retQuestionSummary.setPageNumber(pageNumber);
+            retQuestionSummary.setPageNumberSummary(questionCgPage.getTotalPages());
+            retQuestionSummary.setSummary(questionCgPage.getTotalElements());
         }else{
             //没有查到内容
             retQuestionSummary.setErrorCode("-24");
