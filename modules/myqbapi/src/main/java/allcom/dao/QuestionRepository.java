@@ -1,15 +1,17 @@
 package allcom.dao;
 
 import allcom.entity.Question;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Transactional(readOnly = true)
-public interface QuestionRepository extends CrudRepository<Question,Long> {
+public interface QuestionRepository extends PagingAndSortingRepository<Question,Long> {
     List<Question> findByUmid(int umid);
+    Page<Question> findByUmid(int umid,Pageable pageRequest);
 
     Question findByUmidAndQuestionContentId(int umid,long questionContentId);
 

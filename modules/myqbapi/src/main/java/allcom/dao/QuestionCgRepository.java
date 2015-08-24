@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Transactional(readOnly = true)
-//public interface QuestionCgRepository extends CrudRepository<QuestionCg,Long> {
 //public interface PagingAndSortingRepository<T, ID extends Serializable> extends CrudRepository<T, ID>
 //PagingAndSortingRepository 本身继承了CrudRepository
 public interface QuestionCgRepository extends PagingAndSortingRepository<QuestionCg,Long> {

@@ -182,4 +182,34 @@ public class QuestionController {
         return ret;
     }
 
+    //分页获取题目摘要
+    //http://localhost:8080/getquestionsummary?umid=1&id=19&sessionId=111&pageNumber=1&pageSize=2
+    @RequestMapping(value = "/getquestionsummary")
+    public RetQuestionSummary getQuestionSummary(
+            @RequestParam(value = "umid",required = true)int umid,
+            @RequestParam(value = "pageNumber",required = true) int pageNumber,
+            @RequestParam(value = "pageSize",required = false,defaultValue = "20") int pageSize,
+            @RequestParam(value = "sessionId",required = true)String sessionId,
+            @RequestParam(value = "area",required = false,defaultValue = "cn")String area
+    ) {
+        log.info("in getquestionsummary,umid is:"+umid +"pageNumber is:"+pageNumber +"pageSize is:"+pageSize);
+        RetQuestionSummary ret = new RetQuestionSummary("-1");
+        if (sessionService.verifySessionId(umid, sessionId)) {
+            Account account = accountService.createAccountIfNotExist(umid);
+            if (account != null) {
+                ret = questionService.getQuestionSummary(umid, pageNumber, pageSize, area);
+            }else{
+                //获取account信息失败
+                ret.setErrorCode("-15");
+                ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-15"));
+                log.info("umid:" + umid + " failed to get account");
+            }
+        }else {
+            ret.setErrorCode("-4");
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-4"));
+            log.info("umid:" + umid + " failed to check sessionid:" + sessionId);
+        }
+        return ret;
+    }
+
 }

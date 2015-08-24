@@ -1,6 +1,8 @@
 package allcom.service;
 
+import allcom.bean.QuestionSummaryBean;
 import allcom.controller.RetMessage;
+import allcom.controller.RetQuestionSummary;
 import allcom.dao.*;
 import allcom.entity.*;
 import allcom.oxmapper.QuestionBean;
@@ -12,6 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -539,6 +544,37 @@ public class QuestionService {
         List<AnswerAndNote> answerAndNoteList = null;
         answerAndNoteList = answerAndNoteRepository.findByQuestionIdAndUmid(questionId,umid);
         return answerAndNoteList;
+    }
+
+    public RetQuestionSummary getQuestionSummary(int umid,int pageNumber,int pageSize,String area){
+        RetQuestionSummary retQuestionSummary = new RetQuestionSummary("-1");
+        //创建分页请求
+        Sort sort = new Sort(Sort.Direction.DESC, "id");
+        PageRequest pageRequest = new PageRequest(pageNumber-1,pageSize,sort);
+        //分页查询
+        Page<Question> questionPage = questionRepository.findByUmid(umid,pageRequest);
+        if(questionPage!= null) {
+            List<QuestionSummaryBean> questionSummaryBeanList = new ArrayList<QuestionSummaryBean>();
+            for (Question question : questionPage) {
+                QuestionSummaryBean questionSummaryBean = new QuestionSummaryBean();
+                questionSummaryBean.setId(question.getId());
+                questionSummaryBean.setSubject(question.getSubject());
+                questionSummaryBean.setCreateTime(question.getCreateTime());
+                questionSummaryBeanList.add(questionSummaryBean);
+            }
+            retQuestionSummary.setErrorCode("0");
+            retQuestionSummary.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
+            retQuestionSummary.setQuestionSummaryBeanList(questionSummaryBeanList);
+            retQuestionSummary.setCurrentCounts(questionPage.getNumberOfElements());
+            retQuestionSummary.setPageNumber(pageNumber);
+            retQuestionSummary.setPageNumberSummary(questionPage.getTotalPages());
+            retQuestionSummary.setSummary(questionPage.getTotalElements());
+        }else{
+            //没有查到内容
+            retQuestionSummary.setErrorCode("-24");
+            retQuestionSummary.setErrorMessage(GlobalTools.getMessageByLocale(area,"-24"));
+        }
+        return retQuestionSummary;
     }
 
 }
