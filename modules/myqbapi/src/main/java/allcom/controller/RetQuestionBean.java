@@ -1,6 +1,7 @@
 package allcom.controller;
 
 import allcom.entity.AnswerAndNote;
+import allcom.entity.Tag;
 import allcom.oxmapper.QuestionBean;
 
 import java.util.List;
@@ -15,12 +16,17 @@ public class RetQuestionBean {
     private QuestionBean questionBean;
     //List对应json输出中的的数组
     private List<AnswerAndNote> answerAndNoteList;
+    //对应的订正本id
+    private long notebookId;
+    //对应的标签信息
+    private List<Tag> tagList;
 
-    public RetQuestionBean(){}
+    //public RetQuestionBean(){}
 
     public RetQuestionBean(String errorCode){
         this.errorCode = errorCode;
         this.errorMessage = "";
+        notebookId = -1;
     }
 
     public String getErrorCode(){return this.errorCode;}
@@ -34,5 +40,11 @@ public class RetQuestionBean {
 
     public List<AnswerAndNote> getAnswerAndNoteList(){return this.answerAndNoteList;}
     public void setAnswerAndNoteList(List<AnswerAndNote> answerAndNoteList){this.answerAndNoteList = answerAndNoteList;}
+
+    public long getNotebookId(){return this.notebookId;}
+    public void setNotebookId(long notebookId){this.notebookId = notebookId;}
+
+    public List<Tag> getTagList(){return this.tagList;}
+    public void setTagList(List<Tag> tagList) {this.tagList = tagList;}
 
 }

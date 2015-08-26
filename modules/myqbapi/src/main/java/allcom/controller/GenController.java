@@ -36,6 +36,8 @@ public class GenController {
     private QuestionCgService questionCgService;
     @Autowired
     private ClassTypeService classTypeService;
+    @Autowired
+    private NoteBookService noteBookService;
 
     // 通用接口,用于已经完成登录验证后的其它请求
     @RequestMapping(value = "/gi")
@@ -193,7 +195,17 @@ public class GenController {
                     //获取符合条件的题目草稿id（按umid查找）
                     ret = questionCgService.getCgIds(umid,area);
                 }else if(functionId == 50){
-
+                    //新增订正本组
+                    //http://localhost:8080/gi?functionId=50&umid=1&generalInput=groupName=james的订正本组&sessionId=111
+                    ret = noteBookService.createNoteBookGroup(umid,inputMap.get("groupName"),area);
+                }else if(functionId == 51){
+                    //修改订正本组组名
+                    //http://localhost:8080/gi?functionId=51&umid=1&generalInput=groupId=1<[CDATA]>groupName=james的订正本组&sessionId=111
+                    ret = noteBookService.modifyNoteBookGroup(umid,inputMap.get("groupId"), inputMap.get("groupName"),area);
+                }else if(functionId == 52){
+                    //删除订正本组
+                    //http://localhost:8080/gi?functionId=52&umid=1&generalInput=groupId=1&sessionId=111
+                    ret = noteBookService.deleteNoteBookGroup(umid,inputMap.get("groupId"),area);
                 }
 
             }else{

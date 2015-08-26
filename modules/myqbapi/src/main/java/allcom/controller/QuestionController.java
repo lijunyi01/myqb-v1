@@ -69,9 +69,17 @@ public class QuestionController {
                             retQuestionBean.setErrorCode("0");
                             retQuestionBean.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
                             retQuestionBean.setQuestionBean(questionBean);
+                            retQuestionBean.setNotebookId(question.getNotebookId());
                             List<AnswerAndNote> answerAndNoteList = questionService.getAnswerAndNoteList(umid,id);
                             if(answerAndNoteList !=null){
                                 retQuestionBean.setAnswerAndNoteList(answerAndNoteList);
+                            }
+                            List<QuestionTag> questionTagList = questionService.getQuestionTagList(id);
+                            if(questionTagList !=null){
+                                List<Tag> tagList = questionService.getTagListByQuestionTagList(questionTagList);
+                                if(tagList != null){
+                                    retQuestionBean.setTagList(tagList);
+                                }
                             }
                         }
 

@@ -47,6 +47,10 @@ public class QuestionService {
     private QuestionOmxService questionOmxService;
     @Autowired
     private AttachmentRepository attachmentRepository;
+    @Autowired
+    private QuestionTagRepository questionTagRepository;
+    @Autowired
+    private TagRepository tagRepository;
 
     //@Transactional
     //保存一个题目(一部分内容存入数据库，一部分存入xml文件)
@@ -541,9 +545,24 @@ public class QuestionService {
     }
 
     public List<AnswerAndNote> getAnswerAndNoteList(int umid,long questionId){
-        List<AnswerAndNote> answerAndNoteList = null;
-        answerAndNoteList = answerAndNoteRepository.findByQuestionIdAndUmid(questionId,umid);
+        List<AnswerAndNote> answerAndNoteList = answerAndNoteRepository.findByQuestionIdAndUmid(questionId,umid);
         return answerAndNoteList;
+    }
+
+    public List<QuestionTag> getQuestionTagList(long questionId){
+        List<QuestionTag> questionTagList = questionTagRepository.findByQuestionId(questionId);
+        return questionTagList;
+    }
+
+    public List<Tag> getTagListByQuestionTagList(List<QuestionTag> questionTagList){
+        List<Tag> tagList = new ArrayList<Tag>();
+        for(QuestionTag questionTag:questionTagList){
+            Tag tag = tagRepository.findOne(questionTag.getTagId());
+            if(tag !=null){
+                tagList.add(tag);
+            }
+        }
+        return tagList;
     }
 
     public RetQuestionSummary getQuestionSummary(int umid,int pageNumber,int pageSize,String area){

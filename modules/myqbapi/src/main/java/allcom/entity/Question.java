@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 
 @SuppressWarnings("serial")
 @Entity
-@Table(name = "myqb_question",indexes = {@Index(name = "i_1",columnList = "umid,grade",unique = false),@Index(name = "i_2",columnList = "classType,classSubType",unique = false),@Index(name = "i_3",columnList = "questionType",unique = false)})
+@Table(name = "myqb_question",indexes = {@Index(name = "i_1",columnList = "umid,grade",unique = false),@Index(name = "i_2",columnList = "classType,classSubType",unique = false),@Index(name = "i_3",columnList = "questionType",unique = false),@Index(name = "i_4",columnList = "notebookId",unique = false)})
 public class Question implements java.io.Serializable {
 
     @Id
@@ -28,6 +28,7 @@ public class Question implements java.io.Serializable {
     private long questionContentId;     //对应的内容表的Id,分离出内容表是为了提升本表查询性能；该字段实际是内容表的外键，但考虑性能未定义外键，由应用管理两表关系
     private String subject;
     private Timestamp createTime;    //创建时间
+    private long notebookId;         //对应的订正本id
 
     protected Question() {
     }
@@ -36,6 +37,7 @@ public class Question implements java.io.Serializable {
         this.umid = umid;
         this.knownFlag = 0;
         this.questionContentId = questionContentId;
+        this.notebookId = -1;
     }
 
     public Question(int umid,int grade,int multiplexFlag,int questionType,int classType,int classSubType,long questionContentId,String subject) {
@@ -48,6 +50,7 @@ public class Question implements java.io.Serializable {
         this.questionContentId = questionContentId;
         this.subject = subject;
         this.questionType = questionType;
+        this.notebookId = -1;
     }
 
     public long getId(){
@@ -86,5 +89,8 @@ public class Question implements java.io.Serializable {
 
     public Timestamp getCreateTime(){return this.createTime;}
     public void setCreateTime(Timestamp createTime){this.createTime = createTime;}
+
+    public long getNotebookId(){return this.notebookId;}
+    public void setNotebookId(long notebookId){this.notebookId = notebookId;}
 
 }
