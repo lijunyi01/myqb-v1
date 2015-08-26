@@ -133,4 +133,48 @@ public class NoteBookService {
         return ret;
     }
 
+    public RetMessage showNoteBookGroup(int umid,String area){
+        RetMessage ret = new RetMessage();
+        String retContent="";
+        List<NoteBookGroup> noteBookGroupList = noteBookGroupRepository.findByUmid(umid);
+        if(noteBookGroupList !=null){
+            for(NoteBookGroup noteBookGroup:noteBookGroupList){
+                if(retContent.equals("")){
+                    retContent += noteBookGroup.getId()+":"+noteBookGroup.getName();
+                }else{
+                    retContent += "<[CDATA]>"+noteBookGroup.getId()+":"+noteBookGroup.getName();
+                }
+            }
+            ret.setErrorCode("0");
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
+            ret.setRetContent(retContent);
+        }
+        return ret;
+    }
+
+    public RetMessage createNoteBook(int umid,String bookName,String groupId,String area){
+        RetMessage ret = new RetMessage();
+        String retContent="";
+        NoteBook noteBook = noteBookRepository.findByUmidAndName(umid,bookName);
+        if(noteBook ==null){
+            noteBook = new NoteBook(umid,bookName);
+            long gId = GlobalTools.convertStringToLong(groupId);
+            if(gId != -10000){
+                noteBook.setGroupId(gId);
+            }
+            NoteBook noteBook1 = noteBookRepository.save(noteBook);
+            if(noteBook1 != null){
+                ret.setErrorCode("0");
+                ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"0"));
+                retContent += "id:"+noteBook1.getId();
+                ret.setRetContent(retContent);
+            }
+        }else{
+            //同名订正本已存在
+            ret.setErrorCode("-25");
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-25"));
+        }
+        return ret;
+    }
+
 }

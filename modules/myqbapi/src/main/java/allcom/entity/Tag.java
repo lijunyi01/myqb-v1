@@ -14,6 +14,7 @@ public class Tag implements java.io.Serializable {
     private int umid;
     private String name;   //标签名
 
+    protected Tag(){}
 
     public Tag(int umid, String name) {
         this.umid = umid;

@@ -161,7 +161,7 @@ public class QuestionController {
 
 
     //分页获取草稿摘要
-    //http://localhost:8080/getcgsummary?umid=1&id=19&sessionId=111&pageNumber=1&pageSize=2
+    //http://localhost:8080/getcgsummary?umid=1&sessionId=111&pageNumber=1&pageSize=2
     @RequestMapping(value = "/getcgsummary")
     public RetQuestionSummary getCgSummary(
             @RequestParam(value = "umid",required = true)int umid,
@@ -191,7 +191,7 @@ public class QuestionController {
     }
 
     //分页获取题目摘要
-    //http://localhost:8080/getquestionsummary?umid=1&id=19&sessionId=111&pageNumber=1&pageSize=2
+    //http://localhost:8080/getquestionsummary?umid=1&sessionId=111&pageNumber=1&pageSize=2
     @RequestMapping(value = "/getquestionsummary")
     public RetQuestionSummary getQuestionSummary(
             @RequestParam(value = "umid",required = true)int umid,

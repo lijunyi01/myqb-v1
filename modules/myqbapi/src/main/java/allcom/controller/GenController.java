@@ -68,17 +68,12 @@ public class GenController {
                     log.info("umid:" + umid + " functionId:"+functionId +" genCall result:" + ret.getErrorCode());
                 }else if (functionId == 21) {
                     //设置本地存储的用户账户信息
-                    int grade_i = -1000;
-                    if(GlobalTools.isNumeric(inputMap.get("grade"))) {
-                        grade_i = Integer.parseInt(inputMap.get("grade"));
-                    }
-
-                    if(grade_i <-100 || grade_i >1000){
+                    int grade_i = GlobalTools.convertStringToInt(inputMap.get("grade"));
+                    if(grade_i == -10000){
                         ret = accountService.returnFail(area,"-14");
                     }else{
                         ret = accountService.setLocalInfo(area,umid,inputMap,grade_i);
                     }
-
                 }else if (functionId == 22) {
                     //获取本地存储的用户账户信息
                     ret = accountService.getLocalInfo(area,umid);
@@ -99,7 +94,6 @@ public class GenController {
                         ret = classTypeService.getClassSubTypeInfo(area,classType);
                         log.info("umid:"+umid+" get classSubType result:" + ret.getErrorCode());
                     }
-
                 }else if (functionId == 30) {
                     //存储题目信息(心得及正确／错误答案保存于数据库表myqb_answerandnote；创建题目时，子题的正确／错误答案及心得不一定有，可以后期添加)
                     //http://localhost:8080/gi?functionId=30&umid=1&sessionId=111&generalInput=grade=10<[CDATA]>questionType=101<[CDATA]>classType=1<[CDATA]>classSubType=1<[CDATA]>multiplexFlag=1<[CDATA]>subQuestionCount=2<[CDATA]>contentHeader=content-header-test<[CDATA]>subject=sub<[CDATA]>attachmentIds=<[CDATA]>subQuestions=seqId=1<[CDATA2]>qType=1<[CDATA2]>content=content1<[CDATA2]>attachedInfo=A:6<[CDATA3]>B:7<[CDATA3]>C:8<[CDATA3]>D:9<[CDATA2]>attachmentIds=<[CDATA2]>correctAnswer=C<[CDATA2]>wrongAnswer=A<[CDATA2]>note=note1<[CDATA1]>seqId=2<[CDATA2]>qType=1<[CDATA2]>content=content2<[CDATA2]>attachedInfo=A:1<[CDATA3]>B:2<[CDATA3]>C:3<[CDATA3]>D:4<[CDATA2]>attachmentIds=<[CDATA2]>correctAnswer=A<[CDATA2]>wrongAnswer=D<[CDATA2]>note=note2
@@ -206,6 +200,19 @@ public class GenController {
                     //删除订正本组
                     //http://localhost:8080/gi?functionId=52&umid=1&generalInput=groupId=1&sessionId=111
                     ret = noteBookService.deleteNoteBookGroup(umid,inputMap.get("groupId"),area);
+                }else if(functionId == 53){
+                    //查询订正本组
+                    //http://localhost:8080/gi?functionId=53&umid=1&generalInput=&sessionId=111
+                    ret = noteBookService.showNoteBookGroup(umid,area);
+                }else if(functionId == 54){
+                    //新增订正本(新增时可以不指定groupId，但为了便于处理，要求参数要带groupId=)
+                    //http://localhost:8080/gi?functionId=54&umid=1&generalInput=bookName=book1<[CDATA]>groupId=1&sessionId=111
+                    if(inputMap.size()!=2){
+                        ret = noteBookService.returnFail(area, "-14");
+                        log.info("general input param error:" + generalInput);
+                    }else{
+                        ret = noteBookService.createNoteBook(umid,inputMap.get("bookName"),inputMap.get("groupId"),area);
+                    }
                 }
 
             }else{

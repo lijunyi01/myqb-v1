@@ -15,6 +15,7 @@ public class NoteBook implements java.io.Serializable {
     private String name;   //订正本名
     private long groupId;  //订正本组的id
 
+    protected NoteBook(){}
 
     public NoteBook(int umid,String name) {
         this.umid = umid;

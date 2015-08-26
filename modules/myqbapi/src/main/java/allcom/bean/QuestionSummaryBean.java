@@ -1,7 +1,5 @@
 package allcom.bean;
 
-import com.sun.tools.doclets.formats.html.TagletWriterImpl;
-
 import java.sql.Timestamp;
 
 /**

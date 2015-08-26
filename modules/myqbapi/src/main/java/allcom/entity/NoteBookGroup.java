@@ -14,6 +14,7 @@ public class NoteBookGroup implements java.io.Serializable {
     private int umid;
     private String name;   //组名
 
+    protected NoteBookGroup(){}
 
     public NoteBookGroup(int umid, String name) {
         this.umid = umid;

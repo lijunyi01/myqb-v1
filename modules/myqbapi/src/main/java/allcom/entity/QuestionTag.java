@@ -15,6 +15,7 @@ public class QuestionTag implements java.io.Serializable {
     private long questionId;
     private long tagId;
 
+    protected QuestionTag(){}
 
     public QuestionTag(int umid, long questionId,long tagId) {
         this.umid = umid;
