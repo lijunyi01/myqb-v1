@@ -37,20 +37,25 @@ public class NoteBookService {
     public RetMessage createNoteBookGroup(int umid,String groupName,String area){
         RetMessage ret = new RetMessage();
         String retContent="";
-        NoteBookGroup noteBookGroup = noteBookGroupRepository.findByUmidAndName(umid,groupName);
-        if(noteBookGroup ==null){
-            noteBookGroup = new NoteBookGroup(umid,groupName);
-            NoteBookGroup noteBookGroup1 = noteBookGroupRepository.save(noteBookGroup);
-            if(noteBookGroup1 != null){
-                ret.setErrorCode("0");
-                ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"0"));
-                retContent += "groupId:"+noteBookGroup1.getId();
-                ret.setRetContent(retContent);
+        if(GlobalTools.stringParamHasNullOrEmpty(groupName)){
+            ret.setErrorCode("-29");
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-29"));
+        }else {
+            NoteBookGroup noteBookGroup = noteBookGroupRepository.findByUmidAndName(umid, groupName);
+            if (noteBookGroup == null) {
+                noteBookGroup = new NoteBookGroup(umid, groupName);
+                NoteBookGroup noteBookGroup1 = noteBookGroupRepository.save(noteBookGroup);
+                if (noteBookGroup1 != null) {
+                    ret.setErrorCode("0");
+                    ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
+                    retContent += "groupId:" + noteBookGroup1.getId();
+                    ret.setRetContent(retContent);
+                }
+            }else {
+                //名称冲突
+                ret.setErrorCode("-27");
+                ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "-27"));
             }
-        }else{
-            //名称冲突
-            ret.setErrorCode("-27");
-            ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-27"));
         }
         return ret;
     }
@@ -88,25 +93,33 @@ public class NoteBookService {
         return ret;
     }
 
+    //group删
     public RetMessage deleteNoteBookGroup(int umid,String groupId,String area){
         RetMessage ret = new RetMessage();
         //String retContent="";
         long gId = GlobalTools.convertStringToLong(groupId);
         if(gId == -10000){
-            ret.setErrorCode("-14");
-            ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-14"));
+            ret.setErrorCode("-29");
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-29"));
         }else {
             NoteBookGroup noteBookGroup = noteBookGroupRepository.findOne(gId);
             if (noteBookGroup != null && noteBookGroup.getUmid()==umid) {
                 //还有订正本属于该组，不能删
                 List<NoteBook> noteBookList = noteBookRepository.findByUmidAndGroupId(umid,gId);
-                if(noteBookList!=null && !noteBookList.isEmpty()){
-                    ret.setErrorCode("-26");
-                    ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "-26"));
+                if(noteBookList != null) {
+                    if (!noteBookList.isEmpty()) {
+                        ret.setErrorCode("-26");
+                        ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "-26"));
+                    } else {
+                        noteBookGroupRepository.delete(gId);
+                        ret.setErrorCode("0");
+                        ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
+                    }
                 }else{
-                    noteBookGroupRepository.delete(gId);
-                    ret.setErrorCode("0");
-                    ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
+                    //数据库查询一定出异常了
+                    ret.setErrorCode("-30");
+                    ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "-30"));
+                    log.info("noteBookRepository.findByUmidAndGroupId(umid,gId):failed!!!");
                 }
             } else {
                 //未找到符合条件的数据
@@ -117,6 +130,7 @@ public class NoteBookService {
         return ret;
     }
 
+    //group查
     public RetMessage showNoteBookGroup(int umid,String area){
         RetMessage ret = new RetMessage();
         String retContent="";
@@ -132,44 +146,58 @@ public class NoteBookService {
             ret.setErrorCode("0");
             ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
             ret.setRetContent(retContent);
+        }else{
+            //数据库查询一定出异常了
+            ret.setErrorCode("-30");
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "-30"));
+            log.info("noteBookGroupRepository.findByUmid(umid):failed!!!");
         }
         return ret;
     }
 
+    //订正本增
     public RetMessage createNoteBook(int umid,String bookName,String groupId,String area){
         RetMessage ret = new RetMessage();
         String retContent="";
-        NoteBook noteBook = noteBookRepository.findByUmidAndName(umid,bookName);
-        if(noteBook ==null){
-            noteBook = new NoteBook(umid,bookName);
-            long gId = GlobalTools.convertStringToLong(groupId);
-            if(gId != -10000){
-                NoteBookGroup noteBookGroup = noteBookGroupRepository.findOne(gId);
-                if(noteBookGroup!=null && noteBookGroup.getUmid() == umid) {
-                    noteBook.setGroupId(gId);
-                }else{
-                    ret.setErrorCode("-24");
-                    ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-24"));
+        //此处参数校验允许groupId为空或不可转为数字，此情况被认为不设置组信息
+        if(GlobalTools.stringParamHasNullOrEmpty(bookName)){
+            ret.setErrorCode("-29");
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-29"));
+        }else {
+            NoteBook noteBook = noteBookRepository.findByUmidAndName(umid, bookName);
+            if (noteBook == null) {
+                noteBook = new NoteBook(umid, bookName);
+                long gId = GlobalTools.convertStringToLong(groupId);
+                if (gId != -10000) {
+                    NoteBookGroup noteBookGroup = noteBookGroupRepository.findOne(gId);
+                    if (noteBookGroup != null && noteBookGroup.getUmid() == umid) {
+                        noteBook.setGroupId(gId);
+                    }else {
+                        //所设置的组不存在
+                        ret.setErrorCode("-24");
+                        ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "-24"));
+                    }
                 }
-            }
-            //groupId对得上才创建，否则返回－24
-            if(!ret.getErrorCode().equals("-24")) {
-                NoteBook noteBook1 = noteBookRepository.save(noteBook);
-                if (noteBook1 != null) {
-                    ret.setErrorCode("0");
-                    ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
-                    retContent += "id:" + noteBook1.getId();
-                    ret.setRetContent(retContent);
+                //groupId对得上才创建，否则返回－24
+                if (!ret.getErrorCode().equals("-24")) {
+                    NoteBook noteBook1 = noteBookRepository.save(noteBook);
+                    if (noteBook1 != null) {
+                        ret.setErrorCode("0");
+                        ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
+                        retContent += "id:" + noteBook1.getId();
+                        ret.setRetContent(retContent);
+                    }
                 }
+            }else {
+                //名称冲突
+                ret.setErrorCode("-27");
+                ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "-27"));
             }
-        }else{
-            //同名订正本已存在
-            ret.setErrorCode("-25");
-            ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-25"));
         }
         return ret;
     }
 
+    //订正本改
     public RetMessage modifyNoteBook(int umid,String id,String bookName,String groupId,String area) {
         RetMessage ret = new RetMessage();
         long bookId = GlobalTools.convertStringToLong(id);
