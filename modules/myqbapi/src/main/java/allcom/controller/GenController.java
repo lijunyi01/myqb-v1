@@ -214,16 +214,32 @@ public class GenController {
                         ret = noteBookService.createNoteBook(umid,inputMap.get("bookName"),inputMap.get("groupId"),area);
                     }
                 }else if(functionId == 55){
-                    //修改订正本
-                    //http://localhost:8080/gi?functionId=55&umid=1&generalInput=id=1<[CDATA]>bookName=book1<[CDATA]>groupId=1&sessionId=111
-                    if(inputMap.size()!=3){
+                    //修改订正本名称
+                    //http://localhost:8080/gi?functionId=55&umid=1&generalInput=id=1<[CDATA]>bookName=book1&sessionId=111
+                    if(inputMap.size()!=2){
                         ret = noteBookService.returnFail(area, "-14");
                         log.info("general input param error:" + generalInput);
                     }else{
-                        ret = noteBookService.modifyNoteBook(umid,inputMap.get("id"),inputMap.get("bookName"),inputMap.get("groupId"),area);
+                        ret = noteBookService.modifyNoteBookName(umid, inputMap.get("id"), inputMap.get("bookName"), area);
                     }
+                }else if(functionId == 56){
+                    //修改订正本对应的组id
+                    //http://localhost:8080/gi?functionId=56&umid=1&generalInput=id=1<[CDATA]>groupId=1&sessionId=111
+                    if(inputMap.size()!=2){
+                        ret = noteBookService.returnFail(area, "-14");
+                        log.info("general input param error:" + generalInput);
+                    }else{
+                        ret = noteBookService.modifyNoteBookGroupId(umid, inputMap.get("id"), inputMap.get("groupId"), area);
+                    }
+                }else if(functionId == 57){
+                    //删除订正本
+                    //http://localhost:8080/gi?functionId=57&umid=1&generalInput=id=1&sessionId=111
+                    ret = noteBookService.deleteNoteBook(umid, inputMap.get("id"), area);
+                }else if(functionId == 58){
+                    //查询订正本(groupId为空表示按umid查所有订正本，否则按umid和groupId查符合条件的订正本)
+                    //http://localhost:8080/gi?functionId=58&umid=1&generalInput=groupId=&sessionId=111
+                    ret = noteBookService.showNoteBook(umid,inputMap.get("groupId"),area);
                 }
-
             }else{
                 //获取account信息失败
                 ret = accountService.returnFail(area, "-15");

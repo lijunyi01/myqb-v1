@@ -14,6 +14,7 @@ public interface QuestionRepository extends PagingAndSortingRepository<Question,
     Page<Question> findByUmid(int umid,Pageable pageRequest);
 
     Question findByUmidAndQuestionContentId(int umid,long questionContentId);
+    List<Question> findByUmidAndNotebookId(int umid,long notebookId);
 
 //    @Query("from Question a, b where b.umid=?1 and b.content like %?2 and a.questContentId = b.id")
 //    List<Question> findByUmidAndContent(int umid,String content);
