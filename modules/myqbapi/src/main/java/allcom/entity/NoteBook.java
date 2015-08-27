@@ -20,6 +20,7 @@ public class NoteBook implements java.io.Serializable {
     public NoteBook(int umid,String name) {
         this.umid = umid;
         this.name = name;
+        this.groupId = -1;
     }
 
     public long getId(){

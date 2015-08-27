@@ -190,6 +190,35 @@ public class GlobalTools {
         return ret;
     }
 
+    //判断String型参数中是否有null,如有则返回true;使用不定长参数
+    public static boolean stringParamHasNull(String ...args){
+        boolean ret = false;
+        for(String arg:args){
+            if(arg == null){
+                ret = true;
+                break;
+            }
+        }
+        return ret;
+    }
+
+    //判断String型参数中是否有null或者"",如有则返回true;使用不定长参数
+    public static boolean stringParamHasNullOrEmpty(String ...args){
+        boolean ret = false;
+        for(String arg:args){
+            if(arg == null){
+                ret = true;
+                break;
+            }else{
+                if(arg.equals("")){
+                    ret = true;
+                    break;
+                }
+            }
+        }
+        return ret;
+    }
+
     public static void main(String[] args){
 //        1.测试随机串
 //        String rs = GlobalTools.getRandomString(6,true);
@@ -236,6 +265,13 @@ public class GlobalTools {
 //        String input = "sub|sdfa|dsafasd||cont|cot";
 //        String[] a = input.split("\\|\\|");
 //        String b = a[0];
+
+//        测试函数paramHasNull
+//        String a="";
+//        String b=null;
+//        if(!paramHasNull(a)){
+//            System.out.print("param has null");
+//        }
 
 
     }

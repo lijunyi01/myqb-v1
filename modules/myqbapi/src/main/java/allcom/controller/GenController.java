@@ -213,6 +213,15 @@ public class GenController {
                     }else{
                         ret = noteBookService.createNoteBook(umid,inputMap.get("bookName"),inputMap.get("groupId"),area);
                     }
+                }else if(functionId == 55){
+                    //修改订正本
+                    //http://localhost:8080/gi?functionId=55&umid=1&generalInput=id=1<[CDATA]>bookName=book1<[CDATA]>groupId=1&sessionId=111
+                    if(inputMap.size()!=3){
+                        ret = noteBookService.returnFail(area, "-14");
+                        log.info("general input param error:" + generalInput);
+                    }else{
+                        ret = noteBookService.modifyNoteBook(umid,inputMap.get("id"),inputMap.get("bookName"),inputMap.get("groupId"),area);
+                    }
                 }
 
             }else{

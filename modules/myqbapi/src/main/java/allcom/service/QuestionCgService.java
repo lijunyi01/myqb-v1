@@ -329,7 +329,7 @@ public class QuestionCgService {
             retQuestionSummary.setPageNumberSummary(questionCgPage.getTotalPages());
             retQuestionSummary.setSummary(questionCgPage.getTotalElements());
         }else{
-            //没有查到内容
+            //查询失败（如果只是没有查到内容，questionCgPage!= null）
             retQuestionSummary.setErrorCode("-24");
             retQuestionSummary.setErrorMessage(GlobalTools.getMessageByLocale(area,"-24"));
         }
