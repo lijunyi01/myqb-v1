@@ -38,6 +38,8 @@ public class GenController {
     private ClassTypeService classTypeService;
     @Autowired
     private NoteBookService noteBookService;
+    @Autowired
+    private TagService tagService;
 
     // 通用接口,用于已经完成登录验证后的其它请求
     @RequestMapping(value = "/gi")
@@ -164,13 +166,26 @@ public class GenController {
                         }
                     }
                 }else if (functionId == 35) {
-                    //删除某条题目
+                    //彻底删除某条题目(题目的status==1)
                     //http://localhost:8080/gi?functionId=35&umid=1&sessionId=111&generalInput=questionId=1
+                    if (inputMap.size() != 1) {
+                        ret = questionService.returnFail(area, "-14");
+                        log.info("general input param error:" + generalInput);
+                    } else {
+                        if (questionService.deleteQuestion(umid, inputMap.get("questionId"))) {
+                            ret = questionService.returnFail(area, "0");
+                        } else {
+                            ret = questionService.returnFail(area, "-18");
+                        }
+                    }
+                }else if (functionId == 36) {
+                    //预删除某条题目(题目的status==0，删除完成后，status==1)
+                    //http://localhost:8080/gi?functionId=36&umid=1&sessionId=111&generalInput=questionId=1
                     if(inputMap.size()!=1){
                         ret = questionService.returnFail(area, "-14");
                         log.info("general input param error:" + generalInput);
                     }else{
-                        if(questionService.deleteQuestion(umid, inputMap)){
+                        if(questionService.deleteQuestion2(umid, inputMap.get("questionId"))){
                             ret = questionService.returnFail(area, "0");
                         }else{
                             ret = questionService.returnFail(area, "-18");
@@ -239,6 +254,51 @@ public class GenController {
                     //查询订正本(groupId为空表示按umid查所有订正本，否则按umid和groupId查符合条件的订正本)
                     //http://localhost:8080/gi?functionId=58&umid=1&generalInput=groupId=&sessionId=111
                     ret = noteBookService.showNoteBook(umid,inputMap.get("groupId"),area);
+                }else if(functionId == 60){
+                    //Tag新增
+                    //http://localhost:8080/gi?functionId=60&umid=1&generalInput=tagName=tagname1&sessionId=111
+                    ret = tagService.createTag(umid, inputMap.get("tagName"), area);
+                }else if(functionId == 61) {
+                    //Tag修改
+                    //http://localhost:8080/gi?functionId=61&umid=1&generalInput=tagId=1<[CDATA]>tagName=tagname2&sessionId=111
+                    ret = tagService.modifyTag(umid, inputMap.get("tagId"), inputMap.get("tagName"), area);
+                }else if(functionId == 62){
+                    //Tag删
+                    //http://localhost:8080/gi?functionId=62&umid=1&generalInput=tagId=1&sessionId=111
+                    ret = tagService.deleteTag(umid, inputMap.get("tagId"), area);
+                }else if(functionId == 63){
+                    //Tag查询(含tag对应的题目的数量)
+                    //http://localhost:8080/gi?functionId=63&umid=1&generalInput=&sessionId=111
+                    ret = tagService.showTag(umid, area);
+                }else if(functionId == 70){
+                    //获取草稿箱题目数量
+                    //http://localhost:8080/gi?functionId=70&umid=1&generalInput=&sessionId=111
+                    ret = questionCgService.getCgNumber(umid, area);
+                }else if(functionId == 71){
+                    //获取废件箱题目数量
+                    //http://localhost:8080/gi?functionId=71&umid=1&generalInput=&sessionId=111
+                    ret = questionService.getTrashNumber(umid, area);
+                }else if(functionId == 72){
+                    //按订正本获取题目数量(bookId为空时取所有题目数量（不含废件）)
+                    //http://localhost:8080/gi?functionId=72&umid=1&generalInput=bookId=&sessionId=111
+                    ret = questionService.getQuestionNumber(umid,inputMap.get("bookId"),area);
+                }else if(functionId == 73){
+                    //按标签获取题目数量(标签必须有效)  标签查询时已经返回了每个标签对应的题目数量，本方法可能无需用到了
+                    //http://localhost:8080/gi?functionId=73&umid=1&generalInput=tagId=1&sessionId=111
+                    ret = tagService.getNumberByTag(umid,inputMap.get("tagId"),area);
+                }else if(functionId == 80){
+                    //给题目打标签
+                    //http://localhost:8080/gi?functionId=80&umid=1&generalInput=tagId=1<[CDATA]>questionId=1&sessionId=111
+                    ret = tagService.addTagToQuestion(umid,inputMap.get("tagId"),inputMap.get("questionId"),area);
+                }else if(functionId == 81){
+                    //给题目去除标签
+                    //http://localhost:8080/gi?functionId=81&umid=1&generalInput=tagId=1<[CDATA]>questionId=1&sessionId=111
+                    ret = tagService.delTagFromQuestion(umid, inputMap.get("tagId"), inputMap.get("questionId"),area);
+                }else if(functionId == 82){
+                    //给题目修改一个标签，内部逻辑是：给题目去除原标签，然后再给题目打一个标签（分两种情况：1.打一个已存在标签 2.打一个不存在的标签，需要先添加标签本身）
+                    //对应于上述两种情况，情况1时，addTagId值是有效的tagId；情况2时，addTagId为空且addTagName不为空
+                    //http://localhost:8080/gi?functionId=82&umid=1&generalInput=delTagId=1<[CDATA]>addTagId=2<[CDATA]>addTagName=tagname1<[CDATA]>questionId=1&sessionId=111
+                    ret = tagService.modifyTagFromQuestion(umid,inputMap.get("questionId"),inputMap.get("delTagId"),inputMap.get("addTagId"),inputMap.get("addTagName"),area);
                 }
             }else{
                 //获取account信息失败
@@ -250,8 +310,6 @@ public class GenController {
             ret = sessionService.returnFail(area, "-4");
             log.info("umid:" + umid + " failed to check sessionid:" + sessionId);
         }
-
-
         return ret;
     }
 

@@ -61,7 +61,7 @@ public class QuestionController {
             Account account = accountService.createAccountIfNotExist(umid);
             if (account != null) {
                 Question question = questionService.getQuestionById(id);
-                if(question!=null && question.getUmid()==umid){
+                if(question!=null && question.getUmid()==umid && question.getStatus()==0){
                     String xmlPath = question.getContentPath();
                     try {
                         QuestionBean questionBean = questionOmxService.loadQuestionBean(xmlPath);
@@ -106,7 +106,7 @@ public class QuestionController {
     }
 
 
-    // 通过id获得题目草稿（json形式）
+    // 通过id获得草稿（json形式）
     // http://localhost:8080/getquestioncg?umid=1&id=19&sessionId=111
     @RequestMapping(value = "/getquestioncg")
     public RetQuestionCgBean getRetQuestionCg(
@@ -206,6 +206,36 @@ public class QuestionController {
             Account account = accountService.createAccountIfNotExist(umid);
             if (account != null) {
                 ret = questionService.getQuestionSummary(umid, pageNumber, pageSize, area);
+            }else{
+                //获取account信息失败
+                ret.setErrorCode("-15");
+                ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-15"));
+                log.info("umid:" + umid + " failed to get account");
+            }
+        }else {
+            ret.setErrorCode("-4");
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-4"));
+            log.info("umid:" + umid + " failed to check sessionid:" + sessionId);
+        }
+        return ret;
+    }
+
+    //分页获取废件摘要
+    //http://localhost:8080/gettrashsummary?umid=1&sessionId=111&pageNumber=1&pageSize=2
+    @RequestMapping(value = "/gettrashsummary")
+    public RetQuestionSummary getTrashSummary(
+            @RequestParam(value = "umid",required = true)int umid,
+            @RequestParam(value = "pageNumber",required = true) int pageNumber,
+            @RequestParam(value = "pageSize",required = false,defaultValue = "20") int pageSize,
+            @RequestParam(value = "sessionId",required = true)String sessionId,
+            @RequestParam(value = "area",required = false,defaultValue = "cn")String area
+    ) {
+        log.info("in gettrashsummary,umid is:"+umid +"pageNumber is:"+pageNumber +"pageSize is:"+pageSize);
+        RetQuestionSummary ret = new RetQuestionSummary("-1");
+        if (sessionService.verifySessionId(umid, sessionId)) {
+            Account account = accountService.createAccountIfNotExist(umid);
+            if (account != null) {
+                ret = questionService.getTrashSummary(umid, pageNumber, pageSize, area);
             }else{
                 //获取account信息失败
                 ret.setErrorCode("-15");

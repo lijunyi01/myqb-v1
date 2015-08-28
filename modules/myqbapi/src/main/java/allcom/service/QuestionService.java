@@ -51,6 +51,8 @@ public class QuestionService {
     private QuestionTagRepository questionTagRepository;
     @Autowired
     private TagRepository tagRepository;
+    @Autowired
+    private NoteBookRepository noteBookRepository;
 
     //@Transactional
     //保存一个题目(一部分内容存入数据库，一部分存入xml文件)
@@ -112,13 +114,13 @@ public class QuestionService {
     }
 
     //删除题目
-    public boolean deleteQuestion(int umid,Map<String,String> inputMap){
+    public boolean deleteQuestion(int umid,String questionIdS){
         boolean ret = false;
         boolean fileDeleted = false;
-        long questionId=GlobalTools.convertStringToLong(inputMap.get("questionId"));
+        long questionId=GlobalTools.convertStringToLong(questionIdS);
         if(questionId!=-10000) {
             Question question = questionRepository.findOne(questionId);
-            if (question != null && question.getUmid() == umid) {
+            if (question != null && question.getUmid() == umid && question.getStatus() ==1) {
 
                 //删附件
                 List<Attachment> attachmentList = attachmentRepository.findByUmidAndQuestionId(umid,questionId);
@@ -175,6 +177,23 @@ public class QuestionService {
         questionContentRepository.delete(questionContentId);
         attachmentRepository.deleteByUmidAndQuestionId(questionId,umid);
         questionRepository.delete(questionId);
+    }
+
+    //预删除题目
+    public boolean deleteQuestion2(int umid,String questionIdS){
+        boolean ret = false;
+        boolean fileDeleted = false;
+        long questionId=GlobalTools.convertStringToLong(questionIdS);
+        if(questionId!=-10000) {
+            Question question = questionRepository.findOne(questionId);
+            if (question != null && question.getUmid() == umid && question.getStatus() ==0) {
+                question.setStatus(1);
+                if(questionRepository.save(question)!=null){
+                    ret = true;
+                }
+            }
+        }
+        return ret;
     }
 
     //完整地修改题目
@@ -242,7 +261,7 @@ public class QuestionService {
     public RetMessage getIdsByType(int umid,Map<String,String> inputMap,String area){
         RetMessage ret = new RetMessage();
         String retContent="";
-        List<Question> questionList = questionRepository.findByUmid(umid);
+        List<Question> questionList = questionRepository.findByUmidAndStatus(umid, 0);
         if(!questionList.isEmpty()){
             for(Question question:questionList){
                 if(questionHitOn(question,inputMap)){
@@ -266,7 +285,7 @@ public class QuestionService {
         List<QuestionContent> questionContentList = questionContentRepository.findByUmidAndContent(umid,content);
         if(!questionContentList.isEmpty()){
             for(QuestionContent questionContent:questionContentList){
-                Question question = questionRepository.findByUmidAndQuestionContentId(umid,questionContent.getId());
+                Question question = questionRepository.findByUmidAndStatusAndQuestionContentId(umid, 0, questionContent.getId());
                 if(question != null){
                     if(retContent.equals("")){
                         retContent = question.getId()+"";
@@ -571,7 +590,7 @@ public class QuestionService {
         Sort sort = new Sort(Sort.Direction.DESC, "id");
         PageRequest pageRequest = new PageRequest(pageNumber-1,pageSize,sort);
         //分页查询
-        Page<Question> questionPage = questionRepository.findByUmid(umid,pageRequest);
+        Page<Question> questionPage = questionRepository.findByUmidAndStatus(umid, 0, pageRequest);
         if(questionPage!= null) {
             List<QuestionSummaryBean> questionSummaryBeanList = new ArrayList<QuestionSummaryBean>();
             for (Question question : questionPage) {
@@ -594,6 +613,103 @@ public class QuestionService {
             retQuestionSummary.setErrorMessage(GlobalTools.getMessageByLocale(area,"-24"));
         }
         return retQuestionSummary;
+    }
+
+    public RetQuestionSummary getTrashSummary(int umid,int pageNumber,int pageSize,String area){
+        RetQuestionSummary retQuestionSummary = new RetQuestionSummary("-1");
+        //创建分页请求
+        Sort sort = new Sort(Sort.Direction.DESC, "id");
+        PageRequest pageRequest = new PageRequest(pageNumber-1,pageSize,sort);
+        //分页查询
+        Page<Question> questionPage = questionRepository.findByUmidAndStatus(umid,1,pageRequest);
+        if(questionPage!= null) {
+            List<QuestionSummaryBean> questionSummaryBeanList = new ArrayList<QuestionSummaryBean>();
+            for (Question question : questionPage) {
+                QuestionSummaryBean questionSummaryBean = new QuestionSummaryBean();
+                questionSummaryBean.setId(question.getId());
+                questionSummaryBean.setSubject(question.getSubject());
+                questionSummaryBean.setCreateTime(question.getCreateTime());
+                questionSummaryBeanList.add(questionSummaryBean);
+            }
+            retQuestionSummary.setErrorCode("0");
+            retQuestionSummary.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
+            retQuestionSummary.setQuestionSummaryBeanList(questionSummaryBeanList);
+            retQuestionSummary.setCurrentCounts(questionPage.getNumberOfElements());
+            retQuestionSummary.setPageNumber(pageNumber);
+            retQuestionSummary.setPageNumberSummary(questionPage.getTotalPages());
+            retQuestionSummary.setSummary(questionPage.getTotalElements());
+        }else{
+            //没有查到内容
+            retQuestionSummary.setErrorCode("-24");
+            retQuestionSummary.setErrorMessage(GlobalTools.getMessageByLocale(area,"-24"));
+        }
+        return retQuestionSummary;
+    }
+
+
+    //获取废件箱题目数量
+    public RetMessage getTrashNumber(int umid,String area){
+        RetMessage ret = new RetMessage();
+        String retContent="";
+        List<Question> questionList = questionRepository.findByUmidAndStatus(umid,1);
+        if(questionList != null) {
+            retContent += "summary:" + questionList.size();
+            ret.setErrorCode("0");
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
+            ret.setRetContent(retContent);
+        }else{
+            //数据库查询异常了
+            ret.setErrorCode("-30");
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "-30"));
+            log.info("questionRepository.findByUmidAndStatus(umid,1):failed!!!");
+        }
+        return ret;
+    }
+
+    //按订正本获取题目数量(bookId为空时取所有题目数量（不含废件）)
+    public RetMessage getQuestionNumber(int umid,String bookId,String area){
+        RetMessage ret = new RetMessage();
+        String retContent="";
+        long bId = GlobalTools.convertStringToLong(bookId);
+        if(!isBookIdValid(umid,bId,true)){
+            ret.setErrorCode("-29");
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area,"-29"));
+        }else {
+            List<Question> questionList = null;
+            if(bId == -10000){
+                questionList = questionRepository.findByUmidAndStatus(umid,0);
+            }else{
+                questionList = questionRepository.findByUmidAndStatusAndNotebookId(umid,0,bId);
+            }
+            if (questionList != null) {
+                retContent += "summary:" + questionList.size();
+                ret.setErrorCode("0");
+                ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
+                ret.setRetContent(retContent);
+            } else {
+                //数据库查询异常了
+                ret.setErrorCode("-30");
+                ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "-30"));
+                log.info("questionRepository.findByUmidAndStatusAndNotebookId(umid,0,bId):failed!!!");
+            }
+        }
+        return ret;
+    }
+
+    //判断订正本Id是否合法（主要判断客户端提供的bookId是否是在订正本表里存在的，且与该用户相关）
+    private boolean isBookIdValid(int umid,long bookId,boolean isNullValid){
+        boolean ret = false;
+        if(bookId == -10000){
+            if(isNullValid) {
+                ret = true;
+            }
+        }else{
+            NoteBook noteBook = noteBookRepository.findOne(bookId);
+            if(noteBook !=null && noteBook.getUmid() == umid){
+                ret = true;
+            }
+        }
+        return ret;
     }
 
 }

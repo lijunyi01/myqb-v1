@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 
 @SuppressWarnings("serial")
 @Entity
-@Table(name = "myqb_question",indexes = {@Index(name = "i_1",columnList = "umid,grade",unique = false),@Index(name = "i_2",columnList = "classType,classSubType",unique = false),@Index(name = "i_3",columnList = "questionType",unique = false),@Index(name = "i_4",columnList = "notebookId",unique = false)})
+@Table(name = "myqb_question",indexes = {@Index(name = "i_1",columnList = "umid,grade",unique = false),@Index(name = "i_2",columnList = "classType,classSubType",unique = false),@Index(name = "i_3",columnList = "questionType",unique = false),@Index(name = "i_4",columnList = "notebookId",unique = false),@Index(name = "i_5",columnList = "umid,status",unique = false)})
 public class Question implements java.io.Serializable {
 
     @Id
@@ -19,6 +19,7 @@ public class Question implements java.io.Serializable {
     private int classType;      //科目大类 1:基础科目；2:数学专业科目；3:计算机专业科目；4:化学专业科目；5:物理专业科目...
     private int classSubType;      //科目子类型 1:语文；2:数学；3:英语；4:历史；5:地理；6:生物；7:物理；8:化学...
     private int knownFlag;      //0:正常的题目   1:已经完全理解了的题目
+    private int status;         //0:正常状态  1:废件状态（预删除）
     private String contentPath;     //题目内容文件（xml）的路径
     //private String optionItem;  //选择题的待选项  (置入xml)
     //private String zqda;        //正确答案   (置入xml)
@@ -38,6 +39,7 @@ public class Question implements java.io.Serializable {
         this.knownFlag = 0;
         this.questionContentId = questionContentId;
         this.notebookId = -1;
+        this.status = 0;
     }
 
     public Question(int umid,int grade,int multiplexFlag,int questionType,int classType,int classSubType,long questionContentId,String subject) {
@@ -51,6 +53,7 @@ public class Question implements java.io.Serializable {
         this.subject = subject;
         this.questionType = questionType;
         this.notebookId = -1;
+        this.status = 0;
     }
 
     public long getId(){
@@ -80,6 +83,9 @@ public class Question implements java.io.Serializable {
 
     public int getKnownFlag(){return this.knownFlag;}
     public void setKnownFlag(int knownFlag){this.knownFlag = knownFlag;}
+
+    public int getStatus(){return this.status;}
+    public void setStatus(int status){this.status = status;}
 
     public long getQuestionContentId() {return this.questionContentId;}
     public void setQuestionContentId(long questionContentId) {this.questionContentId = questionContentId;}

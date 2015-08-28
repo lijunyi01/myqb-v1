@@ -336,4 +336,23 @@ public class QuestionCgService {
         return retQuestionSummary;
     }
 
+    //获取草稿箱题目数量
+    public RetMessage getCgNumber(int umid,String area){
+        RetMessage ret = new RetMessage();
+        String retContent="";
+        List<QuestionCg> questionCgList = questionCgRepository.findByUmid(umid);
+        if(questionCgList != null) {
+            retContent += "summary:" + questionCgList.size();
+            ret.setErrorCode("0");
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "0"));
+            ret.setRetContent(retContent);
+        }else{
+            //数据库查询异常了
+            ret.setErrorCode("-30");
+            ret.setErrorMessage(GlobalTools.getMessageByLocale(area, "-30"));
+            log.info("questionCgRepository.findByUmid(umid):failed!!!");
+        }
+        return ret;
+    }
+
 }

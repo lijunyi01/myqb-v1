@@ -259,7 +259,7 @@ public class NoteBookService {
         }else {
             NoteBook noteBook = noteBookRepository.findOne(bId);
             if (noteBook != null) {
-                //还有题目属于该订正本，不能删
+                //还有题目或废件属于该订正本，不能删
                 List<Question> questionList = questionRepository.findByUmidAndNotebookId(umid,bId);
                 if(questionList != null) {
                     if (!questionList.isEmpty()) {
