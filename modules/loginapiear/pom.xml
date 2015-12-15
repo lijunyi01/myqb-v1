@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>myqb</groupId>
+    <artifactId>loginapiear</artifactId>
+    <version>1.0</version>
+    <packaging>ear</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>myqb</groupId>
+            <artifactId>loginapi</artifactId>
+            <version>1.0</version>
+            <type>war</type>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-ear-plugin</artifactId>-->
+                <!--<version>2.9</version>-->
+                <configuration>
+                    <packagingIncludes>META-INF/**,**/gxpt_*.jar,**/gxpt_*.war</packagingIncludes>
+                    <modules>
+                        <webModule>
+                            <groupId>myqb</groupId>
+                            <artifactId>loginapi</artifactId>
+                            <!--<includeInApplicationXml>true</includeInApplicationXml>-->
+                        </webModule>
+                    </modules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>
