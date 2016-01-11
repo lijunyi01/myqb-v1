@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.2.3.RELEASE</version>
+        <version>1.2.7.RELEASE</version>
     </parent>
 
     <!--可行的去除内嵌tomcat,从而不会打包至war包的方法。此方按打出来的包小1/4！-->
@@ -40,16 +40,16 @@
             <version>5.1.33</version>
         </dependency>
         <!--连oracle用,已导入本地库-->
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc</artifactId>
-            <version>14</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.oracle</groupId>-->
+            <!--<artifactId>ojdbc6</artifactId>-->
+            <!--<version>11.2.0.2</version>-->
+        <!--</dependency>-->
         <!--HikariCP 是一个高性能的 JDBC 连接池组件-->
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>2.3.8</version>
+            <!--<version>2.3.8</version>-->
         </dependency>
 
 
@@ -64,7 +64,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
-            <version>3.2.5.RELEASE</version>
+            <!--<version>3.2.5.RELEASE</version>-->
         </dependency>
 
         <!--图片验证码-->
